@@ -297,8 +297,73 @@ function loadRates(){
   if($('rateNote')) $('rateNote').value=r.note??'';
  }catch{}
 }
- async function submitOrder(){
+async function submitOrder() {
   try {
+    const customer = {
+      name: $('customerName')?.value?.trim() || '',
+      contact: $('customerContact')?.value?.trim() || ''
+    };
+
+    const pickupStops = [...document.querySelectorAll('.customer-stop')]
+      .map(stop => {
+        const fields = [...stop.querySelectorAll('input, textarea')];
+
+        return {
+          name: fields[0]?.value?.trim() || '',
+          note: fields[1]?.value?.trim() || ''
+        };
+      })
+      .filter(x => x.name || x.note);
+
+    const items = [...document.querySelectorAll('.customer-item')]
+      .map(item => {
+        const fields = [...item.querySelectorAll('input, textarea')];
+
+        return {
+          name: fields[0]?.value?.trim() || '',
+          qty: Number(fields[1]?.value || 1)
+        };
+      })
+      .filter(x => x.name);
+
+    const note = [...document.querySelectorAll('textarea')]
+      .map(x => x.value.trim())
+      .filter(Boolean)
+      .join('\n');
+
+    const res = await fetch('/api/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        status: 'customer_submitted',
+        customer,
+        pickup: pickupStops[0]?.name || '',
+        dropoff: pickupStops[pickupStops.length - 1]?.name || '',
+        item: items.map(x => `${x.name} x${x.qty}`).join(', '),
+        note
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'ส่งออเดอร์ไม่สำเร็จ');
+    }
+
+    if (data.id) {
+      localStorage.setItem('dekdoenOrderId', data.id);
+    }
+
+    toast('ส่งข้อมูลให้แอดมินแล้ว');
+    console.log('ORDER CREATED:', data);
+
+  } catch (err) {
+    console.error('SUBMIT ORDER ERROR:', err);
+    toast('ส่งข้อมูลไม่สำเร็จ');
+  }
+}
     const inputs = [...document.querySelectorAll('input, textarea')];
 
     const values = inputs
