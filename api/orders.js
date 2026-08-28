@@ -32,14 +32,19 @@ async function supabase(path, options = {}) {
     data = text;
   }
 
-  if (!response.ok) {
-    const error = new Error(
-  `SUPABASE_ERROR: ${JSON.stringify(data)}`
-);
-    error.status = response.status;
-    error.data = data;
-    throw error;
-  }
+  
+    if (!response.ok) {
+  console.error("SUPABASE RESPONSE:", response.status, data);
+
+  const error = new Error(
+    `SUPABASE_ERROR: ${JSON.stringify(data)}`
+  );
+
+  error.status = response.status;
+  error.data = data;
+  throw error;
+}
+  
 
   return data;
 }
