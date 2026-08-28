@@ -33,7 +33,9 @@ async function supabase(path, options = {}) {
   }
 
   if (!response.ok) {
-    const error = new Error("SUPABASE_ERROR");
+    const error = new Error(
+  `SUPABASE_ERROR: ${JSON.stringify(data)}`
+);
     error.status = response.status;
     error.data = data;
     throw error;
