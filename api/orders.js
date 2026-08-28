@@ -12,7 +12,9 @@ function json(res, status, body) {
 }
 
 async function supabase(path, options = {}) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+  const baseUrl = SUPABASE_URL.replace(/\/+$/, "").replace(/\/rest\/v1$/, "");
+
+const response = await fetch(`${baseUrl}/rest/v1/${path}`, {
     ...options,
     headers: {
       apikey: SUPABASE_KEY,
