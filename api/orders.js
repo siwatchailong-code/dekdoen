@@ -1,61 +1,243 @@
-// DEK-DERN Order API
-// Vercel-ready endpoint contract. For production, replace the in-memory store
-// with a persistent database (Supabase/Postgres) without changing the frontend contract.
-let orders = globalThis.__DEKDERN_ORDERS || (globalThis.__DEKDERN_ORDERS = new Map());
+// DEK-DOEN Order API - Supabase
 
-function json(res, status, body){
-  res.statusCode=status;
-  res.setHeader("Content-Type","application/json; charset=utf-8");
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.SUPABASE_ANON_KEY;
+
+function json(res, status, body) {
+  res.statusCode = status;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.end(JSON.stringify(body));
 }
 
-module.exports = async (req,res)=>{
-  if(req.method==="GET"){
-    const id=(req.query||{}).id;
-    if(id){
-      const order=orders.get(id);
-      return order ? json(res,200,order) : json(res,404,{error:"ORDER_NOT_FOUND"});
+async function supabase(path, options = {}) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...options,
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "return=representation",
+      ...(options.headers || {}),
+    },
+  });
+
+  const text = await response.text();
+
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = text;
+  }
+
+  if (!response.ok) {
+    const error = new Error("SUPABASE_ERROR");
+    error.status = response.status;
+    error.data = data;
+    throw error;
+  }
+
+  return data;
+}
+
+module.exports = async (req, res) => {
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    return json(res, 500, {
+      error: "SUPABASE_ENV_MISSING",
+    });
+  }
+
+  // GET /api/orders
+  if (req.method === "GET") {
+    try {
+      const id = req.query?.id;
+
+      if (id) {
+        const data = await supabase(
+          `orders?id=eq.${encodeURIComponent(id)}&select=*`
+        );
+
+        if (!data || !data.length) {
+          return json(res, 404, {
+            error: "ORDER_NOT_FOUND",
+          });
+        }
+
+        return json(res, 200, data[0]);
+      }
+
+      const data = await supabase(
+        "orders?select=*&order=created_at.desc"
+      );
+
+      return json(res, 200, {
+        orders: data || [],
+      });
+    } catch (error) {
+      console.error(error);
+      return json(res, error.status || 500, {
+        error: "GET_ORDERS_FAILED",
+        detail: error.data || error.message,
+      });
     }
-    return json(res,200,{orders:[...orders.values()].sort((a,b)=>b.createdAt-a.createdAt)});
   }
 
-  if(req.method==="POST"){
-    let body={};
-    try{
-      const chunks=[];
-      for await(const c of req) chunks.push(c);
-      body=JSON.parse(Buffer.concat(chunks).toString("utf8")||"{}");
-    }catch(e){ return json(res,400,{error:"INVALID_JSON"}); }
+  // POST /api/orders
+  if (req.method === "POST") {
+    let body = {};
 
-    const id=body.id || "DD-"+String(Date.now()).slice(-8);
-    const order={
-      id,
-      status: body.status || "customer_submitted",
-      customer: body.customer || {},
-      stops: Array.isArray(body.stops) ? body.stops : [],
-      deliveryFee: Number(body.deliveryFee||0),
-      goodsTotal: Number(body.goodsTotal||0),
-      note: body.note || "",
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
-    orders.set(id,order);
-    return json(res,201,order);
+    try {
+      const chunks = [];
+
+      for await (const chunk of req) {
+        chunks.push(chunk);
+      }
+
+      body = JSON.parse(
+        Buffer.concat(chunks).toString("utf8") || "{}"
+      );
+    } catch {
+      return json(res, 400, {
+        error: "INVALID_JSON",
+      });
+    }
+
+    try {
+      const id =
+        body.id ||
+        `DD-${Date.now().toString().slice(-8)}`;
+
+      const order = {
+        id,
+        pickup:
+          body.pickup ||
+          body.stops?.[0]?.address ||
+          "",
+        dropoff:
+          body.dropoff ||
+          body.stops?.[body.stops.length - 1]?.address ||
+          "",
+        item:
+          body.item ||
+          body.goods ||
+          "",
+        note: body.note || "",
+        price:
+          Number(
+            body.price ??
+            body.deliveryFee ??
+            0
+          ),
+        status:
+          body.status ||
+          "customer_submitted",
+        rider_id:
+          body.rider_id ||
+          body.riderId ||
+          null,
+        rider_name:
+          body.rider_name ||
+          body.riderName ||
+          null,
+        claimed_at:
+          body.claimed_at ||
+          null,
+      };
+
+      const data = await supabase("orders", {
+        method: "POST",
+        body: JSON.stringify(order),
+      });
+
+      return json(res, 201, data?.[0] || order);
+    } catch (error) {
+      console.error(error);
+
+      return json(res, error.status || 500, {
+        error: "CREATE_ORDER_FAILED",
+        detail: error.data || error.message,
+      });
+    }
   }
 
-  if(req.method==="PATCH"){
-    const id=(req.query||{}).id;
-    if(!id || !orders.has(id)) return json(res,404,{error:"ORDER_NOT_FOUND"});
-    let body={};
-    try{
-      const chunks=[];
-      for await(const c of req) chunks.push(c);
-      body=JSON.parse(Buffer.concat(chunks).toString("utf8")||"{}");
-    }catch(e){ return json(res,400,{error:"INVALID_JSON"}); }
-    const order={...orders.get(id),...body,id,updatedAt:Date.now()};
-    orders.set(id,order);
-    return json(res,200,order);
+  // PATCH /api/orders?id=...
+  if (req.method === "PATCH") {
+    const id = req.query?.id;
+
+    if (!id) {
+      return json(res, 400, {
+        error: "ORDER_ID_REQUIRED",
+      });
+    }
+
+    let body = {};
+
+    try {
+      const chunks = [];
+
+      for await (const chunk of req) {
+        chunks.push(chunk);
+      }
+
+      body = JSON.parse(
+        Buffer.concat(chunks).toString("utf8") || "{}"
+      );
+    } catch {
+      return json(res, 400, {
+        error: "INVALID_JSON",
+      });
+    }
+
+    try {
+      const allowed = [
+        "status",
+        "rider_id",
+        "rider_name",
+        "claimed_at",
+        "pickup",
+        "dropoff",
+        "item",
+        "note",
+        "price",
+      ];
+
+      const update = {};
+
+      for (const key of allowed) {
+        if (body[key] !== undefined) {
+          update[key] = body[key];
+        }
+      }
+
+      const data = await supabase(
+        `orders?id=eq.${encodeURIComponent(id)}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(update),
+        }
+      );
+
+      if (!data || !data.length) {
+        return json(res, 404, {
+          error: "ORDER_NOT_FOUND",
+        });
+      }
+
+      return json(res, 200, data[0]);
+    } catch (error) {
+      console.error(error);
+
+      return json(res, error.status || 500, {
+        error: "UPDATE_ORDER_FAILED",
+        detail: error.data || error.message,
+      });
+    }
   }
 
-  return json(res,405,{error:"METHOD_NOT_ALLOWED"});
+  res.setHeader("Allow", "GET, POST, PATCH");
+  return json(res, 405, {
+    error: "METHOD_NOT_ALLOWED",
+  });
 };
