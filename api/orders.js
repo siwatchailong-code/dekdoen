@@ -114,10 +114,7 @@ module.exports = async (req, res) => {
     }
 
     try {
-      const id =
-        body.id ||
-        `DD-${Date.now().toString().slice(-8)}`;
-
+    const id = body.id ? Number(body.id) : undefined;
       const order = {
         id,
         pickup:
