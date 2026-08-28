@@ -1,1 +1,1 @@
-{"version":2,"rewrites":[{"source":"/api/:path*","destination":"/api/:path*"}]}
+{"version":2,"functions":{"api/orders.js":{"runtime":"@vercel/node"}}}

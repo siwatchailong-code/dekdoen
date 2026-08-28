@@ -1,14 +1,7 @@
-DEKDOEN V9 — Order System Foundation
-
-เพิ่มจาก V8:
-- สร้างเลขออเดอร์ใหม่อัตโนมัติ
-- บันทึกข้อมูลออเดอร์
-- สร้างลิงก์ customer/rider แยกจาก order เดียวกัน
-- โหลดข้อมูลออเดอร์ตาม ?view=customer&order=... หรือ ?view=rider&order=...
-- ตั้งค่าค่าบริการเริ่มต้นและค่าระยะทางได้จากหน้าแอดมิน
-- แนบรูปหลายรูปพร้อม thumbnail และลบรายรูป
-- ไม่เชื่อม Google Maps ในเวอร์ชันนี้ตามบรีฟ
-
-หมายเหตุ:
-เวอร์ชันนี้เป็นฐานระบบฝั่งหน้าเว็บและการจำลองข้อมูลด้วย localStorage เพื่อทดสอบ flow.
-การให้ลิงก์ทำงานข้ามมือถือ/อุปกรณ์และบันทึกข้อมูลบนเซิร์ฟเวอร์จริง ต้องเชื่อมฐานข้อมูล/API ในขั้น production.
+เด็กเดิน — ชุดแก้ใหม่
+1) แทน index.html เดิมด้วยไฟล์นี้
+2) แทน api/orders.js เดิมด้วยไฟล์นี้
+3) แทน vercel.json เดิมด้วยไฟล์นี้
+4) Vercel ต้องมี SUPABASE_URL และ SUPABASE_SERVICE_ROLE_KEY
+API คาดว่าตาราง orders มีอย่างน้อย id,status,customer,pickup,dropoff,item,note,body,created_at
+โค้ด UI ใหม่ไม่ใช้ onclick และโครงสร้าง try/catch ถูกเขียนใหม่ทั้งหมด

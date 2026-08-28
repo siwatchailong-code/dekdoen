@@ -5,451 +5,141 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>เด็กเดิน — ระบบจัดการงานรับหิ้ว</title>
 <style>
-:root{
- --navy:#0b2f55;--blue:#1769b0;--blue2:#0f548f;--yellow:#f4c542;--bg:#f5f7fa;
- --card:#fff;--line:#dfe7f0;--text:#172334;--muted:#6d7b8c;--green:#17945b;--red:#d64545;
-}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans Thai",Arial,sans-serif}
-button,input,textarea{font:inherit}button{cursor:pointer}
-.top{height:72px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:20;box-shadow:0 5px 18px #08284a22}
-.brand{display:flex;align-items:center;gap:12px}.brand img{width:48px;height:48px;border-radius:14px;object-fit:cover;background:#fff}.brand b{font-size:22px}.brand small{display:block;font-size:11px;color:#b9d0e8;margin-top:2px}
-.roles{display:flex;gap:7px}.role{border:1px solid #ffffff2e;background:#ffffff10;color:#dcecff;border-radius:12px;padding:10px 14px;font-weight:800}.role.active{background:var(--yellow);color:#4d3a00;border-color:var(--yellow)}
-.wrap{max-width:1180px;margin:auto;padding:28px 20px 60px}
-.hero{background:linear-gradient(135deg,#0b3a70,#1470cc);color:#fff;border-radius:18px;padding:30px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:18px;box-shadow:0 10px 26px rgba(10,47,85,.10)}
-.hero h1{margin:0 0 6px;font-size:29px}.hero p{margin:0;color:#d8eaff;line-height:1.5;font-size:14px}.hero .pill{background:#ffffff18;border:1px solid #ffffff2b;padding:11px 14px;border-radius:13px;font-size:12px;font-weight:800;white-space:nowrap}
-.grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,.8fr);gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 5px 20px rgba(24,60,100,.07);margin-bottom:18px}.card h2{font-size:18px;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:5px}.head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:16px}
-label{font-size:12px;font-weight:800;color:#556579;display:block;margin:0 0 6px}.field{margin-bottom:13px}input,textarea{width:100%;border:1px solid #d5e0eb;background:#fbfdff;border-radius:12px;padding:12px 13px;outline:none}input:focus,textarea:focus{border-color:#5b9ee4;box-shadow:0 0 0 3px #1268c414}textarea{min-height:86px;resize:vertical}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.actions{display:flex;gap:9px;flex-wrap:wrap}.btn{border:0;border-radius:12px;padding:11px 15px;font-weight:900}.primary{background:var(--blue);color:#fff}.yellow{background:var(--yellow);color:#4d3a00}.ghost{background:#eef4fa;color:#31506f}.green{background:var(--green);color:#fff}.danger{background:#fff0f0;color:var(--red)}
-.stop{border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0;background:#fcfdff}.stophead{display:flex;align-items:center;gap:10px;margin-bottom:12px}.num{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--blue);color:#fff;font-weight:900;font-size:13px}.stoptitle{font-weight:900;flex:1}.stoptools{display:flex;gap:5px}.stoptools button{border:0;border-radius:8px;padding:6px 8px;background:#eef3f8;color:#607084;font-size:11px}
-.map{height:230px;border-radius:15px;position:relative;overflow:hidden;border:1px solid #cbd8e6;background:
-linear-gradient(24deg,transparent 47%,#fff 48%,#fff 49%,transparent 50%),
-linear-gradient(155deg,transparent 45%,#fff 46%,#fff 48%,transparent 49%),
-linear-gradient(90deg,#e7eef3 1px,transparent 1px),linear-gradient(#e7eef3 1px,transparent 1px);
-background-size:auto,auto,38px 38px,38px 38px;background-color:#dfe9ee}
-.map .searchbox{position:absolute;top:10px;left:10px;right:100px;background:#fff;border-radius:11px;padding:10px 12px;box-shadow:0 3px 12px #0002;color:#7b8795;font-size:12px}.map .maplabel{position:absolute;right:10px;top:10px;background:#fff;border-radius:9px;padding:8px 10px;font-size:10px;color:#5d6d7f;box-shadow:0 2px 8px #0001}
-.pin{position:absolute;width:36px;height:36px;border-radius:50% 50% 50% 0;background:var(--blue);border:3px solid #fff;transform:translate(-50%,-90%) rotate(-45deg);box-shadow:0 4px 10px #0003;touch-action:none}.pin:after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;left:11px;top:11px}
-.route{position:absolute;height:5px;background:#1268c4;transform-origin:left center;border-radius:5px;opacity:.9}.mapnote{position:absolute;bottom:10px;left:10px;background:#ffffffdd;border-radius:9px;padding:7px 9px;font-size:10px;color:#526477}
-.photo{border:1.5px dashed #b8cce0;border-radius:12px;padding:13px;text-align:center;color:var(--blue);background:#f8fbff;font-size:12px;cursor:pointer;transition:.18s}.photo:hover{border-color:var(--blue);background:#f3f8fd}.thumbs{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.thumb{position:relative;width:64px;height:64px}.thumbs img{width:64px;height:64px;border-radius:10px;object-fit:cover;border:1px solid var(--line);display:block}.thumb-remove{position:absolute;right:-5px;top:-5px;width:19px;height:19px;border:0;border-radius:50%;background:#fff;color:#8a2631;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:12px;line-height:19px;padding:0}.photo-hint{margin-top:6px;font-size:10px;color:#7a8a9b}
-.summary{position:sticky;top:92px}.pricebox{background:#eef6ff;border-radius:15px;padding:15px;margin:12px 0}.pricebig{font-size:32px;font-weight:900;color:var(--blue)}.line{display:flex;justify-content:space-between;gap:12px;margin:10px 0;font-size:13px}.line.total{padding-top:12px;border-top:1px solid #cfddea;font-weight:900;font-size:16px}.status{display:inline-flex;align-items:center;gap:6px;background:#eaf8f1;color:#21734c;border:1px solid #cce9d9;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:900}.dot{width:7px;height:7px;border-radius:50%;background:#22a464}
-.linkbox{background:#f7f9fc;border:1px solid var(--line);border-radius:12px;padding:11px;font-size:11px;word-break:break-all;color:#526174}.empty{padding:26px;text-align:center;color:var(--muted);border:1px dashed #cbd7e3;border-radius:14px;background:#fafcff}
-.rider-stop{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid #edf1f5}.rider-stop:last-child{border-bottom:0}.rnum{width:38px;height:38px;border-radius:12px;background:#eaf3ff;color:var(--blue);display:grid;place-items:center;font-weight:900}.tag{display:inline-block;font-size:10px;padding:5px 8px;border-radius:8px;background:#f1f5f8;color:#627184;margin-top:5px}
-.hidden{display:none!important}.toast{position:fixed;right:20px;bottom:20px;background:#15283d;color:#fff;padding:12px 16px;border-radius:12px;box-shadow:0 10px 30px #0003;display:none;z-index:50;font-size:13px;font-weight:800}
-@media(max-width:850px){.top{height:auto;padding:12px 14px;gap:12px;align-items:flex-start}.roles{overflow:auto}.role{white-space:nowrap}.hero{display:block;padding:22px}.hero .pill{display:inline-block;margin-top:15px}.grid{grid-template-columns:1fr}.summary{position:static}.row{grid-template-columns:1fr}.wrap{padding:18px 12px 45px}.brand b{font-size:19px}}
-</style>
-
-<style id="logo-fix">
-.brand-logo{
-  width:56px !important;height:56px !important;
-  object-fit:cover !important;border-radius:14px !important;
-  display:block !important;flex:0 0 auto !important;
-  background:#fff !important;
-}
-@media (max-width:700px){
-  .brand-logo{width:46px !important;height:46px !important;border-radius:12px !important}
-}
+*{box-sizing:border-box}body{margin:0;background:#f4f6f8;color:#172033;font-family:Arial,"Noto Sans Thai",sans-serif}
+button,input,textarea{font:inherit}button{cursor:pointer}header{background:#075dbd;color:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.brand{display:flex;align-items:center;gap:10px}.brand img{width:48px;height:48px;border-radius:12px;object-fit:cover;background:#fff}.brand b{font-size:20px;display:block}.brand small{opacity:.85}
+.roles{display:flex;gap:8px}.role{border:1px solid #ffffff55;background:#ffffff18;color:#fff;border-radius:11px;padding:10px 17px}.role.active{background:#ffd21c;color:#17335b;font-weight:bold}
+main{max-width:1180px;margin:auto;padding:26px 18px 60px}.hero{background:linear-gradient(135deg,#0878e8,#1262ca);color:white;border-radius:20px;padding:27px 30px;margin-bottom:20px}.hero h1{margin:0 0 6px}.hero p{margin:0;opacity:.9}
+.view{display:none}.view.active{display:block}.grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px}.card{background:#fff;border:1px solid #e2e7ee;border-radius:17px;padding:21px;margin-bottom:18px;box-shadow:0 7px 24px #182b4812}
+h2{margin:0 0 5px;font-size:20px}.sub{font-size:13px;color:#697386;margin-bottom:17px}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{margin-bottom:13px}.field label{display:block;font-size:13px;font-weight:bold;margin-bottom:6px}
+input,textarea{width:100%;border:1px solid #d6dee9;border-radius:11px;padding:11px 12px;outline:none}textarea{min-height:82px;resize:vertical}input:focus,textarea:focus{border-color:#0878e8}
+.stop{border:1px solid #e1e7ef;border-radius:14px;padding:14px;margin:10px 0;background:#fbfcfe}.stophead{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}.num{display:inline-grid;place-items:center;width:29px;height:29px;border-radius:50%;background:#eaf3ff;color:#075dbd;font-weight:bold;margin-right:8px}.remove{border:0;background:#fff0f0;color:#d64545;border-radius:8px;padding:7px 10px}.add{width:100%;border:1px dashed #aebbd0;background:#f8fbff;color:#075dbd;padding:11px;border-radius:11px;font-weight:bold}
+.summary{position:sticky;top:15px}.pricebox{background:#edf5ff;border-radius:15px;padding:17px;margin:14px 0}.total{font-size:30px;font-weight:900;color:#075dbd}.line{display:flex;justify-content:space-between;margin:9px 0;font-size:14px}.primary{width:100%;border:0;background:#0878e8;color:#fff;padding:13px;border-radius:11px;font-weight:bold}.primary:disabled{opacity:.55}
+.orders{display:grid;gap:11px}.order{border:1px solid #e1e7ef;border-radius:13px;padding:15px;display:flex;justify-content:space-between;gap:10px}.order small{color:#697386}.status{background:#eaf9f2;color:#08794e;border-radius:99px;padding:6px 9px;font-size:12px;font-weight:bold}.empty{text-align:center;color:#697386;padding:30px}.notice{padding:12px;border-radius:10px;background:#fff5d6;color:#725800}
+#toast{position:fixed;right:20px;bottom:20px;background:#182235;color:#fff;padding:13px 17px;border-radius:11px;display:none;z-index:99}
+@media(max-width:800px){header{flex-wrap:wrap;padding:12px}.roles{width:100%}.role{flex:1}.grid,.row{grid-template-columns:1fr}.summary{position:static}.hero{padding:22px}}
 </style>
 </head>
 <body>
-<header class="top">
- <div class="brand"><img src="logo.png" alt="เด็กเดิน"><div><b>เด็กเดิน</b><small>ระบบจัดการงานรับหิ้ว • ส่งถึงที่</small></div></div>
- <div class="roles">
-  <button class="role active" data-role="admin">แอดมิน</button>
-  <button class="role" data-role="customer">ลูกค้า</button>
-  <button class="role" data-role="rider">ไรเดอร์</button>
- </div>
+<header>
+<div class="brand"><img src="logo.png" alt="เด็กเดิน" onerror="this.style.display='none'"><div><b>เด็กเดิน</b><small>ระบบจัดการงานรับหิ้ว • ส่งถึงที่</small></div></div>
+<nav class="roles">
+<button class="role active" data-role="admin" type="button">แอดมิน</button>
+<button class="role" data-role="customer" type="button">ลูกค้า</button>
+<button class="role" data-role="rider" type="button">ไรเดอร์</button>
+</nav>
 </header>
+<main>
+<section class="hero"><h1 id="heroTitle">จัดการงานรับหิ้ว</h1><p id="heroText">สร้างออเดอร์ เพิ่มจุดรับของ ดูลูกค้าและไรเดอร์ในระบบเดียว</p></section>
 
-<main class="wrap">
-<section class="hero">
- <div><h1 id="heroTitle">จัดการงานรับหิ้ว</h1><p id="heroText">สร้างออเดอร์ เพิ่มจุดรับของ ผูกสินค้าและรูปกับแต่ละจุด แล้วส่งใบงานให้ไรเดอร์ในครั้งเดียว</p></div>
- <div class="pill">ระบบพร้อมใช้งาน</div>
-</section>
+<section id="adminView" class="view active"><div class="grid"><div>
+<div class="card"><h2>ข้อมูลลูกค้า</h2><div class="sub">ข้อมูลนี้จะติดไปกับใบงาน</div><div class="row">
+<div class="field"><label>ชื่อลูกค้า</label><input id="adminCustomerName" placeholder="เช่น น้องเอ"></div>
+<div class="field"><label>แชท/ช่องทางติดต่อ</label><input id="adminCustomerContact" placeholder="เช่น Facebook: น้องเอ"></div>
+</div><div class="field"><label>หมายเหตุ</label><textarea id="adminNote" placeholder="รายละเอียดเพิ่มเติมของงาน"></textarea></div></div>
+<div class="card"><h2>จุดรับสินค้าและจุดส่ง</h2><div class="sub">ใส่ร้าน/สถานที่ตามลำดับการวิ่งงาน</div><div id="adminStops"></div><button id="adminAddStop" class="add" type="button">＋ เพิ่มจุดรับสินค้า</button></div>
+</div><aside class="card summary"><h2>สรุปราคา</h2><div class="sub">แก้ค่าสินค้าได้ตามจริงก่อนยืนยัน</div>
+<div class="field"><label>ค่าสินค้ารวม (บาท)</label><input id="adminGoods" type="number" min="0" value="0"></div>
+<div class="field"><label>ค่าหิ้ว/ค่าบริการ (บาท)</label><input id="adminFee" type="number" min="0" value="20"></div>
+<div class="pricebox">ยอดรวมลูกค้า<div id="adminTotal" class="total">20 ฿</div></div>
+<div class="line"><span>ค่าสินค้า</span><b id="adminGoodsText">0 ฿</b></div><div class="line"><span>ค่าหิ้ว</span><b id="adminFeeText">20 ฿</b></div><div class="line"><span>จำนวนจุด</span><b id="adminStopsText">1</b></div>
+<button id="adminSubmit" class="primary" type="button">สร้างออเดอร์</button></aside></div></section>
 
-<!-- ADMIN -->
-<section id="adminView">
-<div class="grid">
-<div>
- <div class="card">
-  <div class="head"><div><h2>ข้อมูลลูกค้า</h2><div class="sub">ข้อมูลนี้จะติดไปกับใบงาน</div></div><div style="text-align:right"><span class="status"><span class="dot"></span><span id="orderStatus">ออเดอร์ใหม่</span></span><div class="sub" style="margin-top:7px">รหัสงาน <b id="orderId">DD-000001</b></div></div></div>
-  <div class="row">
-   <div class="field"><label>ชื่อลูกค้า</label><input id="customerName" placeholder="เช่น น้องเอ"></div>
-   <div class="field"><label>แชท/ช่องทางติดต่อ</label><input id="customerContact" placeholder="เช่น Facebook: น้องเอ"></div>
-  </div>
-  <div class="field"><label>หมายเหตุ</label><textarea id="customerNote" placeholder="รายละเอียดเพิ่มเติมของงาน"></textarea></div>
- </div>
+<section id="customerView" class="view"><div class="grid"><div>
+<div class="card"><h2>สร้างงานรับหิ้ว</h2><div class="sub">กรอกข้อมูลแล้วส่งงานให้ระบบ</div><div class="row">
+<div class="field"><label>ชื่อลูกค้า</label><input id="customerName" placeholder="เช่น น้องเอ"></div>
+<div class="field"><label>แชท/ช่องทางติดต่อ</label><input id="customerContact" placeholder="เช่น Facebook: น้องเอ"></div>
+</div><div class="field"><label>หมายเหตุ</label><textarea id="customerNote" placeholder="รายละเอียดเพิ่มเติม"></textarea></div></div>
+<div class="card"><h2>จุดรับสินค้าและจุดส่ง</h2><div class="sub">เพิ่มร้าน/สถานที่และรายละเอียดของแต่ละจุด</div><div id="customerStops"></div><button id="customerAddStop" class="add" type="button">＋ เพิ่มจุดรับสินค้า</button></div>
+</div><aside class="card summary"><h2>สรุปราคา</h2><div class="sub">ระบบคิดจากข้อมูลที่กรอก</div>
+<div class="field"><label>ค่าสินค้ารวม (บาท)</label><input id="customerGoods" type="number" min="0" value="0"></div>
+<div class="field"><label>ค่าหิ้ว/ค่าบริการ (บาท)</label><input id="customerFee" type="number" min="0" value="20"></div>
+<div class="pricebox">ยอดรวมลูกค้า<div id="customerTotal" class="total">20 ฿</div></div>
+<div class="line"><span>ค่าสินค้า</span><b id="customerGoodsText">0 ฿</b></div><div class="line"><span>ค่าหิ้ว</span><b id="customerFeeText">20 ฿</b></div><div class="line"><span>จำนวนจุด</span><b id="customerStopsText">1</b></div>
+<button id="customerSubmit" class="primary" type="button">ส่งออเดอร์</button></aside></div></section>
 
- <div class="card">
-  <div class="head"><div><h2>จุดรับสินค้าและจุดส่ง</h2><div class="sub">สินค้าแต่ละชิ้นจะผูกกับ “จุด” ของมันโดยตรง</div></div></div>
-  <div id="stops"></div>
-  <button class="btn ghost" style="width:100%" onclick="addStop()">+ เพิ่มจุดรับสินค้า</button>
- </div>
-
- <div class="card">
-  <div class="head"><div><h2>ใบงานไรเดอร์</h2><div class="sub">สร้างลิงก์แยกสำหรับลูกค้าและไรเดอร์จากออเดอร์เดียวกัน</div></div></div>
-  <div class="row">
-   <div><label>ลิงก์ลูกค้า</label><div class="linkbox" id="customerLink"></div><div class="actions" style="margin-top:8px"><button class="btn ghost" onclick="copyLink('customer')">คัดลอก</button><button class="btn yellow" onclick="openRole('customer')">เปิดหน้าลูกค้า</button></div></div>
-   <div><label>ลิงก์ไรเดอร์</label><div class="linkbox" id="riderLink"></div><div class="actions" style="margin-top:8px"><button class="btn ghost" onclick="copyLink('rider')">คัดลอก</button><button class="btn primary" onclick="openRole('rider')">เปิดหน้าไรเดอร์</button></div></div>
-  </div>
-  <div class="actions" style="margin-top:15px"><button class="btn green" onclick="saveOrder()"> บันทึกและสร้างใบงาน</button><button class="btn primary" onclick="window.print()">พิมพ์ใบงาน</button></div>
- </div>
-</div>
-
-<aside class="summary">
- <div class="card">
-  <div class="head"><div><h2>สรุปราคา</h2><div class="sub">แก้ค่าสินค้าได้ตามจริงก่อนยืนยัน</div></div></div>
-  <div class="field"><label>ค่าสินค้ารวม (บาท)</label><input id="goodsTotal" type="number" value="0" min="0" oninput="recalc()"></div>
-  <div class="field"><label>ค่าหิ้ว/ค่าบริการ (บาท)</label><input id="serviceFee" type="number" value="20" min="0" oninput="recalc()"></div>
-  <div class="pricebox"><small>ยอดรวมลูกค้า</small><div class="pricebig" id="grandTotal">20 ฿</div></div>
-  <div class="line"><span>ค่าสินค้า</span><b id="sumGoods">0 ฿</b></div>
-  <div class="line"><span>ค่าหิ้ว</span><b id="sumFee">20 ฿</b></div>
-  <div class="line"><span>จำนวนจุด</span><b id="sumStops">1</b></div>
-  <div class="line total"><span>รวมทั้งหมด</span><b id="sumTotal">20 ฿</b></div>
- </div>
- <div class="card">
-  <div class="head"><div><h2>ตั้งค่าราคา</h2><div class="sub">ปรับเกณฑ์ราคาได้เองโดยไม่ต้องแก้โค้ด</div></div></div>
-  <div class="row">
-   <div class="field"><label>ค่าบริการเริ่มต้น (บาท)</label><input id="rateBase" type="number" min="0" value="20" oninput="saveRates();recalc()"></div>
-   <div class="field"><label>ค่าระยะทาง / กม. (บาท)</label><input id="rateKm" type="number" min="0" value="5" oninput="saveRates()"></div>
-  </div>
-  <div class="field"><label>หมายเหตุราคา</label><input id="rateNote" placeholder="เช่น คิดตามระยะทางจริง"></div>
- </div>
- <div class="card"><h2>การส่งงาน</h2><p class="sub">แอดมินสร้างเลขออเดอร์และลิงก์แยกให้ลูกค้า/ไรเดอร์จากงานเดียวกัน</p></div>
-</aside>
-</div>
-</section>
-
-<!-- CUSTOMER -->
-<section id="customerView" class="hidden">
-<div class="grid">
-<div>
- <div class="card">
-  <div class="head"><div><h2>ให้เราช่วยหิ้วให้คุณ</h2><div class="sub">กรอกรายละเอียดงาน ปักหมุดได้หลายจุด และแนบรูปสินค้า</div></div><div style="text-align:right"><span class="status"><span class="dot"></span>ลิงก์ลูกค้า</span><div class="sub" style="margin-top:7px">รหัสงาน <b id="customerOrderId">—</b></div></div></div>
-  <div class="row"><div class="field"><label>ชื่อ</label><input id="cName" placeholder="ชื่อที่ต้องการให้ติดต่อ"></div><div class="field"><label>เบอร์/ช่องทางติดต่อ</label><input placeholder="Facebook / เบอร์โทร"></div></div>
-  <div class="field"><label>รายละเอียดงาน</label><textarea placeholder="เช่น ฝากซื้อ 3 ร้าน ส่งที่หอพัก..."></textarea></div>
- </div>
- <div class="card">
-  <div class="head"><div><h2>จุดรับของ</h2><div class="sub">ค้นหาสถานที่ แล้วปรับหมุดได้ • 1 จุด = 1 กลุ่มสินค้า</div></div></div>
-  <div id="customerStops"></div>
-  <button class="btn ghost" style="width:100%" onclick="addCustomerStop()">+ เพิ่มจุดรับของ</button>
- </div>
- <div class="card">
-  <h2>จุดส่ง</h2><div class="sub">ปักหมุดปลายทางสำหรับไรเดอร์</div>
-  <div class="map" style="margin-top:12px" id="deliveryMap"><div class="searchbox"> ค้นหาที่อยู่ / สถานที่</div><div class="maplabel">จุดส่ง</div><div class="pin" style="left:64%;top:62%"></div><div class="mapnote">ลากหมุดเพื่อปรับตำแหน่งได้</div></div>
-  <div class="field" style="margin-top:12px"><label>รายละเอียดจุดส่ง</label><input placeholder="เช่น หอพัก / อาคาร / ห้อง"></div>
- </div>
- <div class="actions"><button class="btn green" onclick="submitOrder()"> ยืนยันรายการ</button></div>
-</div>
-<aside class="summary">
- <div class="card"><h2>ขั้นตอน</h2><div class="rider-stop"><div class="rnum">1</div><div><b>กรอกรายละเอียด</b><div class="tag">ชื่อ + งาน</div></div></div><div class="rider-stop"><div class="rnum">2</div><div><b>ปักหมุดหลายจุด</b><div class="tag">ร้าน → ร้าน → จุดส่ง</div></div></div><div class="rider-stop"><div class="rnum">3</div><div><b>แนบรูปสินค้า</b><div class="tag">ผูกกับจุดรับของ</div></div></div><div class="rider-stop"><div class="rnum">4</div><div><b>ส่งให้แอดมินตรวจ</b></div></div></div>
-</aside>
-</div>
-</section>
-
-<!-- RIDER -->
-<section id="riderView" class="hidden">
-<div class="grid">
-<div>
- <div class="card">
-  <div class="head"><div><h2>ใบงานไรเดอร์</h2><div class="sub">ออเดอร์เดียว เห็นลำดับจุด สินค้า รูป และรายละเอียดครบ</div></div><div style="text-align:right"><span class="status"><span class="dot"></span>พร้อมรับงาน</span><div class="sub" style="margin-top:7px">รหัสงาน <b id="riderOrderId">—</b></div></div></div>
-  <div class="row"><div><label>รหัสงาน</label><input value="DD-20260828-001" readonly></div><div><label>ลูกค้า</label><input id="riderCustomer" value="น้องเอ" readonly></div></div>
- </div>
- <div class="card">
-  <div class="head"><div><h2>เส้นทาง</h2><div class="sub">เรียงจุดตามลำดับงาน</div></div><button class="btn ghost" onclick="toast('เปิดเส้นทางในแอปแผนที่')">เปิดแผนที่</button></div>
-  <div class="map" style="height:270px"><div class="searchbox">เส้นทางงาน • จุดรับ 3 จุด → จุดส่ง</div><div class="maplabel">ลำดับอัตโนมัติ</div><div class="route" style="left:25%;top:57%;width:52%;transform:rotate:-24deg)"></div><div class="pin" style="left:25%;top:57%"></div><div class="pin" style="left:48%;top:39%"></div><div class="pin" style="left:68%;top:55%"></div><div class="pin" style="left:82%;top:69%"></div><div class="mapnote">1 จุดรับ → 2 จุดรับ → 3 จุดรับ → 4 จุดส่ง</div></div>
- </div>
- <div class="card">
-  <div class="head"><div><h2>รายการตามจุด</h2><div class="sub">เช็กของที่ร้านก่อนออกจากแต่ละจุด</div></div></div>
-  <div class="rider-stop"><div class="rnum">1</div><div><b>ร้าน A</b><div>ข้าวหมูกรอบ 2 กล่อง</div><div class="tag">มีรูปสินค้า • หมายเหตุ: ไม่ใส่ผัก</div></div><button class="btn ghost" onclick="toast('จุดที่ 1 เสร็จแล้ว')">เสร็จ</button></div>
-  <div class="rider-stop"><div class="rnum">2</div><div><b>ร้าน B</b><div>ชาเย็น 1 แก้ว</div><div class="tag">มีรูปสินค้า</div></div><button class="btn ghost" onclick="toast('จุดที่ 2 เสร็จแล้ว')">เสร็จ</button></div>
-  <div class="rider-stop"><div class="rnum">3</div><div><b>ร้าน C</b><div>เอกสาร 1 ชุด</div><div class="tag">รายละเอียดงาน</div></div><button class="btn ghost" onclick="toast('จุดที่ 3 เสร็จแล้ว')">เสร็จ</button></div>
-  <div class="rider-stop"><div class="rnum">4</div><div><b>จุดส่ง</b><div>หอพัก / จุดส่งของลูกค้า</div><div class="tag">ปลายทาง</div></div><button class="btn green" onclick="toast('ส่งงานสำเร็จ')">ส่งสำเร็จ</button></div>
- </div>
-</div>
-<aside class="summary">
- <div class="card"><h2>สรุปงาน</h2><div class="pricebox"><small>ค่าสินค้าประเมิน</small><div class="pricebig">120 ฿</div></div><div class="line"><span>ค่าหิ้ว</span><b>35 ฿</b></div><div class="line total"><span>รวม</span><b>155 ฿</b></div><div class="actions"><button class="btn primary" style="width:100%" onclick="toast('รับงานแล้ว')">รับงาน</button></div></div>
- <div class="card"><h2>หมายเหตุ</h2><p class="sub">ถ้าสินค้าหรือพิกัดไม่ตรง ให้ติดต่อแอดมินก่อนซื้อ</p></div>
-</aside>
-</div>
-</section>
-</main>
-<div class="toast" id="toast"></div>
+<section id="riderView" class="view"><div class="card"><h2>งานไรเดอร์</h2><div class="sub">ดูงานที่ลูกค้าส่งเข้ามา</div><div id="riderOrders" class="orders"><div class="empty">กำลังโหลดงาน...</div></div></div></section>
+</main><div id="toast"></div>
 
 <script>
+"use strict";
 const $=id=>document.getElementById(id);
-let stopId=0, customerStopId=0;
+const state={role:"admin"};
 
-function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
-function addStop(data={}){
- stopId++;
- const el=document.createElement('div'); el.className='stop'; el.dataset.id=stopId;
- el.innerHTML=`<div class="stophead"><div class="num">${stopId}</div><div class="stoptitle">${stopId===1?'จุดรับของ':'จุดรับของ '+stopId}</div><div class="stoptools"><button onclick="moveStop(this,-1)">↑</button><button onclick="moveStop(this,1)">↓</button><button class="danger" onclick="this.closest('.stop').remove();refreshStops()">ลบ</button></div></div>
- <div class="row"><div class="field"><label>ชื่อร้าน / สถานที่</label><input value="${esc(data.name||'')}" placeholder="ค้นหาร้าน / สถานที่"></div><div class="field"><label>ค่าสินค้าของจุดนี้ (บาท)</label><input type="number" value="${Number(data.price||0)}" min="0" oninput="recalc()"></div></div>
- <div class="map"><div class="searchbox">ค้นหาร้าน / สถานที่</div><div class="maplabel">ปักหมุด</div><div class="pin" style="left:${35+stopId*15}%;top:${48+(stopId%2)*15}%"></div><div class="mapnote">แผนที่จริงจะเชื่อมในขั้นตอนถัดไป</div></div>
- <div class="row" style="margin-top:10px"><div><label>สินค้า</label><input value="${esc(data.product||'')}" placeholder="เช่น ข้าวหมูกรอบ 2 กล่อง"></div><div><label>หมายเหตุจุดนี้</label><input value="${esc(data.note||'')}" placeholder="เช่น ไม่ใส่ผัก"></div></div>
- <div style="margin-top:10px"><label>รูปสินค้า</label><div class="photo" onclick="fakePhoto(this)">+ แตะเพื่อแนบรูปสินค้า</div><div class="thumbs"></div><div class="photo-hint">เลือกได้หลายรูป และกดเพิ่มรูปได้อีก</div></div>`;
- $('stops').appendChild(el); refreshStops();
+function toast(msg){const x=$("toast");x.textContent=msg;x.style.display="block";clearTimeout(window.__toast);window.__toast=setTimeout(()=>x.style.display="none",2200)}
+function money(n){return Number(n||0).toLocaleString("th-TH")+" ฿"}
+
+function switchRole(role){
+ if(!["admin","customer","rider"].includes(role)) role="admin";
+ state.role=role;
+ document.querySelectorAll(".role").forEach(b=>b.classList.toggle("active",b.dataset.role===role));
+ ["admin","customer","rider"].forEach(r=>$(r+"View").classList.toggle("active",r===role));
+ const t={
+  admin:["จัดการงานรับหิ้ว","สร้างออเดอร์ เพิ่มจุดรับของ ดูลูกค้าและไรเดอร์ในระบบเดียว"],
+  customer:["ให้เราช่วยหิ้วให้คุณ","เพิ่มจุดรับของหลายจุด แนบรายละเอียด แล้วส่งงานให้ระบบ"],
+  rider:["ใบงานไรเดอร์","เห็นลำดับเส้นทาง สินค้า จุดรับ-ส่ง และรายละเอียดงาน"]
+ }[role];
+ $("heroTitle").textContent=t[0];$("heroText").textContent=t[1];
+ if(role==="rider") loadOrders();
 }
-function refreshStops(){
- [...$('stops').children].forEach((x,i)=>{x.querySelector('.num').textContent=i+1;x.querySelector('.stoptitle').textContent=i===0?'จุดรับของ':'จุดรับของ '+(i+1)});
- $('sumStops').textContent=Math.max(1,$('stops').children.length); recalc();
+
+function addStop(prefix){
+ const box=$(prefix+"Stops"), n=box.children.length+1, el=document.createElement("div");
+ el.className="stop";
+ el.innerHTML='<div class="stophead"><div><span class="num">'+n+'</span><b>จุดรับ/ส่ง</b></div><button class="remove" type="button">ลบ</button></div>'+
+ '<div class="field"><label>ค้นหาร้าน / สถานที่</label><input class="stopName" placeholder="พิมพ์ชื่อร้าน / สถานที่"></div>'+
+ '<div class="field"><label>รายละเอียดสินค้า / งาน</label><textarea class="stopNote" placeholder="เช่น ข้าว 2 กล่อง"></textarea></div>';
+ el.querySelector(".remove").addEventListener("click",()=>{el.remove();renumber(box);recalc(prefix)});
+ box.appendChild(el);recalc(prefix);
 }
-function moveStop(btn,dir){const x=btn.closest('.stop');const p=x.parentElement;const i=[...p.children].indexOf(x);const n=p.children[i+dir];if(n) dir<0?p.insertBefore(x,n):p.insertBefore(n,x);refreshStops()}
-function addCustomerStop(){
- customerStopId++;
- const el=document.createElement('div');el.className='stop';
- el.innerHTML=`<div class="stophead"><div class="num">${customerStopId}</div><div class="stoptitle">จุดรับของ ${customerStopId}</div><div class="stoptools"><button onclick="this.closest('.stop').remove()">ลบ</button></div></div>
- <div class="field"><label>ค้นหาร้าน / สถานที่</label><input placeholder="พิมพ์ชื่อร้าน แล้วเลือกผลลัพธ์"></div>
- <div class="map"><div class="searchbox">พิมพ์ชื่อร้าน / สถานที่</div><div class="maplabel">ปักหมุด</div><div class="pin" style="left:${30+customerStopId*18}%;top:${50+(customerStopId%2)*12}%"></div><div class="mapnote">แผนที่จริงจะเชื่อมในขั้นตอนถัดไป</div></div>
- <div class="field" style="margin-top:10px"><label>รายละเอียดสินค้า</label><textarea placeholder="ชื่อสินค้า / จำนวน / รายละเอียด"></textarea></div>
- <div><label>รูปสินค้า</label><div class="photo" onclick="fakePhoto(this)">+ แนบรูปสินค้าของจุดนี้</div><div class="thumbs"></div><div class="photo-hint">เลือกได้หลายรูป และกดเพิ่มรูปได้อีก</div></div>`;
- $('customerStops').appendChild(el);
+function renumber(box){[...box.children].forEach((x,i)=>x.querySelector(".num").textContent=i+1)}
+function recalc(p){
+ const goods=Math.max(0,Number($(p+"Goods").value)||0),fee=Math.max(0,Number($(p+"Fee").value)||0),stops=$(p+"Stops").children.length;
+ $(p+"Total").textContent=money(goods+fee);$(p+"GoodsText").textContent=money(goods);$(p+"FeeText").textContent=money(fee);$(p+"StopsText").textContent=stops;
 }
-function fakePhoto(box){
- const input=document.createElement('input'); input.type='file'; input.accept='image/*'; input.multiple=true; input.style.display='none';
- document.body.appendChild(input);
- input.onchange=()=>{
-   [...input.files].forEach(file=>{
-     if(!file.type.startsWith('image/')) return;
-     const reader=new FileReader();
-     reader.onload=e=>{
-       const wrap=document.createElement('div'); wrap.className='thumb';
-       const img=document.createElement('img'); img.src=e.target.result; img.alt=file.name;
-       const remove=document.createElement('button'); remove.type='button'; remove.className='thumb-remove'; remove.textContent='×'; remove.title='ลบรูปนี้';
-       remove.onclick=ev=>{ev.stopPropagation();wrap.remove()};
-       wrap.append(img,remove); box.nextElementSibling.appendChild(wrap);
-     }; reader.readAsDataURL(file);
-   });
-   input.remove();
- }; input.click();
+function collect(p){
+ const stops=[...$(p+"Stops").children].map(s=>({name:s.querySelector(".stopName").value.trim(),note:s.querySelector(".stopNote").value.trim()})).filter(s=>s.name||s.note);
+ const admin=p==="admin";
+ const customer={name:$(p+(admin?"CustomerName":"Name")).value.trim(),contact:$(p+(admin?"CustomerContact":"Contact")).value.trim()};
+ const goods=Math.max(0,Number($(p+"Goods").value)||0),fee=Math.max(0,Number($(p+"Fee").value)||0);
+ return {status:"customer_submitted",customer,stops,pickup:stops[0]?.name||"",dropoff:stops.at(-1)?.name||"",goodsTotal:goods,serviceFee:fee,total:goods+fee,note:$(p+"Note").value.trim(),items:stops.map(x=>x.name).filter(Boolean).join(", ")};
 }
-function recalc(){
- let goods=Number($('goodsTotal')?.value||0), fee=Number($('serviceFee')?.value||20), total=goods+fee;
- if($('grandTotal')) $('grandTotal').textContent=total.toLocaleString()+' ฿';
- if($('sumGoods')) $('sumGoods').textContent=goods.toLocaleString()+' ฿';
- if($('sumFee')) $('sumFee').textContent=fee.toLocaleString()+' ฿';
- if($('sumTotal')) $('sumTotal').textContent=total.toLocaleString()+' ฿';
-}
-function baseUrl(){return location.origin+location.pathname}
-function makeOrderId(){return 'DD-'+new Date().toISOString().slice(0,10).replaceAll('-','')+'-'+String(Date.now()).slice(-4)}
-function currentOrderId(){return new URLSearchParams(location.search).get('order') || localStorage.getItem('dekdoen_current_order') || 'DD-'+new Date().toISOString().slice(0,10).replaceAll('-','')+'-0001'}
-function updateLinks(){
- const id=currentOrderId();
- if($('customerLink')) $('customerLink').textContent=baseUrl()+'?view=customer&order='+encodeURIComponent(id);
- if($('riderLink')) $('riderLink').textContent=baseUrl()+'?view=rider&order='+encodeURIComponent(id);
- if($('orderId')) $('orderId').textContent=id;
- if($('customerOrderId')) $('customerOrderId').textContent=id;
- if($('riderOrderId')) $('riderOrderId').textContent=id;
-}
-function copyLink(type){const v=type==='customer'?$('customerLink').textContent:$('riderLink').textContent;navigator.clipboard?.writeText(v);toast('คัดลอกลิงก์แล้ว')}
-function openRole(role){location.href=baseUrl()+'?view='+role+'&order='+encodeURIComponent(currentOrderId())}
-function collectStops(containerId){
- return [...$(containerId).children].map((el,i)=>({
-   index:i+1,
-   name:el.querySelector('input')?.value||'',
-   price:Number([...el.querySelectorAll('input[type=number]')][0]?.value||0),
-   product:el.querySelectorAll('input')[2]?.value||el.querySelector('textarea')?.value||'',
-   note:el.querySelectorAll('input')[3]?.value||''
- }));
-}
-function saveOrder(){
- const id=makeOrderId();
- localStorage.setItem('dekdoen_current_order',id);
- const order={
-   id,status:'รอตรวจสอบ',
-   customer:{name:$('customerName').value,contact:$('customerContact').value,note:$('customerNote').value},
-   goods:Number($('goodsTotal').value||0),fee:Number($('serviceFee').value||0),
-   stops:collectStops('stops'),
-   createdAt:new Date().toISOString()
- };
- localStorage.setItem('dekdoen_order_'+id,JSON.stringify(order));
- $('orderStatus').textContent='รอตรวจสอบ';
- updateLinks();
- toast('สร้างออเดอร์ '+id+' และสร้างลิงก์แล้ว');
-}
-function loadOrder(id){
- const raw=localStorage.getItem('dekdoen_order_'+id);
- if(!raw)return null;
- try{return JSON.parse(raw)}catch{return null}
-}
-function applyCustomerOrder(id){
- const o=loadOrder(id);
- if(o){
-   if($('cName')) $('cName').value=o.customer.name||'';
-   if($('customerOrderId')) $('customerOrderId').textContent=o.id;
- }
-}
-function applyRiderOrder(id){
- const o=loadOrder(id);
- if(o){
-   $('riderCustomer').value=o.customer.name||'';
-   $('riderOrderId').textContent=o.id;
- }
-}
-function saveRates(){
- const rates={base:Number($('rateBase')?.value||20),km:Number($('rateKm')?.value||5),note:$('rateNote')?.value||''};
- localStorage.setItem('dekdoen_rates',JSON.stringify(rates));
-}
-function loadRates(){
+async function submitOrder(p){
+ const btn=$(p+"Submit"),o=collect(p);
+ if(!o.customer.name){toast("กรุณาใส่ชื่อลูกค้า");return}
+ if(!o.stops.length){toast("กรุณาเพิ่มอย่างน้อย 1 จุด");return}
+ btn.disabled=true;const old=btn.textContent;btn.textContent="กำลังส่ง...";
  try{
-  const r=JSON.parse(localStorage.getItem('dekdoen_rates')||'{}');
-  if($('rateBase')) $('rateBase').value=r.base??20;
-  if($('rateKm')) $('rateKm').value=r.km??5;
-  if($('rateNote')) $('rateNote').value=r.note??'';
- }catch{}
+  const res=await fetch("/api/orders",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(o)});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error||"ส่งออเดอร์ไม่สำเร็จ");
+  if(data.id)localStorage.setItem("dekdoenOrderId",String(data.id));
+  toast("ส่งออเดอร์เรียบร้อยแล้ว");
+ }catch(err){console.error("SUBMIT ORDER ERROR:",err);toast(err.message||"ส่งออเดอร์ไม่สำเร็จ")}
+ finally{btn.disabled=false;btn.textContent=old}
 }
-async function submitOrder() {
-  try {
-    const customer = {
-      name: $('customerName')?.value?.trim() || '',
-      contact: $('customerContact')?.value?.trim() || ''
-    };
-
-    const pickupStops = [...document.querySelectorAll('.customer-stop')]
-      .map(stop => {
-        const fields = [...stop.querySelectorAll('input, textarea')];
-
-        return {
-          name: fields[0]?.value?.trim() || '',
-          note: fields[1]?.value?.trim() || ''
-        };
-      })
-      .filter(x => x.name || x.note);
-
-    const items = [...document.querySelectorAll('.customer-item')]
-      .map(item => {
-        const fields = [...item.querySelectorAll('input, textarea')];
-
-        return {
-          name: fields[0]?.value?.trim() || '',
-          qty: Number(fields[1]?.value || 1)
-        };
-      })
-      .filter(x => x.name);
-
-    const note = [...document.querySelectorAll('textarea')]
-      .map(x => x.value.trim())
-      .filter(Boolean)
-      .join('\n');
-
-    const res = await fetch('/api/orders', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        status: 'customer_submitted',
-        customer,
-        pickup: pickupStops[0]?.name || '',
-        dropoff: pickupStops[pickupStops.length - 1]?.name || '',
-        item: items.map(x => `${x.name} x${x.qty}`).join(', '),
-        note
-      })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || 'ส่งออเดอร์ไม่สำเร็จ');
-    }
-
-    if (data.id) {
-      localStorage.setItem('dekdoenOrderId', data.id);
-    }
-
-    toast('ส่งข้อมูลให้แอดมินแล้ว');
-    console.log('ORDER CREATED:', data);
-
-  } catch (err) {
-    console.error('SUBMIT ORDER ERROR:', err);
-    toast('ส่งข้อมูลไม่สำเร็จ');
-  }
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+async function loadOrders(){
+ const box=$("riderOrders");box.innerHTML='<div class="empty">กำลังโหลดงาน...</div>';
+ try{
+  const res=await fetch("/api/orders",{cache:"no-store"}),data=await res.json().catch(()=>({}));
+  if(!res.ok)throw new Error(data.error||"โหลดงานไม่สำเร็จ");
+  const orders=Array.isArray(data.orders)?data.orders:[];
+  if(!orders.length){box.innerHTML='<div class="empty">ยังไม่มีงานเข้ามา</div>';return}
+  box.innerHTML=orders.map(row=>{let b=row.body;if(typeof b==="string"){try{b=JSON.parse(b)}catch{}};b=b||row;
+   return '<div class="order"><div><b>'+esc(b.customer?.name||"ไม่ระบุชื่อ")+'</b><br><small>'+esc(b.pickup||"-")+' → '+esc(b.dropoff||"-")+'</small><br><small>'+esc(b.items||b.note||"-")+'</small></div><span class="status">'+esc(row.status||b.status||"new")+'</span></div>'
+  }).join("");
+ }catch(err){console.error(err);box.innerHTML='<div class="notice">โหลดงานไม่ได้: '+esc(err.message)+'</div>'}
 }
-    const inputs = [...document.querySelectorAll('input, textarea')];
 
-    const values = inputs
-      .map(el => ({
-        id: el.id,
-        value: el.value?.trim() || ''
-      }))
-      .filter(x => x.value);
-
-    const customer = {
-      name: $('customerName')?.value || '',
-      contact: $('customerContact')?.value || ''
-    };
-
-    const pickupStops = [...document.querySelectorAll('.customer-stop')]
-      .map(stop => {
-        const fields = [...stop.querySelectorAll('input, textarea')];
-        return {
-          name: fields[0]?.value?.trim() || '',
-          note: fields[1]?.value?.trim() || ''
-        };
-      })
-      .filter(x => x.name || x.note);
-
-    const items = [...document.querySelectorAll('.customer-item')]
-      .map(item => {
-        const fields = [...item.querySelectorAll('input, textarea')];
-        return {
-          name: fields[0]?.value?.trim() || '',
-          qty: Number(fields[1]?.value || 1)
-        };
-      })
-      .filter(x => x.name);
-
-    const note =
-      [...document.querySelectorAll('textarea')]
-        .map(x => x.value.trim())
-        .filter(Boolean)
-        .join('\n');
-
-   body: JSON.stringify({
-  status: 'customer_submitted',
-  customer,
-  pickup: pickupStops[0]?.name || '',
-  dropoff: pickupStops[pickupStops.length - 1]?.name || '',
-  item: items.map(x => `${x.name} x${x.qty}`).join(', '),
-  note
-})
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || 'ส่งออเดอร์ไม่สำเร็จ');
-    }
-
-    if (data.id) {
-      localStorage.setItem('dekdoenOrderId', data.id);
-    }
-
-    toast('ส่งข้อมูลให้แอดมินแล้ว');
-
-    console.log('ORDER CREATED:', data);
-
-  } catch (err) {
-    console.error('SUBMIT ORDER ERROR:', err);
-    toast('ส่งข้อมูลไม่สำเร็จ');
-  }
-}
-function toast(t){const x=$('toast');x.textContent=t;x.style.display='block';clearTimeout(window.__t);window.__t=setTimeout(()=>x.style.display='none',2200)}
-function setRole(role){
- document.querySelectorAll('.role').forEach(b=>b.classList.toggle('active',b.dataset.role===role));
- ['admin','customer','rider'].forEach(r=>$(r+'View').classList.toggle('hidden',r!==role));
- if(role==='admin'){ $('heroTitle').textContent='จัดการงานรับหิ้ว';$('heroText').textContent='สร้างออเดอร์ เพิ่มจุดรับของ ผูกสินค้าและรูปกับแต่ละจุด แล้วส่งใบงานให้ไรเดอร์ในครั้งเดียว'}
- if(role==='customer'){ $('heroTitle').textContent='ให้เราช่วยหิ้วให้คุณ';$('heroText').textContent='ปักหมุดจุดรับของหลายจุด แนบรูปและรายละเอียด แล้วส่งข้อมูลให้แอดมินตรวจสอบ'}
- if(role==='rider'){ $('heroTitle').textContent='ใบงานไรเดอร์';$('heroText').textContent='เห็นลำดับเส้นทาง สินค้า รูป และรายละเอียดของแต่ละจุดในงานเดียว'}
- updateLinks();
-}
-document.querySelectorAll('.role').forEach(b=>b.onclick=()=>setRole(b.dataset.role));
-const params=new URLSearchParams(location.search);
-const initial=params.get('view')||'admin';
-setRole(['admin','customer','rider'].includes(initial)?initial:'admin');
-loadRates();
-if(initial==='customer') applyCustomerOrder(params.get('order')||'');
-if(initial==='rider') applyRiderOrder(params.get('order')||'');
-addStop({name:'ร้าน A',price:0});addStop({name:'ร้าน B',price:0});
-addCustomerStop();addCustomerStop();recalc();updateLinks();
+document.querySelectorAll(".role").forEach(b=>b.addEventListener("click",()=>switchRole(b.dataset.role)));
+$("adminAddStop").addEventListener("click",()=>addStop("admin"));
+$("customerAddStop").addEventListener("click",()=>addStop("customer"));
+$("adminSubmit").addEventListener("click",()=>submitOrder("admin"));
+$("customerSubmit").addEventListener("click",()=>submitOrder("customer"));
+["adminGoods","adminFee"].forEach(id=>$(id).addEventListener("input",()=>recalc("admin")));
+["customerGoods","customerFee"].forEach(id=>$(id).addEventListener("input",()=>recalc("customer")));
+addStop("admin");addStop("customer");
+const initial=new URLSearchParams(location.search).get("view");if(["admin","customer","rider"].includes(initial))switchRole(initial);
 </script>
 </body></html>
