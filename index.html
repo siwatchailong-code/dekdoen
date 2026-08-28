@@ -339,18 +339,14 @@ function loadRates(){
         .filter(Boolean)
         .join('\n');
 
-    const res = await fetch('/api/orders', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        status: 'customer_submitted',
-        customer,
-        pickupStops,
-        items,
-        note
-      })
+   body: JSON.stringify({
+  status: 'customer_submitted',
+  customer,
+  pickup: pickupStops[0]?.name || '',
+  dropoff: pickupStops[pickupStops.length - 1]?.name || '',
+  item: items.map(x => `${x.name} x${x.qty}`).join(', '),
+  note
+})
     });
 
     const data = await res.json();
