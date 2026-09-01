@@ -6,11 +6,17 @@
 <meta name="theme-color" content="#0b2f55">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="logo.jpg">
-<title>เด็กเดิน — ระบบจัดการงานรับหิ้ว</title>
+<title>เด็กเดิน (Dekdein) — แพลตฟอร์ม Match ผู้ให้บริการ</title>
 <style>
 :root{
  --navy:#0b2f55;--blue:#1769b0;--blue2:#0f548f;--yellow:#f4c542;--bg:#f5f7fa;
  --card:#fff;--line:#dfe7f0;--text:#172334;--muted:#6d7b8c;--green:#17945b;--red:#d64545;
+ /* ---------- Dekdein Match Marketplace: โทนสีใหม่ (ส้มเป็นสีหลัก) ----------
+    ใช้เฉพาะกับ UI ใหม่ของฝั่งลูกค้า/ผู้ให้บริการ (ค้นหา/โปรไฟล์/MATCH/แชท/รีวิว) เท่านั้น — ไม่แตะ
+    ตัวแปร --navy/--blue เดิมที่หน้า Admin และระบบออเดอร์เดิมยังใช้อยู่ กันไม่ให้ดีไซน์ใหม่ไปกระทบ
+    ส่วนที่ไม่ได้ขอให้ปรับ */
+ --brand:#ff7a1a;--brand-dark:#e2650a;--brand-light:#fff1e6;--brand-line:#ffd9b8;
+ --ink:#1c1610;--ink-soft:#7a6f63;--surface:#fffaf6;--radius-lg:20px;--radius-md:14px;
 }
 *{box-sizing:border-box;min-width:0}body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans Thai",Arial,sans-serif;overflow-wrap:break-word;word-break:break-word}
 button,input,textarea{font:inherit}button{cursor:pointer}
@@ -41,6 +47,7 @@ button,input,textarea{font:inherit}button{cursor:pointer}
 .grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,.8fr);gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 5px 20px rgba(24,60,100,.07);margin-bottom:18px}.card h2{font-size:18px;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:5px}.head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:16px;flex-wrap:wrap}
 label{font-size:12px;font-weight:800;color:#556579;display:block;margin:0 0 6px}.field{margin-bottom:13px}input,textarea,select{width:100%;border:1px solid #d5e0eb;background:#fbfdff;border-radius:12px;padding:12px 13px;outline:none;max-width:100%}input:focus,textarea:focus,select:focus{border-color:#5b9ee4;box-shadow:0 0 0 3px #1268c414}textarea{min-height:86px;resize:vertical}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.actions{display:flex;gap:9px;flex-wrap:wrap}.btn{border:0;border-radius:12px;padding:11px 15px;font-weight:900}.primary{background:var(--blue);color:#fff}.yellow{background:var(--yellow);color:#4d3a00}.ghost{background:#eef4fa;color:#31506f}.green{background:var(--green);color:#fff}.danger{background:#fff0f0;color:var(--red)}
+.btn:disabled,button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .stop{border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0;background:#fcfdff}.stophead{display:flex;align-items:center;gap:10px;margin-bottom:12px}.num{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--blue);color:#fff;font-weight:900;font-size:13px}.stoptitle{font-weight:900;flex:1}.stoptools{display:flex;gap:5px}.stoptools button{border:0;border-radius:8px;padding:6px 8px;background:#eef3f8;color:#607084;font-size:11px;display:grid;place-items:center}.stoptools button[disabled]{opacity:.35;cursor:not-allowed}
 .loc-fields{margin:10px 0}.loc-field{margin-bottom:10px;position:relative}
 .loc-chip{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:#f7faff}
@@ -100,6 +107,259 @@ background-size:auto,auto,38px 38px,38px 38px;background-color:#dfe9ee;margin:10
 .check{width:26px;height:26px;border-radius:8px;border:2px solid #b9c8d8;display:inline-grid;place-items:center;font-weight:900;cursor:pointer;color:#8aa0b6;margin-left:8px}
 .check.on{background:var(--green);border-color:var(--green);color:#fff}
 @media(max-width:850px){.top{height:auto;padding:12px 14px;gap:12px;align-items:flex-start}.roles{overflow:auto}.role{white-space:nowrap}.hero{display:block;padding:22px}.hero .pill{display:inline-block;margin-top:15px}.grid{grid-template-columns:1fr}.summary{position:static}.row{grid-template-columns:1fr}.wrap{padding:18px 12px 45px}.brand b{font-size:19px}}
+
+/* ---------- Platform v2: nav, rider directory/profile, portfolio, availability, timeline ---------- */
+.navtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;background:#eef2f7;border-radius:14px;padding:5px}
+.navtab{border:0;background:transparent;color:#5c6c7f;border-radius:10px;padding:9px 14px;font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:6px;text-decoration:none;cursor:pointer}
+.navtab.active{background:#fff;color:var(--navy);box-shadow:0 2px 8px rgba(24,60,100,.10)}
+.navtab svg{flex:0 0 auto}
+.jobmap-placeholder{font-size:12px;color:var(--muted);padding:2px 2px 10px;display:flex;align-items:center;gap:6px}
+.avail-switch{display:flex;align-items:center;gap:10px;background:#f4f9ff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0}
+.avail-switch .swlabel{flex:1}
+.avail-switch .swlabel b{display:block;font-size:13px}
+.avail-switch .swlabel small{color:var(--muted);font-size:11px}
+.switch{position:relative;display:inline-block;width:46px;height:26px;flex:0 0 auto}
+.switch input{opacity:0;width:0;height:0}
+.switch .slider{position:absolute;inset:0;background:#cfd8e2;border-radius:999px;transition:.18s;cursor:pointer}
+.switch .slider:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.18s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.switch input:checked+.slider{background:var(--green)}
+.switch input:checked+.slider:before{transform:translateX(20px)}
+.switch input:disabled+.slider{opacity:.5;cursor:not-allowed}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.stat-box{background:#f7faff;border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat-box .snum{font-size:20px;font-weight:900;color:var(--navy)}
+.stat-box .slabel{font-size:11px;color:var(--muted);margin-top:3px}
+@media(max-width:600px){.stat-grid{grid-template-columns:repeat(3,1fr);gap:6px}.stat-box{padding:8px}.stat-box .snum{font-size:16px}}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{border:1px solid var(--line);background:#fff;color:#4c5c70;border-radius:999px;padding:8px 13px;font-size:12px;font-weight:800}
+.chip.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.chip-search{flex:1;min-width:160px}
+.rider-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.rider-card{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fff;box-shadow:0 3px 12px rgba(24,60,100,.05);cursor:pointer;transition:.15s}
+.rider-card:hover{box-shadow:0 8px 22px rgba(24,60,100,.12);transform:translateY(-1px)}
+.rider-card .rchead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rider-card .rcname{font-weight:900;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.avail-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;font-size:10px;font-weight:900}
+.avail-pill.st-open{background:#eaf8f1;color:#17945b}
+.avail-pill.st-busy{background:#fff4e0;color:#9a6400}
+.avail-pill.st-closed{background:#f1f3f6;color:#6d7b8c}
+.avail-pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.rider-card .rcarea{font-size:11.5px;color:var(--muted);margin:6px 0;display:flex;align-items:center;gap:5px}
+.rider-card .rcstats{font-size:11px;color:#607084;display:flex;gap:10px;margin-top:8px}
+.portfolio-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+@media(min-width:640px){.portfolio-grid{grid-template-columns:repeat(4,1fr)}}
+.portfolio-item{position:relative;border-radius:13px;overflow:hidden;aspect-ratio:1/1;background:#eef2f6;cursor:pointer}
+.portfolio-item img{width:100%;height:100%;object-fit:cover;display:block}
+.portfolio-item .pcap{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(0deg,rgba(9,20,34,.75),transparent);color:#fff;font-size:10.5px;padding:14px 8px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.portfolio-item .premove{position:absolute;top:6px;right:6px;border:0;border-radius:50%;width:24px;height:24px;background:#fff;color:#8a2631;box-shadow:0 2px 8px #0003;font-size:13px;line-height:24px;padding:0}
+.portfolio-move{position:absolute;top:6px;left:6px;display:flex;flex-direction:column;gap:4px}
+.portfolio-move button{border:0;border-radius:50%;width:22px;height:22px;background:#fff;color:#31506f;box-shadow:0 2px 8px #0003;display:grid;place-items:center;padding:0}
+.portfolio-move button[disabled]{opacity:.4;cursor:not-allowed}
+.portfolio-add{border:1.5px dashed #b8cce0;border-radius:13px;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--blue);background:#f8fbff;font-size:11px;text-align:center;cursor:pointer}
+.direct-rider-banner{display:flex;align-items:center;gap:12px;background:#eef6ff;border:1px solid #cfe3fb;border-radius:14px;padding:12px 14px;margin-bottom:16px}
+.direct-rider-banner .drtext{flex:1;font-size:12.5px}
+.direct-rider-banner .drtext b{display:block;font-size:14px;color:var(--navy)}
+.order-card{border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:10px;background:#fff;cursor:pointer;transition:.15s}
+.order-card:hover{box-shadow:0 6px 18px rgba(24,60,100,.08)}
+.order-card .ochead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.hero-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.hero-cta .btn{padding:13px 18px;font-size:13px}
+.lightbox-close{position:absolute;top:18px;right:22px;color:#fff;background:#ffffff26;border:0;border-radius:50%;width:38px;height:38px;font-size:18px}
+
+/* ==================================================================================
+   Dekdein Match Marketplace — ดีไซน์ใหม่ (ส้มเป็นสีหลัก, การ์ดขาว, เส้นขอบบาง, เงานุ่ม, มินิมอล)
+   ใช้กับ: หน้าแรกลูกค้า (ค้นหาผู้ให้บริการ), โปรไฟล์ผู้ให้บริการ, MATCH, ห้องแชท/ข้อเสนอราคา, รีวิว,
+   หน้าโปรไฟล์ลูกค้า, ส่วนของผู้ให้บริการ (Match ใหม่/กำลังดำเนินการ/ประวัติงาน/โปรไฟล์) และ Bottom Navigation
+   ================================================================================== */
+.dk-shell{max-width:1180px;margin:0 auto}
+.dk-card{background:var(--surface);border:1px solid var(--brand-line);border-radius:var(--radius-lg);padding:20px;box-shadow:0 4px 18px rgba(226,101,10,.06);margin-bottom:16px}
+.dk-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.dk-head h2{margin:0;font-size:18px;color:var(--ink)}
+.dk-head .dk-sub{font-size:12.5px;color:var(--ink-soft);margin-top:4px}
+.dk-search-row{display:flex;gap:8px;margin-bottom:12px}
+.dk-search-row input{flex:1;border:1px solid var(--brand-line);background:#fff;border-radius:var(--radius-md);padding:13px 15px;outline:none;font-size:13.5px}
+.dk-search-row input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-light)}
+.dk-chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.dk-chip{border:1px solid var(--brand-line);background:#fff;color:var(--ink-soft);border-radius:999px;padding:9px 15px;font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:6px}
+.dk-chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+.dk-provider-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.dk-pcard{border:1px solid var(--brand-line);border-radius:var(--radius-lg);padding:16px;background:#fff;box-shadow:0 3px 14px rgba(28,22,16,.05);cursor:pointer;transition:.15s;display:flex;flex-direction:column;gap:10px}
+.dk-pcard:hover{box-shadow:0 10px 26px rgba(226,101,10,.12);transform:translateY(-2px)}
+.dk-pchead{display:flex;align-items:flex-start;gap:10px}
+.dk-pcname{font-weight:900;font-size:14.5px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-pcsub{font-size:11px;color:var(--ink-soft);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-startprice{font-size:13px;color:var(--ink);font-weight:800}
+.dk-startprice b{color:var(--brand-dark);font-size:14.5px}
+.dk-startprice.muted{color:var(--ink-soft);font-weight:600;font-size:12px}
+.dk-rating-sep{color:var(--brand-line);margin:0 1px;flex-shrink:0}
+/* บั๊กที่แก้: การ์ดผู้ให้บริการการ์ดแคบ (2 คอลัมน์บนมือถือ) เดิมทำให้ตัวเลขคะแนน/จำนวนรีวิวถูกบีบจน "4.9" และ
+   "รีวิว" ขึ้นบรรทัดใหม่ทีละตัวอักษร เพราะ *{min-width:0} (กฎกลางของทั้งไฟล์) ไปลบ min-width:auto เริ่มต้นของ
+   flex item ออก รวมกับ body{word-break:break-word} ทำให้ข้อความตัวเลข/คำสั้น ๆ ที่ไม่ควรตัดถูกตัดกลางคำ — ส่วนที่
+   ควรอยู่บรรทัดเดียวเสมอ (ดาว/คะแนน/จำนวนรีวิว) ต้องปักเป็น white-space:nowrap+flex-shrink:0 ไว้ชัดเจน แล้วให้
+   เฉพาะพื้นที่ (ระยะทาง/ที่อยู่คร่าว ๆ) เป็นส่วนที่ยืดหด+ตัดด้วย … แทน (มี overflow:hidden/text-overflow:ellipsis
+   อยู่แล้ว แต่ต้องมี flex:1;min-width:0 กำกับชัดเจน ไม่งั้นบีบตัวเลขข้าง ๆ แทน) */
+.dk-rating-num{white-space:nowrap;flex-shrink:0}
+.dk-norating{color:var(--ink-soft);font-weight:600}
+.dk-area-inline{display:inline-flex;align-items:center;gap:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle;margin-left:auto;min-width:0}
+/* ไอคอนหมุดต้องไม่ถูกบีบหายเมื่อชื่อพื้นที่ยาว (เป็น flex item ที่ *{min-width:0} ทำให้ย่อได้ถึง 0) */
+.dk-area-inline svg{flex-shrink:0}
+/* ---------- โครงการ์ดผู้ให้บริการตาม Reference: อวตารซ้าย เนื้อหาทั้งหมดไหลเป็นคอลัมน์ทางขวาของอวตาร
+   สถานะเป็นจุดสี+ข้อความบางมุมขวาบน ปุ่มสองปุ่มเต็มความกว้างการ์ดด้านล่าง ---------- */
+.dk-pcbody{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.dk-pctop{display:flex;align-items:flex-start;gap:8px}
+.dk-pctop .dk-pcname{flex:1;min-width:0}
+.dk-onstatus{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.dk-onstatus i{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
+.dk-onstatus.st-available{color:#178a4c}
+.dk-onstatus.st-busy{color:#c8880e}
+.dk-onstatus.st-offline{color:#9a8f83}
+/* ---------- แถวแนะนำแบบเลื่อนแนวนอนตาม Reference ("คนที่เหมาะกับคุณ") ---------- */
+.dk-hscroll{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.dk-hscroll::-webkit-scrollbar{display:none}
+.dk-mini{flex:0 0 108px;display:flex;flex-direction:column;align-items:center;gap:3px;background:#fff;border:1px solid var(--brand-line);border-radius:16px;padding:12px 8px;cursor:pointer;font-family:inherit;text-align:center}
+.dk-mini-av{position:relative;display:inline-block;line-height:0}
+.dk-mini-dot{position:absolute;right:1px;bottom:1px;width:12px;height:12px;border-radius:50%;border:2px solid #fff}
+.dk-mini-dot.st-available{background:#22a35c}.dk-mini-dot.st-busy{background:#e2a20a}.dk-mini-dot.st-offline{background:#b3a89c}
+.dk-mini-name{font-size:12.5px;font-weight:900;color:var(--ink);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-mini-sub{font-size:10.5px;color:var(--ink-soft);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-mini-rate{font-size:11px;font-weight:800;color:var(--ink)}
+/* ---------- หัวข้อ section แบบ Reference: ชื่อหมวดหนา + ตัวนับ/ลิงก์ทางขวา ---------- */
+.dk-sechead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:2px 0 9px}
+.dk-sechead h3{margin:0;font-size:14.5px;font-weight:900;color:var(--ink)}
+.dk-sechead span{font-size:11.5px;color:var(--ink-soft);font-weight:700;white-space:nowrap}
+/* บรรทัดข้อมูลใต้ชื่อคู่สนทนาในหัวห้องแชท ตาม Reference (ราคา + สถานะอยู่บรรทัดเดียวกันใต้ชื่อ) */
+.dk-chathead-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:3px;font-size:11.5px;color:var(--ink-soft)}
+.dk-chathead-meta b{color:var(--brand-dark);font-weight:900;font-size:12px}
+/* ---------- รายการขั้นตอน MATCH (เติมพื้นที่ว่างตอนรอตอบรับ) ---------- */
+.dk-steps{margin-top:16px;border-top:1px solid var(--brand-line);padding-top:16px}
+.dk-step{display:flex;gap:11px;align-items:flex-start;padding:9px 0}
+.dk-step-dot{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:var(--brand-light);color:var(--ink-soft);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:900}
+.dk-step.done .dk-step-dot{background:var(--brand);color:#fff}
+.dk-step b{display:block;font-size:12.5px;color:var(--ink);font-weight:800}
+.dk-step span{display:block;font-size:11.5px;color:var(--ink-soft);margin-top:2px;line-height:1.5}
+.dk-step.done b{color:var(--brand-dark)}
+/* ---------- รายการผลงานตาม Reference: รูปย่อสี่เหลี่ยมมนซ้าย + ชื่อผลงาน + วันที่ ---------- */
+.dk-worklist{display:flex;flex-direction:column;gap:2px}
+.dk-work{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--brand-line);cursor:pointer}
+.dk-work:last-child{border-bottom:0}
+.dk-work img{width:60px;height:60px;border-radius:12px;object-fit:cover;flex:0 0 auto;background:var(--brand-light)}
+.dk-work-text{min-width:0}
+.dk-work-text b{display:block;font-size:13px;font-weight:800;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-work-text span{display:block;font-size:11px;color:var(--ink-soft);margin-top:3px}
+.dk-status{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:10.5px;font-weight:900}
+.dk-status.st-available{background:#e9f9ef;color:#178a4c}
+.dk-status.st-busy{background:#fff4e0;color:#a06a00}
+.dk-status.st-offline{background:#f1f1ef;color:#83786c}
+.dk-status .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.dk-tagrow{display:flex;flex-wrap:wrap;gap:6px}
+.dk-tag{background:var(--brand-light);color:var(--brand-dark);border-radius:8px;padding:4px 9px;font-size:10.5px;font-weight:800}
+.dk-rating{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-soft)}
+.dk-rating b{color:var(--ink)}
+.dk-star{color:#f4a825}
+.dk-area{font-size:11.5px;color:var(--ink-soft);display:flex;align-items:center;gap:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-pcard-actions{display:flex;gap:8px;margin-top:auto}
+.dk-btn{border:0;border-radius:12px;padding:11px 15px;font-weight:900;font-size:13px;cursor:pointer;flex:1;text-align:center}
+.dk-btn.primary{background:var(--brand);color:#fff}
+.dk-btn.primary:disabled{background:#eee0d2;color:#b6a48f;cursor:not-allowed}
+.dk-btn.ghost{background:var(--brand-light);color:var(--brand-dark)}
+.dk-btn.outline{background:#fff;border:1px solid var(--brand-line);color:var(--ink)}
+.dk-btn.danger{background:#fdeceb;color:#c23b2f}
+.dk-btn:disabled{opacity:.6;cursor:not-allowed}
+.dk-profile-hero{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.dk-profile-hero .avt{width:76px;height:76px}
+.dk-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.dk-stat{background:var(--brand-light);border-radius:var(--radius-md);padding:12px;text-align:center}
+.dk-stat b{display:block;font-size:18px;color:var(--brand-dark)}
+.dk-stat span{font-size:10.5px;color:var(--ink-soft)}
+.dk-portfolio-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+@media(min-width:640px){.dk-portfolio-grid{grid-template-columns:repeat(4,1fr)}}
+.dk-review{border-bottom:1px solid var(--brand-line);padding:12px 0}
+.dk-review:last-child{border-bottom:0}
+.dk-review-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+.dk-review-stars{color:#f4a825;font-size:13px;letter-spacing:1px}
+.dk-review-name{font-weight:800;font-size:12.5px;color:var(--ink)}
+.dk-review-time{font-size:10.5px;color:var(--ink-soft)}
+.dk-review-comment{font-size:12.5px;color:var(--ink-soft);margin-top:3px}
+.dk-match-list{display:flex;flex-direction:column;gap:10px}
+.dk-match-row{border:1px solid var(--brand-line);border-radius:var(--radius-md);padding:13px 14px;background:#fff;display:flex;align-items:center;gap:12px;cursor:pointer;transition:.15s}
+.dk-match-row:hover{box-shadow:0 5px 16px rgba(226,101,10,.08)}
+.dk-match-row .mtext{flex:1;min-width:0}
+.dk-match-row .mtitle{font-weight:900;font-size:13.5px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-match-row .mmeta{font-size:11.5px;color:var(--ink-soft);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-mstatus{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;font-size:10.5px;font-weight:900;white-space:nowrap;flex:0 0 auto}
+.dk-mstatus.st-pending{background:#fff4e0;color:#a06a00}
+.dk-mstatus.st-accepted{background:#eaf2ff;color:#1a4fa0}
+.dk-mstatus.st-active{background:#e9f9ef;color:#178a4c}
+.dk-mstatus.st-completed{background:#eef0f4;color:#4b5768}
+.dk-mstatus.st-declined,.dk-mstatus.st-cancelled{background:#fdeceb;color:#c23b2f}
+.dk-chatbox{border:1px solid var(--brand-line);border-radius:var(--radius-md);padding:12px;height:480px;max-height:60vh;overflow-y:auto;background:#fffdfa;margin-bottom:10px;scroll-behavior:smooth}
+.dk-proposal-card{max-width:78%;background:#fff;border:1.5px solid var(--brand);border-radius:14px;padding:13px 14px;margin:8px 0}
+.dk-proposal-card.me{margin-left:auto}
+.dk-proposal-card .pptitle{font-size:11px;font-weight:900;color:var(--brand-dark);text-transform:uppercase;letter-spacing:.03em}
+.dk-proposal-card .ppprice{font-size:22px;font-weight:900;color:var(--ink);margin:4px 0 8px}
+.dk-proposal-card .ppactions{display:flex;gap:8px}
+.dk-proposal-card .ppresult{font-size:12px;font-weight:800;padding:6px 0}
+.dk-proposal-card .ppresult.accepted{color:#178a4c}
+.dk-proposal-card .ppresult.rejected{color:#c23b2f}
+.dk-avail-switch{display:flex;align-items:center;gap:10px;background:var(--brand-light);border:1px solid var(--brand-line);border-radius:var(--radius-md);padding:13px 14px;margin:12px 0}
+.dk-avail-switch .swlabel{flex:1}
+.dk-avail-switch .swlabel b{display:block;font-size:13px;color:var(--ink)}
+.dk-avail-switch .swlabel small{color:var(--ink-soft);font-size:11px}
+.dk-empty{padding:30px 18px;text-align:center;color:var(--ink-soft);border:1px dashed var(--brand-line);border-radius:var(--radius-md);background:#fffdfa;font-size:13px}
+.dk-services-edit{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+.dk-service-pick{border:1px solid var(--brand-line);background:#fff;color:var(--ink-soft);border-radius:999px;padding:8px 13px;font-size:12px;font-weight:800}
+.dk-service-pick.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.dk-stars-picker{display:flex;gap:6px;font-size:30px;color:#e3d9cc;margin:6px 0 12px}
+.dk-stars-picker span{cursor:pointer}
+.dk-stars-picker span.on{color:#f4a825}
+
+/* ---------- Bottom Navigation (มือถือเป็นหลัก) ---------- */
+.dk-bottomnav{display:none}
+@media(max-width:850px){
+ .dk-bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid var(--brand-line);
+  display:flex;box-shadow:0 -4px 18px rgba(28,22,16,.08);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+ .dk-bottomnav .bnitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;color:var(--ink-soft);font-size:10.5px;font-weight:800;padding:6px 2px;border-radius:12px}
+ .dk-bottomnav .bnitem.active{color:var(--brand-dark)}
+ .dk-bottomnav .bnitem .bnbadge{position:relative}
+ .dk-bottomnav .bnitem .bndot{position:absolute;top:-3px;right:-6px;width:8px;height:8px;border-radius:50%;background:var(--red)}
+ body{padding-bottom:64px}
+ .dk-navtabs-desktop{display:none}
+}
+@media(min-width:851px){
+ .dk-bottomnav{display:none !important}
+ /* บั๊กที่แก้: เดิม .dk-navtabs-desktop{display:flex} อยู่นอก media query ทำให้ชนะ .dk-navtabs-desktop{display:none}
+    ที่อยู่ใน @media(max-width:850px) เสมอ (ลำดับ source ทับกัน ไม่เกี่ยวกับ media query) ผลคือแท็บเมนูชุดสำหรับ
+    จอเดสก์ท็อปไปโผล่ซ้อนอยู่บนมือถือด้วย เปลืองพื้นที่และซ้ำกับ Bottom Nav — ต้องผูก display:flex ไว้ในเงื่อนไข
+    จอกว้างเท่านั้น ให้เข้าคู่กับกฎ display:none ที่ตั้งไว้แล้วสำหรับจอแคบ */
+ .dk-navtabs-desktop{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;background:var(--brand-light);border-radius:14px;padding:5px}
+}
+.dk-navtabs-desktop .navtab{border:0;background:transparent;color:var(--ink-soft);border-radius:10px;padding:9px 14px;font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:6px;cursor:pointer}
+.dk-navtabs-desktop .navtab.active{background:#fff;color:var(--brand-dark);box-shadow:0 2px 8px rgba(226,101,10,.12)}
+/* บั๊กที่แก้: เดิมบังคับ 2 คอลัมน์เสมอที่จอ <=600px ทำให้การ์ดผู้ให้บริการเหลือกว้างจริงแค่ ~155px บนมือถือทั่วไป
+   (390px) ไม่พอสำหรับ อวตาร+ชื่อ+ป้ายสถานะในแถวเดียวกัน ทำให้ชื่อผู้ให้บริการถูกบีบจนความกว้างเกือบ 0 (มองไม่เห็น
+   เลยจริง ๆ ไม่ใช่แค่ล้น) — ปล่อยให้กฎ auto-fill,minmax(230px,1fr) ที่ตั้งไว้แล้วจัดคอลัมน์เองตามพื้นที่จริงแทน
+   (จะได้ 1 คอลัมน์บนมือถือทั่วไป และ 2 คอลัมน์เองอัตโนมัติเมื่อจอกว้างพอจริง ๆ เช่น แท็บเล็ต) */
+@media(max-width:600px){.dk-stat-row{gap:6px}.dk-stat{padding:9px}.dk-stat b{font-size:15px}}
+
+/* ---------- โหมดหัวเว็บสำหรับลูกค้า/ผู้ให้บริการ: แถบบนสะอาด โปร่ง ไม่ใช้สีกรมท่าของแอดมิน ไม่มีปุ่ม dev/testing
+   (สลับ role, ทดสอบเสียง) ปนอยู่ใน Customer Flow หลัก — ดู setRole() ที่ toggle คลาสนี้ ---------- */
+.top.dk-mode{height:58px;padding:0 16px;background:var(--surface);color:var(--ink);box-shadow:0 1px 0 var(--brand-line);border-bottom:1px solid var(--brand-line)}
+/* ตาม Reference: หัวเว็บเป็นบรรทัดเดียวสะอาด ๆ — เวิร์ดมาร์กแบรนด์สีส้มซ้าย ไอคอนขวา ไม่มีบรรทัดคำโปรย
+   ไม่มีปุ่ม dev ไม่มีแถบสลับ role (ของแอดมินเท่านั้น) */
+.top.dk-mode .brand{gap:9px}
+.top.dk-mode .brand small{display:none}
+.top.dk-mode .brand b{font-size:20px;color:var(--brand);letter-spacing:-.2px;line-height:1}
+.top.dk-mode .brand img,.top.dk-mode .brand-logo{width:32px !important;height:32px !important;border-radius:9px !important}
+.top.dk-mode .headerRight{gap:8px}
+.top.dk-mode .roles,.top.dk-mode #testVoiceBtn{display:none}
+.top.dk-mode .icon-btn{background:var(--brand-light);border-color:var(--brand-line);color:var(--brand-dark)}
+.top.dk-mode .notif-panel{color:var(--text)}
+@media(max-width:850px){.top.dk-mode{padding:10px 14px}}
+/* .collapse (ระบบพับเก็บเดิม) ที่ซ้อนอยู่ในการ์ดดีไซน์ใหม่ (dk-card) ต้องใช้สีส้มของแบรนด์แทนสีฟ้าเดิม — ไม่แตะสี
+   ของ .collapse ที่อยู่นอก dk-card (เช่นในหน้าแอดมิน/ติดตามออเดอร์เดิม) เลย */
+.dk-card .collapse{border-color:var(--brand-line);background:var(--surface)}
+.dk-card .collapse>summary{color:var(--brand-dark)}
+.dk-card .collapse[open]>summary{border-bottom-color:var(--brand-line)}
 </style>
 
 <style id="logo-fix">
@@ -115,8 +375,8 @@ background-size:auto,auto,38px 38px,38px 38px;background-color:#dfe9ee;margin:10
 </style>
 </head>
 <body>
-<header class="top">
- <div class="brand"><img class="brand-logo" src="logo.jpg" alt="เด็กเดิน — Dek-Dern"><div><b>เด็กเดิน</b><small>ระบบจัดการงานรับหิ้ว • ส่งถึงที่</small></div></div>
+<header class="top" id="appTopBar">
+ <div class="brand"><img class="brand-logo" src="logo.jpg" alt="เด็กเดิน — Dekdein"><div><b>เด็กเดิน</b><small>Dekdein • แพลตฟอร์ม Match ผู้ให้บริการ</small></div></div>
  <div class="headerRight">
   <div class="roles">
    <button class="role active" data-role="admin">แอดมิน</button>
@@ -124,16 +384,16 @@ background-size:auto,auto,38px 38px,38px 38px;background-color:#dfe9ee;margin:10
    <button class="role" data-role="rider">ไรเดอร์</button>
   </div>
   <div class="notif-wrap">
-   <button type="button" class="icon-btn" id="bellBtn" onclick="toggleNotifPanel()" title="การแจ้งเตือน">🔔<span class="bell-badge hidden" id="bellBadge">0</span></button>
+   <button type="button" class="icon-btn" id="bellBtn" onclick="toggleNotifPanel()" title="การแจ้งเตือน"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="bell-badge hidden" id="bellBadge">0</span></button>
    <div class="notif-panel hidden" id="notifPanel"></div>
   </div>
-  <button type="button" class="icon-btn" id="soundToggleBtn" onclick="toggleSound()" title="เปิด/ปิดเสียงแจ้งเตือน">🔊</button>
+  <button type="button" class="icon-btn" id="soundToggleBtn" onclick="toggleSound()" title="เปิด/ปิดเสียงแจ้งเตือน"></button>
   <button type="button" class="btn ghost" id="testVoiceBtn" onclick="testVoice()" title="ทดสอบเสียงอินโทรแจ้งเตือนออเดอร์ใหม่บนอุปกรณ์นี้">ทดสอบเสียง</button>
  </div>
 </header>
 
 <main class="wrap">
-<section class="hero">
+<section class="hero" id="heroSection">
  <div><h1 id="heroTitle">จัดการงานรับหิ้ว</h1><p id="heroText">สร้างออเดอร์ เพิ่มจุดรับ-ส่งของ ผูกสินค้าและรูปกับแต่ละจุด แล้วส่งใบงานให้ไรเดอร์ในครั้งเดียว</p></div>
  <div class="pill">ระบบพร้อมใช้งาน</div>
 </section>
@@ -148,6 +408,7 @@ background-size:auto,auto,38px 38px,38px 38px;background-color:#dfe9ee;margin:10
 <section id="riderView" class="hidden"><div id="riderRoot"></div></section>
 
 </main>
+<nav class="dk-bottomnav hidden" id="dkBottomNav"></nav>
 <div class="toast" id="toast"></div>
 <div class="lightbox hidden" id="lightbox" onclick="closeLightbox()"><img id="lightboxImg" src="" alt="ดูรูปขนาดใหญ่"></div>
 
@@ -181,37 +442,11 @@ const sbCustomer=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{au
 const sbRider=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:'dekdoen-sb-rider',storage:window.sessionStorage,persistSession:true,autoRefreshToken:true}});
 const sbAdmin=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:'dekdoen-sb-admin',storage:window.sessionStorage,persistSession:true,autoRefreshToken:true}});
 
-/* ======================= Google Maps (จุดรับ-ส่งบนแผนที่ ตอนสร้างออเดอร์ลูกค้า) =======================
-   *** ใส่ Google Maps API Key ของคุณเองตรงบรรทัดถัดไป (ค่าว่างตอนนี้โดยตั้งใจ) ***
-   คีย์นี้เป็นคนละประเภทกับ SUPABASE_SERVICE_ROLE_KEY: Google Maps API Key ถูกออกแบบมาให้ใช้งานฝั่ง frontend
-   ได้ตามปกติ (จำกัดสิทธิ์การใช้งานด้วย "HTTP referrer restriction" ที่ตั้งค่าใน Google Cloud Console แทน ไม่ใช่
-   การซ่อนคีย์) ต้องเปิดใช้งาน API ต่อไปนี้ในโปรเจกต์ Google Cloud ของคุณก่อน (เปิดแล้ว: Maps JavaScript API,
-   Routes API — ตรวจสอบแล้วจากสถานะที่ผู้ใช้แจ้ง): Maps JavaScript API, Places API (New), Routes API — คีย์
-   เดียวกันนี้ถูกใช้ทั้ง 3 อย่าง (แสดงแผนที่/ค้นหาสถานที่/คำนวณเส้นทาง-ระยะทาง-เวลาจริงผ่าน Routes API computeRoutes)
-   ถ้ายังไม่ใส่คีย์ (ค่าว่าง) ระบบแผนที่จะปิดใช้งานอัตโนมัติแบบไม่มี error โดยไม่กระทบการสร้างออเดอร์แบบเดิมเลย
-   (จุดรับ-ส่งบนแผนที่เป็นฟีเจอร์เสริม ไม่บังคับต้องใช้ถึงจะส่งงานได้) */
-const GOOGLE_MAPS_API_KEY='AIzaSyBhFw8W8_K2E4JZ2Xko08B6boq3xDeuVkA';
-// โหลด Google Maps JavaScript API แบบ lazy (โหลดครั้งแรกที่ลูกค้าเปิดฟอร์มสร้างออเดอร์เท่านั้น ไม่โหลดทุกหน้า)
-// ผ่าน callback ตามแนวทางปัจจุบันของ Google (loading=async) กันปัญหาบล็อก main thread ตอนโหลดหน้าเว็บ
-let googleMapsLoadPromise=null;
-function loadGoogleMapsApi(){
- if(googleMapsLoadPromise) return googleMapsLoadPromise;
- googleMapsLoadPromise=new Promise((resolve,reject)=>{
-  if(!GOOGLE_MAPS_API_KEY){ reject(new Error('NO_KEY')); return; }
-  if(window.google&&window.google.maps&&window.google.maps.geometry){ resolve(); return; }
-  window.__onGoogleMapsLoaded=()=>resolve();
-  const s=document.createElement('script');
-  // libraries=geometry: ใช้ decode polyline ที่ได้จาก Routes API สำหรับวาดเส้นทางบนแผนที่ (ค้นหาสถานที่ใช้
-  // Places API (New) ผ่าน REST fetch ตรง ๆ แยกต่างหาก ไม่ใช้ library "places" ของ Maps JS API เดิม เพราะ
-  // widget เดิม google.maps.places.Autocomplete ต้องเปิดใช้ "Places API" รุ่นเก่า ซึ่งโปรเจกต์นี้ไม่ได้เปิด
-  // เปิดไว้เฉพาะ "Places API (New)" เท่านั้น)
-  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(GOOGLE_MAPS_API_KEY)+'&libraries=geometry&language=th&region=TH&loading=async&callback=__onGoogleMapsLoaded';
-  s.async=true;
-  s.onerror=()=>reject(new Error('LOAD_FAILED'));
-  document.head.appendChild(s);
- });
- return googleMapsLoadPromise;
-}
+/* ======================= Match Marketplace: ระบบเดิม "Google Maps ตอนสร้างออเดอร์ลูกค้า" ถูกถอดออกจาก
+   ระบบนี้ทั้งหมดแล้ว (เฟส Match Marketplace) ตามที่ระบุ — ระบบสร้างงาน/จุดรับ-จุดส่ง/ปักหมุด/คำนวณระยะทาง/
+   คำนวณราคาอัตโนมัติของลูกค้าถูกลบออกจริง (ไม่ใช่แค่ซ่อน UI) จึงไม่มีจุดใดในไฟล์นี้เรียกใช้ Google Maps
+   JavaScript API / Places API / Routes API อีกต่อไป — คงเหลือไว้แค่ openMaps() (ปุ่ม "เปิดแผนที่" ของไรเดอร์
+   ที่เปิดลิงก์ค้นหาบน Google Maps เฉย ๆ ไม่ใช้ API key ใด ๆ) ซึ่งไม่เกี่ยวข้องกับระบบสร้างงานเดิมที่ถูกลบ */
 // แปลงเบอร์โทร(หรือ username แอดมิน)เป็น "email ภายใน" ปลอมสำหรับ Supabase Auth เท่านั้น — ผู้ใช้ไม่เห็นค่านี้เลย
 // ยังคงกรอกแค่เบอร์โทร+รหัสผ่านในหน้าเว็บเหมือนเดิมทุกจุด (role ต่อท้าย domain กันเบอร์เดียวกันชนกันข้าม role)
 function phoneToInternalEmail(identifier,role){ return String(identifier||'').trim().toLowerCase()+'@'+role+'.dekdoen.internal'; }
@@ -298,9 +533,11 @@ function toggleSound(){
  renderSoundButton();
  if(soundEnabled){ ensureAudioCtx(); playStatusChime(); }
 }
+const ICON_SOUND_ON=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>`;
+const ICON_SOUND_OFF=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M23 9l-6 6"/><path d="M17 9l6 6"/></svg>`;
 function renderSoundButton(){
  const btn=$('soundToggleBtn'); if(!btn)return;
- btn.textContent=soundEnabled?'🔊':'🔇';
+ btn.innerHTML=soundEnabled?ICON_SOUND_ON:ICON_SOUND_OFF;
  btn.classList.toggle('muted',!soundEnabled);
  btn.title=soundEnabled?'ปิดเสียงแจ้งเตือน':'เปิดเสียงแจ้งเตือน';
 }
@@ -357,6 +594,35 @@ window.addEventListener('focus',()=>{
  notifListeners.forEach(fn=>{try{fn(true)}catch(e){}});
  RIDERS=loadRiders();riderStoreListeners.forEach(fn=>{try{fn(true)}catch(e){}});
 });
+/* ---------- Platform v2: แก้บั๊ก "ออเดอร์/สถานะหายไปเฉย ๆ" เมื่อผู้ใช้เปิดแผนที่/ลิงก์ภายนอก/modal แล้วกลับมาที่แท็บนี้
+   (เช่น เปิด Google Maps จากปุ่ม navBtn แล้วกลับมา) — สาเหตุจริง: การ์ดที่เห็นบนจออาศัยแค่ข้อมูลที่ upsert เข้ามาผ่าน
+   Realtime เท่านั้น ถ้า event หลุดหายไประหว่างแท็บไม่ active (เบราว์เซอร์บาง engine หยุด/ชะลอ WebSocket เบื้องหลัง)
+   ข้อมูลบนจอจะค้างสถานะเก่าโดยที่ผู้ใช้ไม่รู้ตัว จนกว่าจะรีเฟรชเองเท่านั้น — แก้โดย "ดึงข้อมูลจริงจาก Supabase ซ้ำ
+   ทุกครั้งที่แท็บกลับมา active" (ไม่ใช่แค่โหลด localStorage เหมือน listener เดิมด้านบน) ผ่าน syncOrdersForClient/
+   syncChatForClient ที่มีอยู่แล้ว (เรียกได้ปลอดภัย ไม่สร้าง state ซ้ำซ้อน — upsertOrder/upsertChatMessage กันซ้ำเอง
+   ด้วย id อยู่แล้ว) และไม่ subscribe realtime channel ใหม่เลยแม้แต่ช่องเดียว (ใช้ REST fetch ซ้ำเฉยๆ) จึงไม่มีทาง
+   เกิด duplicate subscription ตามที่ห้ามไว้ ครอบคลุมเฉพาะ role ที่ login/sync อยู่จริงตอนนั้นเท่านั้น (ROLE_SYNC_ACTIVE) */
+let refreshActiveRoleBusy=false, refreshActiveRoleLastAt=0;
+async function refreshActiveRoleData(){
+ if(refreshActiveRoleBusy) return;
+ const now=Date.now();
+ if(now-refreshActiveRoleLastAt<1500) return; // กัน focus/pageshow/visibilitychange ยิงซ้อนกันหลายอีเวนต์ในจังหวะเดียว
+ refreshActiveRoleLastAt=now;
+ refreshActiveRoleBusy=true;
+ try{
+  const roles=Object.keys(ROLE_SYNC_ACTIVE).filter(r=>ROLE_SYNC_ACTIVE[r]);
+  for(const role of roles){
+   const client=clientForRole(role);
+   await Promise.all([syncOrdersForClient(client),syncMatchesForClient(client)]);
+   await syncChatForClient(client); // ต้องรอ order/match sync เสร็จก่อนเสมอ (เหตุผลเดียวกับ activateRoleSync)
+  }
+  if(roles.length) fireChange(true);
+ } catch(e){ console.error('refreshActiveRoleData failed',e); }
+ finally{ refreshActiveRoleBusy=false; }
+}
+window.addEventListener('focus',()=>{ refreshActiveRoleData(); });
+window.addEventListener('pageshow',()=>{ refreshActiveRoleData(); });
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') refreshActiveRoleData(); });
 
 // เพิ่มพารามิเตอร์ตัวเลือก distanceKm (ระยะทางจริงจาก Google Maps หน่วยกิโลเมตร) — ถ้าไม่ส่งมา (undefined)
 // จะเท่ากับ 0 พฤติกรรมเดิมทุกประการ (ราคาที่คำนวณไม่เปลี่ยนแปลงจากเดิมเลยถ้าไม่ได้ใช้แผนที่) ใช้ค่า
@@ -383,7 +649,7 @@ function mutateOrder(id,fn){const o=findOrder(id);if(!o)return null;fn(o);saveDB
 /* เฟส 3: createOrder บันทึกลง Supabase จริง (ไม่ใช่ localStorage อีกต่อไป) — id/pricing/timeline คำนวณฝั่ง
    server เสมอ (ดู trigger set_order_id/compute_order_pricing ใน 0001_init.sql) คืนค่า order ที่แปลงเป็น
    รูปทรงเดิมทุกฟิลด์ (ผ่าน mapOrderRow ด้านล่าง) ให้โค้ด UI เดิมใช้งานต่อได้โดยไม่ต้องแก้ */
-async function createOrder({customerId,customerName,customerContact,customerNote,stops,goodsTotal,createdBy,pickupLat,pickupLng,dropoffLat,dropoffLng,distanceKm}){
+async function createOrder({customerId,customerName,customerContact,customerNote,stops,goodsTotal,createdBy,pickupLat,pickupLng,dropoffLat,dropoffLng,distanceKm,riderId,riderName}){
  const client=createdBy==='admin'?sbAdmin:sbCustomer;
  const payload={
   created_by:createdBy||'customer',
@@ -402,6 +668,10 @@ async function createOrder({customerId,customerName,customerContact,customerNote
   dropoff_lng:(dropoffLng===undefined||dropoffLng===null)?null:Number(dropoffLng),
   distance_km:(distanceKm===undefined||distanceKm===null)?null:Number(distanceKm)
  };
+ // Platform v2: "ส่งงานตรงให้ไรเดอร์" — ผูก rider_id/status ตั้งแต่ตอนสร้างออเดอร์เลย (ไม่ผ่านห้องรับงานกลาง/claim_order)
+ // ฝั่ง server (compute_order_pricing trigger, ดู 0007_rider_platform_v2.sql) จะตรวจสอบซ้ำอีกชั้นว่าไรเดอร์นี้มี
+ // อยู่จริง เป็นไรเดอร์ และไม่ถูกแบน — ถ้าไม่ผ่านจะ raise exception กลับมาเป็น error.message ตรงนี้
+ if(riderId){ payload.status='ASSIGNED'; payload.rider_id=riderId; payload.rider_name=riderName||''; }
  const {data,error}=await client.from('orders').insert(payload).select().single();
  if(error){ toast('สร้างออเดอร์ไม่สำเร็จ: '+error.message); return null; }
  upsertOrder(data);
@@ -437,11 +707,18 @@ function upsertOrder(row,opts){
  else{ DB.orders.unshift(mapped); }
  if(!opts||!opts.silent) fireChange(false);
 }
+// เฟส Match Marketplace: chat_messages ตอนนี้ผูกกับ "order" (เดิม) หรือ "match" (ใหม่) อย่างใดอย่างหนึ่งเท่านั้น
+// (บังคับด้วย CHECK constraint ฝั่ง DB แล้ว) — เก็บ kind/meta ของข้อความมาด้วยเพื่อ render การ์ดข้อเสนอราคาได้
+// ต้องรองรับทั้ง insert (ข้อความใหม่) และ update (respond_price_proposal แก้ meta ของการ์ดข้อเสนอราคาเดิม
+// ไม่ได้สร้างข้อความใหม่) — เจอ id เดิมแล้วอัปเดตแทนการข้าม ไม่ใช่แค่กันซ้ำเฉย ๆ เหมือนระบบแชทเดิม
 function upsertChatMessage(row,opts){
- const o=findOrder(row.order_id); if(!o) return;
- if(o.chat.some(m=>m.id===row.id)) return; // กันซ้ำ (realtime อาจส่งมาซ้ำได้ในบางจังหวะ)
- o.chat.push({id:row.id, from:row.sender_role, text:row.text||'', image:row.image||null, at:row.created_at});
- o.chat.sort((a,b)=>new Date(a.at)-new Date(b.at));
+ const target = row.match_id ? findMatch(row.match_id) : findOrder(row.order_id);
+ if(!target) return;
+ const mapped={id:row.id, from:row.sender_role, text:row.text||'', image:row.image||null, at:row.created_at,
+  kind:row.kind||'text', meta:row.meta||null};
+ const idx=target.chat.findIndex(m=>m.id===row.id);
+ if(idx>=0) target.chat[idx]=mapped; else target.chat.push(mapped);
+ target.chat.sort((a,b)=>new Date(a.at)-new Date(b.at));
  if(!opts||!opts.silent) fireChange(false);
 }
 async function syncOrdersForClient(client){
@@ -453,6 +730,37 @@ async function syncChatForClient(client){
  const {data,error}=await client.from('chat_messages').select('*').order('created_at',{ascending:true});
  if(error){ console.error('sync chat failed',error); return; }
  (data||[]).forEach(row=>upsertChatMessage(row,{silent:true}));
+}
+/* ======================= MATCH MARKETPLACE — data layer =======================
+   MATCHES คือ cache กลางของตาราง matches จริง (แพทเทิร์นเดียวกับ DB.orders ทุกประการ) — sync ครั้งแรกหลัง
+   login/activateRoleSync แล้วอัปเดตสดผ่าน Realtime (ดู subscribeRealtimeForRole) โค้ด render ทั้งหมดอ่าน
+   MATCHES ตรง ๆ เหมือนที่ DB.orders ถูกใช้ทั่วทั้งไฟล์ ไม่ต้อง query ใหม่ทุกครั้งที่วาดหน้าจอ */
+let MATCHES=[];
+function mapMatchRow(row){
+ return {
+  id:row.id, status:row.status, customerId:row.customer_id, providerId:row.provider_id,
+  proposedPrice:row.proposed_price==null?null:Number(row.proposed_price),
+  agreedPrice:row.agreed_price==null?null:Number(row.agreed_price),
+  createdAt:row.created_at, updatedAt:row.updated_at,
+  chat:[] // เติมทีหลังจาก chat_messages แยกต่างหาก — ดู upsertMatch/upsertChatMessage
+ };
+}
+function findMatch(id){ return MATCHES.find(m=>m.id===id); }
+function upsertMatch(row,opts){
+ const mapped=mapMatchRow(row);
+ const idx=MATCHES.findIndex(m=>m.id===row.id);
+ if(idx>=0){ mapped.chat=MATCHES[idx].chat; MATCHES[idx]=mapped; } // รักษาแชทที่โหลดไว้แล้วของ match นี้
+ else{ MATCHES.unshift(mapped); }
+ if(!opts||!opts.silent) fireChange(false);
+}
+async function syncMatchesForClient(client){
+ const {data,error}=await client.from('matches').select('*');
+ if(error){ console.error('sync matches failed',error); return; }
+ (data||[]).forEach(row=>upsertMatch(row,{silent:true}));
+}
+function matchesFor(role,userId){
+ if(!userId) return [];
+ return role==='rider' ? MATCHES.filter(m=>m.providerId===userId) : MATCHES.filter(m=>m.customerId===userId);
 }
 async function syncRatesForClient(client){
  const {data,error}=await client.from('rates_config').select('*').maybeSingle();
@@ -494,6 +802,14 @@ async function subscribeRealtimeForRole(role){
   .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},payload=>{
    upsertChatMessage(payload.new);
   })
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'chat_messages'},payload=>{
+   // ใช้ตอนข้อเสนอราคาถูกยอมรับ/ปฏิเสธ (respond_price_proposal แก้ meta ของข้อความเดิม ไม่ได้ insert ใหม่)
+   upsertChatMessage(payload.new);
+  })
+  .on('postgres_changes',{event:'*',schema:'public',table:'matches'},payload=>{
+   if(payload.eventType==='DELETE') return; // ระบบนี้ไม่มีการลบ match จริง
+   upsertMatch(payload.new);
+  })
   .on('postgres_changes',{event:'*',schema:'public',table:'rider_credit_entries'},payload=>{
    if(payload.new) upsertCreditEntry(payload.new); fireChange(false);
   })
@@ -531,11 +847,15 @@ async function activateRoleSync(role){
  if(ROLE_SYNC_ACTIVE[role]) return;
  ROLE_SYNC_ACTIVE[role]=true;
  const client=clientForRole(role);
- const tasks=[syncOrdersForClient(client),syncChatForClient(client),syncRatesForClient(client),syncCreditForClient(client)];
+ // สำคัญ: ต้อง sync orders + matches (เจ้าของ chat แต่ละข้อความ) ให้เสร็จ "ก่อน" sync chat เสมอ — upsertChatMessage
+ // หา order/match ปลายทางจาก cache ที่โหลดไว้แล้วเท่านั้น (ไม่ query แยก) ถ้า sync พร้อมกันแบบไม่รอกัน ข้อความ
+ // อาจมาถึงก่อนออเดอร์/match เจ้าของมันโหลดเสร็จ แล้วถูกทิ้งเงียบ ๆ (หาไม่เจอ target ก็ return ออกไปเลย)
+ const tasks=[syncOrdersForClient(client),syncMatchesForClient(client),syncRatesForClient(client),syncCreditForClient(client)];
  // ตรวจสอบทั้งระบบ (End-to-End, เฟส 4): เฉพาะแอดมินต้องโหลดรายชื่อผู้ใช้ทั้งหมดจริงจาก Supabase มาไว้ใน
  // ADMIN_USERS ด้วย (ดูคอมเมนต์ที่นิยาม ADMIN_USERS ด้านล่าง สำหรับที่มาของปัญหาเดิม)
  if(role==='admin') tasks.push(syncAdminUsersList());
  await Promise.all(tasks);
+ await syncChatForClient(client);
  ensureNotifBaseline(role);
  await subscribeRealtimeForRole(role);
  fireChange(false);
@@ -550,23 +870,36 @@ async function saveRatesNow(){
  const rates={base:Number($('rateBase').value||0),perStop:Number($('ratePerStop').value||0),km:Number($('rateKm').value||0),commission:Number($('rateCommission').value||0),note:$('rateNote').value||''};
  const {error}=await sbAdmin.from('rates_config').update({base:rates.base,per_stop:rates.perStop,km:rates.km,commission_percent:rates.commission,note:rates.note}).eq('id',true);
  if(error){ toast('บันทึกค่าบริการไม่สำเร็จ: '+error.message); return; }
- DB.rates=rates; fireChange(false); renderAdminEstimate(); renderCustomerEstimate();
+ DB.rates=rates; fireChange(false); renderAdminEstimate();
 }
 // เฟส 3: ส่งข้อความแชทลง Supabase จริง (ตาราง chat_messages) — RLS บังคับว่า sender_id ต้องตรงกับผู้ login
 // เองเท่านั้น (กันปลอมตัวเป็นคนอื่นส่งข้อความ) realtime จะส่งข้อความนี้กลับมาแสดงในทุกแท็บที่เกี่ยวข้องอัตโนมัติ
+// คืนค่า true/false บอกผลจริงว่าส่งสำเร็จหรือไม่ (ผู้เรียก customerSendChat/riderSendChat ใช้ตัดสินใจว่าจะ
+// เคลียร์กล่องข้อความ/รูปที่แนบไว้หรือไม่ — ต้องไม่เคลียร์ถ้าส่งไม่สำเร็จ กันข้อความ/รูปหายไปเฉย ๆ โดยไม่ได้ส่งจริง)
 async function addChat(id,from,text,image){
+ return addChatTo({orderId:id},from,text,image);
+}
+// เฟส Match: เวอร์ชันทั่วไปของ addChat — ส่งข้อความแชทที่ผูกกับ "ออเดอร์เดิม" (orderId) หรือ "MATCH ใหม่" (matchId)
+// ก็ได้ (ต้องมีอย่างใดอย่างหนึ่งเท่านั้น ห้ามส่งทั้งคู่ — ตรง constraint ฝั่ง DB เป๊ะ) ใช้ path เดียวกันทุกอย่างกับ
+// addChat เดิม (client เลือกตาม role, ต้อง auth จริง, ข้อความ error สั้นไม่โชว์ raw error, upsertChatMessage ตอนสำเร็จ)
+async function addChatTo(target,from,text,image){
  const t=(text||'').trim();
- if(!t&&!image) return;
+ if(!t&&!image) return false;
  const client=from==='rider'?sbRider:sbCustomer;
  const sender=from==='rider'?currentRider():currentCustomer();
- if(!sender){ toast('กรุณาเข้าสู่ระบบก่อนส่งข้อความ'); return; }
+ if(!sender){ toast('กรุณาเข้าสู่ระบบก่อนส่งข้อความ'); return false; }
  // เฟส 3 (fix): เช่นเดียวกับตอนสร้างออเดอร์ — ดึง user.id จาก Supabase Auth จริงมาใช้เป็น sender_id เสมอ
  // ห้ามใช้ sender.id จาก local mirror ตรงๆ กัน id เก่าก่อนเชื่อม Supabase หลุดเข้าไปเขียนลง DB
  const authId=from==='rider'?await requireRiderAuthId():await requireCustomerAuthId();
- if(!authId){ toast('เซสชันหมดอายุหรือไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่'); return; }
- const {data,error}=await client.from('chat_messages').insert({order_id:id,sender_role:from,sender_id:authId,text:t,image:image||null}).select().single();
- if(error){ toast('ส่งข้อความไม่สำเร็จ: '+error.message); return; }
+ if(!authId){ toast('เซสชันหมดอายุหรือไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่'); return false; }
+ const payload={sender_role:from,sender_id:authId,text:t,image:image||null,kind:'text'};
+ if(target&&target.matchId) payload.match_id=target.matchId; else payload.order_id=target&&target.orderId;
+ const {data,error}=await client.from('chat_messages').insert(payload).select().single();
+ // ข้อความแจ้งผู้ใช้เป็นข้อความสั้น เข้าใจง่ายเสมอ — ไม่โชว์ error.message ดิบ (อาจเป็นข้อความ technical จาก DB/RLS)
+ // ให้ลูกค้าเห็น: log ไว้ที่ console สำหรับตรวจสอบ/debug ฝั่งเราเองแทน
+ if(error){ console.error('addChat failed:',error); toast('ส่งข้อความไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'); return false; }
  upsertChatMessage(data);
+ return true;
 }
 
 /* ======================= ศูนย์การแจ้งเตือน (แยกคีย์ localStorage จากออเดอร์ ไม่กระทบ DB เดิม) ======================= */
@@ -818,7 +1151,7 @@ async function riderSignup({name,phone,password,photo}){
  if(error) return {ok:false,reason:'สมัครสมาชิกไม่สำเร็จ: '+error.message};
  const uid=data.user.id;
  if(photo){ try{ await sbRider.from('profiles').update({photo}).eq('id',uid); }catch(e){} }
- const r={id:uid,name,phone,photo:photo||null,banned:false,createdAt:nowISO()};
+ const r={id:uid,name,phone,photo:photo||null,banned:false,createdAt:nowISO(),availabilityStatus:'available',serviceArea:'',services:'',bio:'',startingPrice:null};
  RIDERS=loadRiders();
  const idx=RIDERS.riders.findIndex(x=>x.id===uid);
  if(idx>=0) RIDERS.riders[idx]=r; else RIDERS.riders.push(r);
@@ -832,17 +1165,17 @@ async function riderLogin(phone,password){
  try{ ({data,error}=await sbRider.auth.signInWithPassword({email,password})); }
  catch(e){ return {ok:false,reason:'เชื่อมต่อระบบไม่สำเร็จ กรุณาลองใหม่ ('+(e&&e.message||e)+')'}; }
  if(error) return {ok:false,reason:'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง'};
- const {data:prof,error:profErr}=await sbRider.from('profiles').select('id,name,phone,photo,banned,created_at').eq('id',data.user.id).single();
+ const {data:prof,error:profErr}=await sbRider.from('profiles').select('id,name,phone,photo,banned,created_at,availability_status,service_area,services,bio,starting_price').eq('id',data.user.id).single();
  if(profErr||!prof){ await sbRider.auth.signOut(); return {ok:false,reason:'ไม่พบข้อมูลบัญชีนี้ กรุณาลองใหม่'}; }
  if(prof.banned){ await sbRider.auth.signOut(); return {ok:false,reason:'บัญชีนี้ถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ'}; }
- const r={id:prof.id,name:prof.name,phone:prof.phone,photo:prof.photo||null,banned:prof.banned,createdAt:prof.created_at};
+ const r={id:prof.id,name:prof.name,phone:prof.phone,photo:prof.photo||null,banned:prof.banned,createdAt:prof.created_at,availabilityStatus:prof.availability_status||'available',serviceArea:prof.service_area||'',services:prof.services||'',bio:prof.bio||'',startingPrice:prof.starting_price!=null?Number(prof.starting_price):null};
  RIDERS=loadRiders();
  const idx=RIDERS.riders.findIndex(x=>x.id===r.id);
  if(idx>=0) RIDERS.riders[idx]=r; else RIDERS.riders.push(r);
  saveRiders();
  return {ok:true,rider:r};
 }
-async function updateRiderProfile(id,{name,phone,password,photo}){
+async function updateRiderProfile(id,{name,phone,password,photo,serviceArea,services,bio,startingPrice}){
  RIDERS=loadRiders();
  const r=findRiderById(id); if(!r) return {ok:false,reason:'ไม่พบบัญชีนี้'};
  const newPhone=phone!=null?phone.trim():r.phone;
@@ -852,6 +1185,12 @@ async function updateRiderProfile(id,{name,phone,password,photo}){
  const patch={};
  if(name!=null&&name.trim()) patch.name=name.trim();
  if(photo!==undefined) patch.photo=photo;
+ if(serviceArea!=null) patch.service_area=serviceArea.trim(); // Platform v2: พื้นที่ให้บริการที่ไรเดอร์ประกาศเอง (ข้อความ ไม่ใช่พิกัด GPS)
+ if(services!=null) patch.services=services; // เฟส Match Marketplace: ประเภทบริการที่รับ (คั่นด้วยจุลภาค เช่น "รับหิ้ว,ส่งของ")
+ if(bio!=null) patch.bio=bio.trim(); // เฟส Match Marketplace: คำแนะนำตัวสั้น ๆ แสดงในหน้าโปรไฟล์ให้ลูกค้าเห็นก่อน MATCH
+ // เฟส "รื้อ Frontend ใหม่ตาม Reference": ราคาเริ่มต้นที่ผู้ให้บริการกำหนดเอง (แสดงในการ์ดหน้าแรกลูกค้า) —
+ // startingPrice===undefined แปลว่ายังไม่แก้ไข, null แปลว่าตั้งใจล้างค่า (กลับไปเป็น "สอบถามราคาในแชท"), ตัวเลข=ตั้งราคา
+ if(startingPrice!==undefined) patch.starting_price=(startingPrice===null||startingPrice==='')?null:Number(startingPrice);
  if(Object.keys(patch).length){
   const {error}=await sbRider.from('profiles').update(patch).eq('id',id);
   if(error) return {ok:false,reason:'บันทึกโปรไฟล์ไม่สำเร็จ: '+error.message};
@@ -862,8 +1201,134 @@ async function updateRiderProfile(id,{name,phone,password,photo}){
  }
  if(name!=null&&name.trim()) r.name=name.trim();
  if(photo!==undefined) r.photo=photo;
+ if(serviceArea!=null) r.serviceArea=serviceArea.trim();
+ if(services!=null) r.services=services;
+ if(bio!=null) r.bio=bio.trim();
+ if(startingPrice!==undefined) r.startingPrice=(startingPrice===null||startingPrice==='')?null:Number(startingPrice);
  saveRiders();
  return {ok:true,rider:r};
+}
+/* ---------- Platform v2: สถานะเปิด/ปิดรับงานของไรเดอร์ (availability_status) — เขียนลง Supabase จริงเสมอ
+   (ไม่ใช่ localStorage เป็นแหล่งความจริงหลัก) ผ่าน profiles_update_own (row-level, มีอยู่แล้วตั้งแต่เฟส 1)
+   ครอบคลุมคอลัมน์ใหม่นี้โดยอัตโนมัติ ไม่ต้องเพิ่ม RLS policy ใด ๆ เพิ่ม (ดู 0007_rider_platform_v2.sql) ---------- */
+let riderAvailabilityBusy=false;
+async function riderSetAvailability(status){
+ if(riderAvailabilityBusy) return;
+ const rider=currentRider(); if(!rider){ toast('กรุณาเข้าสู่ระบบก่อน'); return; }
+ riderAvailabilityBusy=true;
+ try{
+  const {data,error}=await sbRider.from('profiles').update({availability_status:status}).eq('id',rider.id).select('availability_status').single();
+  if(error){ toast('เปลี่ยนสถานะไม่สำเร็จ: '+error.message); return; }
+  RIDERS=loadRiders();
+  const r=findRiderById(rider.id); if(r) r.availabilityStatus=data.availability_status;
+  saveRiders();
+  toast(data.availability_status==='available'?'เปิดรับงานแล้ว':'ปิดรับงานแล้ว');
+  renderRiderRoot();
+ } finally { riderAvailabilityBusy=false; }
+}
+function riderAvailabilityStatus(){
+ const rider=currentRider(); if(!rider) return 'available';
+ return rider.availabilityStatus||'available';
+}
+/* ---------- Platform v2: รายชื่อไรเดอร์แบบสาธารณะ (ให้ลูกค้าเรียกดู/เลือกส่งงานตรง) — อ่านจาก VIEW rider_directory
+   (จำกัดคอลัมน์ไว้แล้วในฐานข้อมูล ไม่มีเบอร์โทร/ข้อมูลอ่อนไหวหลุดออกมา) สถานะที่แสดงคำนวณจากข้อมูลจริงเท่านั้น
+   (availability_status ที่ไรเดอร์ตั้งเอง + has_active_job ที่คำนวณจากออเดอร์จริงที่กำลังทำอยู่) ไม่มีการสุ่ม/หลอก ---------- */
+let RIDER_DIRECTORY=[];
+async function loadRiderDirectory(){
+ const {data,error}=await sbCustomer.from('rider_directory').select('*').order('name',{ascending:true});
+ if(error){ console.error('load rider_directory failed',error); return RIDER_DIRECTORY; }
+ RIDER_DIRECTORY=data||[];
+ return RIDER_DIRECTORY;
+}
+// สถานะที่แสดงจริง 3 แบบ (ไม่ hardcode ต่อไรเดอร์ — คำนวณจากฟิลด์จริงของแต่ละคนเสมอ): เปิดรับงาน / กำลังรับงาน (มีงานที่ทำอยู่จริง) / ปิดรับงาน
+function riderEffectiveStatus(row){
+ if(row.availability_status==='unavailable') return 'closed';
+ if(row.has_active_job) return 'busy';
+ return 'open';
+}
+const RIDER_STATUS_LABEL={open:'เปิดรับงาน',busy:'กำลังรับงาน',closed:'ปิดรับงาน'};
+function availPillHTML(row){
+ const st=riderEffectiveStatus(row);
+ return `<span class="avail-pill st-${st}"><span class="dot"></span>${RIDER_STATUS_LABEL[st]}</span>`;
+}
+/* ---------- Platform v2: ผลงานของไรเดอร์ — เก็บไฟล์จริงใน Supabase Storage (บักเก็ต rider-portfolio) ไม่ใช่
+   base64-in-Postgres เหมือนระบบแชท (ตามที่ระบุห้ามใช้ base64 สำหรับฟีเจอร์นี้โดยเฉพาะ) แถวในตาราง rider_portfolio
+   เก็บแค่ image_url (public URL จริงจาก Storage) + caption + sort_order ---------- */
+let RIDER_PORTFOLIO_CACHE={};
+async function fetchRiderPortfolio(riderId,client){
+ client=client||sbCustomer;
+ const {data,error}=await client.from('rider_portfolio').select('*').eq('rider_id',riderId).order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+ if(error){ console.error('load rider_portfolio failed',error); return RIDER_PORTFOLIO_CACHE[riderId]||[]; }
+ RIDER_PORTFOLIO_CACHE[riderId]=data||[];
+ return RIDER_PORTFOLIO_CACHE[riderId];
+}
+const PORTFOLIO_IMAGE_MAX_DIM=1600;
+// บีบอัดรูปเป็น Blob จริง (ไม่ใช่ data URL) สำหรับอัปโหลดขึ้น Storage โดยตรง — ใช้ pipeline เดียวกับ compressChatImage
+// (resize ด้าน ยาวสุด + ลดคุณภาพลงเรื่อย ๆ จนกว่าจะได้ไฟล์เล็กพอ) ต่างกันแค่ผลลัพธ์เป็น Blob ไม่ใช่ string
+async function compressImageToBlob(file){
+ const rawDataUrl=await fileToDataURL(file);
+ const img=await loadImageEl(rawDataUrl);
+ let w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+ if(w>PORTFOLIO_IMAGE_MAX_DIM||h>PORTFOLIO_IMAGE_MAX_DIM){
+  if(w>=h){h=Math.round(h*PORTFOLIO_IMAGE_MAX_DIM/w);w=PORTFOLIO_IMAGE_MAX_DIM;}
+  else{w=Math.round(w*PORTFOLIO_IMAGE_MAX_DIM/h);h=PORTFOLIO_IMAGE_MAX_DIM;}
+ }
+ const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
+ const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h);
+ for(const q of [0.85,0.72,0.6]){
+  const blob=await new Promise(res=>canvas.toBlob(res,'image/jpeg',q));
+  if(blob&&(blob.size<1200000||q===0.6)) return blob;
+ }
+ return null;
+}
+let riderPortfolioUploadBusy=false;
+async function riderAddPortfolioPhoto(file,caption){
+ const rider=currentRider(); if(!rider){ toast('กรุณาเข้าสู่ระบบก่อน'); return false; }
+ if(!CHAT_IMAGE_ACCEPTED.includes(file.type)){ toast('รองรับเฉพาะไฟล์รูปภาพ JPG, PNG หรือ WebP เท่านั้น'); return false; }
+ if(file.size>CHAT_IMAGE_MAX_BYTES){ toast('รูปภาพต้องมีขนาดไม่เกิน 10 MB'); return false; }
+ if(riderPortfolioUploadBusy) return false;
+ riderPortfolioUploadBusy=true;
+ try{
+  const blob=await compressImageToBlob(file);
+  if(!blob){ toast('ไม่สามารถประมวลผลรูปนี้ได้ ลองรูปอื่น'); return false; }
+  const path=rider.id+'/'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)+'.jpg';
+  const {error:upErr}=await sbRider.storage.from('rider-portfolio').upload(path,blob,{contentType:'image/jpeg',upsert:false});
+  if(upErr){ toast('อัปโหลดรูปไม่สำเร็จ: '+upErr.message); return false; }
+  const {data:pub}=sbRider.storage.from('rider-portfolio').getPublicUrl(path);
+  const existing=RIDER_PORTFOLIO_CACHE[rider.id]||[];
+  const nextSort=existing.length?Math.max(...existing.map(x=>x.sort_order||0))+1:0;
+  const {data,error}=await sbRider.from('rider_portfolio').insert({rider_id:rider.id,image_url:pub.publicUrl,caption:(caption||'').trim(),sort_order:nextSort}).select().single();
+  if(error){ toast('บันทึกผลงานไม่สำเร็จ: '+error.message); return false; }
+  RIDER_PORTFOLIO_CACHE[rider.id]=[...existing,data];
+  return true;
+ } finally { riderPortfolioUploadBusy=false; }
+}
+async function riderDeletePortfolioItem(item){
+ const rider=currentRider(); if(!rider) return false;
+ const {error}=await sbRider.from('rider_portfolio').delete().eq('id',item.id).eq('rider_id',rider.id);
+ if(error){ toast('ลบผลงานไม่สำเร็จ: '+error.message); return false; }
+ // ลบไฟล์จริงใน Storage ด้วย (ไม่บังคับต้องสำเร็จ — ถ้าลบไฟล์ไม่ได้ แถวข้อมูลก็ถูกลบไปแล้ว ไม่กระทบผู้ใช้)
+ try{
+  const marker='/rider-portfolio/';
+  const idx=(item.image_url||'').indexOf(marker);
+  if(idx!==-1){ const path=item.image_url.slice(idx+marker.length); await sbRider.storage.from('rider-portfolio').remove([path]); }
+ }catch(e){}
+ RIDER_PORTFOLIO_CACHE[rider.id]=(RIDER_PORTFOLIO_CACHE[rider.id]||[]).filter(x=>x.id!==item.id);
+ return true;
+}
+async function riderMovePortfolioItem(itemId,dir){
+ const rider=currentRider(); if(!rider) return false;
+ const arr=RIDER_PORTFOLIO_CACHE[rider.id]||[];
+ const i=arr.findIndex(x=>x.id===itemId); if(i===-1) return false;
+ const ni=i+dir; if(ni<0||ni>=arr.length) return false;
+ const a=arr[i], b=arr[ni];
+ const {error}=await sbRider.from('rider_portfolio').update({sort_order:b.sort_order}).eq('id',a.id);
+ if(error){ toast('จัดลำดับไม่สำเร็จ: '+error.message); return false; }
+ const {error:err2}=await sbRider.from('rider_portfolio').update({sort_order:a.sort_order}).eq('id',b.id);
+ if(err2){ toast('จัดลำดับไม่สำเร็จ: '+err2.message); return false; }
+ const tmp=a.sort_order; a.sort_order=b.sort_order; b.sort_order=tmp;
+ arr[i]=b; arr[ni]=a;
+ return true;
 }
 function setRiderSession(riderId){ try{ sessionStorage.setItem(RIDER_SESSION_KEY,riderId); }catch(e){} }
 function clearRiderSession(){ try{ sessionStorage.removeItem(RIDER_SESSION_KEY); }catch(e){} }
@@ -1141,19 +1606,16 @@ async function adminRecordPayment(riderKey,riderName,riderIdRaw){
    (ไม่ใช่แค่สลับ HTML) แล้ว "re-render ทั้ง container จาก array เสมอ" ทุกครั้งที่โครงสร้างเปลี่ยน (เพิ่ม/ลบ/
    ย้ายงาน, เพิ่ม/ลบจุดแวะ) — ปุ่มทุกปุ่ม/ช่องกรอกทุกช่องใน HTML ที่ render ออกมาผูกกับ job.id ของงานนั้นเสมอ
    (ไม่มี index เก่าค้าง ไม่มี event listener หาย/ซ้ำ เพราะ innerHTML ถูกแทนที่ทั้งหมดใหม่ทุกครั้ง) */
-const stopsState={custStops:[],adminStops:[]};
+// Match Marketplace: เหลือแค่ adminStops (แอดมินสร้างออเดอร์แทนลูกค้าที่แจ้งทางแชท/โทรศัพท์ — ระบบเดิม ไม่ถูกแตะ)
+// custStops (ฟอร์มสร้างงานของลูกค้าเดิม) ถูกลบออกจริงทั้งระบบตามที่ระบุ ไม่ใช่แค่ซ่อน — ดูรายละเอียดใน README.txt
+const stopsState={adminStops:[]};
 let stopIdSeq=0;
 function genStopId(){ stopIdSeq++; return 'job_'+Date.now().toString(36)+'_'+stopIdSeq.toString(36)+Math.random().toString(36).slice(2,6); }
-function genWaypointId(){ return 'wp_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function newStopData(data={}){
  return {
   id:data.id||genStopId(),
   pickup:data.pickup||'', dropoff:data.dropoff||'',
-  pickupLoc:data.pickupLoc||null, dropoffLoc:data.dropoffLoc||null, // {lat,lng,placeId,address,name} จาก Places API (New) เท่านั้น (ไม่มีทางปักหมุดจากแผนที่แล้ว)
-  waypoints:(data.waypoints||[]).map(w=>({id:w.id||genWaypointId(),address:w.address||'',name:w.name||'',lat:(w.lat==null?null:w.lat),lng:(w.lng==null?null:w.lng),placeId:w.placeId||null})),
-  detail:data.detail||'', note:data.note||'', qty:Number(data.qty||1)||1, photos:data.photos||[],
-  _route:{distanceKm:null,durationText:null,encodedPolyline:null}, // ระยะทาง/เวลา/เส้นทางจริงจาก Routes API เฉพาะงานนี้เท่านั้น
-  _map:null,_markers:[],_polyline:null,_routeSeq:0,_routeLoading:false,_routeError:null,_placeDebounce:{}
+  detail:data.detail||'', note:data.note||'', qty:Number(data.qty||1)||1, photos:data.photos||[]
  };
 }
 function findJobById(containerId,jobId){ return (stopsState[containerId]||[]).find(j=>j.id===jobId); }
@@ -1164,14 +1626,30 @@ const ICON_TRASH=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" st
 const ICON_PLUS=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>`;
 const ICON_X=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>`;
 const ICON_CAMERA=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:4px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+/* ---------- ไอคอนเพิ่มเติมสำหรับ Platform v2 (นำทาง/ไรเดอร์/ผลงาน) — สไตล์ feather เดียวกับไอคอนเดิมทุกอัน ไม่มีอิโมจิ ---------- */
+const ICON_HOME=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7"/><path d="M9 22V12h6v10"/><path d="M5 10v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10"/></svg>`;
+const ICON_PACKAGE=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`;
+const ICON_LIST=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>`;
+const ICON_BIKE=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>`;
+const ICON_MAPPIN=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+const ICON_IMAGE=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`;
+const ICON_ARROWLEFT=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>`;
+// เฟส Match Marketplace: ไอคอนใหม่สำหรับ Bottom Navigation / UI การ์ด MATCH — วาดด้วยสไตล์เส้น (stroke) เดียวกับ
+// ไอคอนชุดเดิมทั้งหมดข้างต้นทุกประการ (feather-icon style) เพื่อความสม่ำเสมอ ไม่ใช้ emoji เด็ดขาด
+const ICON_MATCH=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M5 8H4a4 4 0 0 0 0 8h1"/><path d="M8.5 12h7"/><path d="M6 5l6 6 6-6"/></svg>`;
+const ICON_CHAT=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>`;
+const ICON_USER=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+const ICON_SEARCH=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`;
+const ICON_CHECK=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
+const ICON_CLOCK=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;
 /* ---------- render งานหนึ่งแถว ---------- */
+// เหลือใช้เฉพาะแอดมิน (adminStops) เท่านั้นแล้ว — ช่องข้อความล้วน ไม่มีแผนที่ (แอดมินไม่เคยใช้ระบบแผนที่เลยแม้แต่ตอนนั้น)
+// ระบบค้นหาสถานที่/ปักหมุด/จุดแวะ/แผนที่/คำนวณระยะทาง-เส้นทางจริงที่เคยอยู่ตรงนี้ (ผูกกับฟอร์มสร้างงานของลูกค้าเดิม
+// โดยเฉพาะ) ถูกลบออกจากไฟล์นี้จริงทั้งหมดแล้วในเฟส Match Marketplace ตามที่ระบุ — ไม่ใช่แค่ซ่อน UI
 function stopRowHTML(containerId,job,seq,total,opts={}){
  const label=opts.label||'จุดที่';
- const showMap=!!opts.showMap;
  const canMoveUp=seq>1, canMoveDown=seq<total;
  const photos=(job.photos||[]).map((src,idx)=>`<div class="thumb"><img src="${src}"><button type="button" class="thumb-remove" onclick="removePhotoFromJob('${containerId}','${job.id}',${idx})">×</button></div>`).join('');
- const locFieldsHTML=showMap?jobLocFieldsHTML(containerId,job):plainPickupDropoffHTML(containerId,job);
- const mapHTML=showMap?jobMapHTML(job):'';
  return `<div class="stop" id="jobRow_${job.id}" data-job-id="${job.id}">
   <div class="stophead"><div class="num">${seq}</div><div class="stoptitle">${label} ${seq}</div>
    <div class="stoptools">
@@ -1179,8 +1657,10 @@ function stopRowHTML(containerId,job,seq,total,opts={}){
     <button type="button" title="เลื่อนลง" ${canMoveDown?'':'disabled'} onclick="moveStopById('${containerId}','${job.id}',1)">${ICON_DOWN}</button>
     <button type="button" class="danger" title="ลบงานนี้" onclick="removeStopById('${containerId}','${job.id}')">${ICON_TRASH}</button>
    </div></div>
-  ${locFieldsHTML}
-  ${mapHTML}
+  <div class="row">
+   <div class="field"><label>รับของ (สถานที่รับ)</label><input value="${esc(job.pickup||'')}" placeholder="เช่น ร้าน A / ตลาด..." oninput="updateJobField('${containerId}','${job.id}','pickup',this.value)"></div>
+   <div class="field"><label>ส่งของ (สถานที่ส่ง)</label><input value="${esc(job.dropoff||'')}" placeholder="เช่น หอ B / ห้อง..." oninput="updateJobField('${containerId}','${job.id}','dropoff',this.value)"></div>
+  </div>
   <div class="field"><label>รายละเอียดสินค้า</label><textarea placeholder="ชื่อสินค้า / จำนวน / รายละเอียด" oninput="updateJobField('${containerId}','${job.id}','detail',this.value)">${esc(job.detail||'')}</textarea></div>
   <div class="row">
    <div class="field"><label>หมายเหตุเพิ่มเติม</label><input value="${esc(job.note||'')}" placeholder="เช่น ไม่ใส่ผัก / โทรก่อนถึง" oninput="updateJobField('${containerId}','${job.id}','note',this.value)"></div>
@@ -1188,84 +1668,6 @@ function stopRowHTML(containerId,job,seq,total,opts={}){
   </div>
   <div><label>รูปสินค้า</label><div class="photo" onclick="addPhotoToJob('${containerId}','${job.id}')">${ICON_CAMERA}แตะเพื่อแนบรูปสินค้า</div><div class="thumbs" id="thumbs_${job.id}">${photos}</div><div class="photo-hint">เลือกได้หลายรูป และกดเพิ่มรูปได้อีก</div></div>
  </div>`;
-}
-// แอดมิน (adminStops): คงพฤติกรรมเดิมทุกประการ — ช่องข้อความล้วน ไม่มีแผนที่ (แอดมินไม่เคยใช้ระบบแผนที่เลย นอกขอบเขตงานนี้)
-function plainPickupDropoffHTML(containerId,job){
- return `<div class="row">
-  <div class="field"><label>รับของ (สถานที่รับ)</label><input value="${esc(job.pickup||'')}" placeholder="เช่น ร้าน A / ตลาด..." oninput="updateJobField('${containerId}','${job.id}','pickup',this.value)"></div>
-  <div class="field"><label>ส่งของ (สถานที่ส่ง)</label><input value="${esc(job.dropoff||'')}" placeholder="เช่น หอ B / ห้อง..." oninput="updateJobField('${containerId}','${job.id}','dropoff',this.value)"></div>
- </div>`;
-}
-// ลูกค้า (custStops): จุดรับ + จุดแวะ (เพิ่ม/ลบได้) + จุดส่ง — เลือกได้ทางเดียวเท่านั้นคือค้นหาผ่าน Places API
-// (New) แล้วเลือกจากรายการผลลัพธ์ — ไม่มีการคลิก/แตะบนแผนที่เพื่อกำหนดตำแหน่งอีกต่อไป (แผนที่เป็นพื้นที่แสดงผล
-// เส้นทางเท่านั้น) เมื่อเลือกสถานที่แล้ว ช่องจะเปลี่ยนเป็น "การ์ดสถานที่ที่เลือก" (ชื่อเด่น+ที่อยู่รอง) พร้อม
-// ปุ่มล้าง (ไอคอน X) ให้ค้นหาใหม่ได้ทันที ตรงตามที่ระบุ: "จุดรับ จุดแวะ จุดส่งทั้งหมดต้องเลือกด้วยวิธีค้นหาสถานที่เท่านั้น"
-function locWrapId(jobId,role,wid){ return role==='waypoint'?('locWrap_'+jobId+'_wp_'+wid):('locWrap_'+jobId+'_'+role); }
-function locInputId(jobId,role,wid){ return role==='waypoint'?('locInput_'+jobId+'_wp_'+wid):('locInput_'+jobId+'_'+role); }
-function locSuggestId(jobId,role,wid){ return role==='waypoint'?('locSuggest_'+jobId+'_wp_'+wid):('locSuggest_'+jobId+'_'+role); }
-function locFieldMeta(job,role,wid){
- if(role==='pickup') return {label:'จุดรับ',placeholder:'ค้นหาชื่อร้าน สถานที่ หรือที่อยู่...'};
- if(role==='dropoff') return {label:'จุดส่ง',placeholder:'ค้นหาชื่อร้าน สถานที่ หรือที่อยู่...'};
- const idx=job.waypoints.findIndex(w=>w.id===wid);
- return {label:'จุดแวะที่ '+(idx+1),placeholder:'ค้นหาสถานที่...'};
-}
-function locFieldLoc(job,role,wid){
- if(role==='pickup') return job.pickupLoc;
- if(role==='dropoff') return job.dropoffLoc;
- const w=job.waypoints.find(x=>x.id===wid);
- return (w&&w.lat!=null&&w.lng!=null)?{lat:w.lat,lng:w.lng,placeId:w.placeId,address:w.address,name:w.name}:null;
-}
-function locFieldTyped(job,role,wid){
- if(role==='pickup') return job.pickup||'';
- if(role==='dropoff') return job.dropoff||'';
- return ((job.waypoints.find(w=>w.id===wid)||{}).address)||'';
-}
-// เนื้อหาภายในกรอบ .loc-field (ไม่รวม div ครอบ) — แยกออกมาเพื่อ refresh เฉพาะช่องนี้ได้โดยไม่ re-render ทั้งงาน
-function locFieldInner(containerId,job,role,wid){
- const meta=locFieldMeta(job,role,wid);
- const loc=locFieldLoc(job,role,wid);
- const widArg=wid?("'"+wid+"'"):'null';
- if(loc){
-  // เลือกสถานที่แล้ว: แสดงเป็นการ์ด "ชื่อสถานที่เด่น + ที่อยู่รอง" (ข้อมูลจริงจาก Places API เท่านั้น) ไม่ใช่แค่พิกัดดิบ
-  return `<label>${esc(meta.label)}</label>
-  <div class="loc-chip">
-   <div class="loc-chip-text">
-    <div class="loc-chip-name">${esc(loc.name||locFieldTyped(job,role,wid)||'')}</div>
-    ${loc.address?`<div class="loc-chip-sub">${esc(loc.address)}</div>`:''}
-   </div>
-   <button type="button" class="loc-clear-btn" title="ล้างและค้นหาใหม่" onclick="clearLocField('${containerId}','${job.id}','${role}',${widArg})">${ICON_X}</button>
-  </div>`;
- }
- return `<label>${esc(meta.label)}</label>
-  <input id="${locInputId(job.id,role,wid)}" value="${esc(locFieldTyped(job,role,wid))}" placeholder="${esc(meta.placeholder)}" autocomplete="off"
-   oninput="onLocInput('${containerId}','${job.id}','${role}',${widArg},this.value)">
-  <div id="${locSuggestId(job.id,role,wid)}" class="place-sugg" hidden></div>`;
-}
-function locFieldHTML(containerId,job,role,wid){
- const loc=locFieldLoc(job,role,wid);
- return `<div class="loc-field${loc?' selected':''}" id="${locWrapId(job.id,role,wid)}" style="position:relative">${locFieldInner(containerId,job,role,wid)}</div>`;
-}
-function refreshLocField(containerId,job,role,wid){
- const wrap=document.getElementById(locWrapId(job.id,role,wid)); if(!wrap) return;
- wrap.innerHTML=locFieldInner(containerId,job,role,wid);
- wrap.classList.toggle('selected',!!locFieldLoc(job,role,wid));
-}
-function jobLocFieldsHTML(containerId,job){
- const pickupHTML=locFieldHTML(containerId,job,'pickup',null);
- const dropoffHTML=locFieldHTML(containerId,job,'dropoff',null);
- const waypointsHTML=job.waypoints.map(w=>`<div class="waypoint-row">
-   ${locFieldHTML(containerId,job,'waypoint',w.id)}
-   <button type="button" class="btn ghost waypoint-remove" title="ลบจุดแวะนี้" onclick="removeWaypointFromJob('${containerId}','${job.id}','${w.id}')">${ICON_X}</button>
-  </div>`).join('');
- return `<div class="loc-fields">
-  ${pickupHTML}
-  ${waypointsHTML}
-  <button type="button" class="btn ghost add-waypoint-btn" onclick="addWaypointToJob('${containerId}','${job.id}')">${ICON_PLUS}เพิ่มจุดแวะ</button>
-  ${dropoffHTML}
- </div>`;
-}
-function jobMapHTML(job){
- return `<div class="jobmap-wrap"><div class="jobmap" id="jobMapCanvas_${job.id}"></div><div class="jobmap-info" id="jobRouteInfo_${job.id}"></div></div>`;
 }
 /* ---------- เพิ่ม/ลบ/ย้ายงาน — ทุกฟังก์ชันแก้ array จริงก่อนเสมอ แล้วค่อย re-render ทั้ง container ---------- */
 function addStopTo(containerId,data={}){
@@ -1293,26 +1695,17 @@ function updateJobField(containerId,jobId,field,value){
 }
 function renderStopsContainer(containerId){
  const c=$(containerId); if(!c) return;
- const label=containerId==='custStops'?'งานที่':'จุดที่';
- const showMap=containerId==='custStops';
  const jobs=stopsState[containerId]||[];
- c.innerHTML=jobs.map((job,i)=>stopRowHTML(containerId,job,i+1,jobs.length,{label,showMap})).join('');
- if(showMap) jobs.forEach(job=>initJobMap(containerId,job));
+ c.innerHTML=jobs.map((job,i)=>stopRowHTML(containerId,job,i+1,jobs.length,{label:'จุดที่'})).join('');
  afterStopsChange(containerId);
 }
 function afterStopsChange(containerId){
- if(containerId==='custStops') renderCustomerEstimate();
  if(containerId==='adminStops') renderAdminEstimate();
 }
 function collectStopsFrom(containerId){
  return (stopsState[containerId]||[]).map(job=>({
   pickup:job.pickup||'', dropoff:job.dropoff||'',
-  detail:job.detail||'', note:job.note||'', qty:Number(job.qty||1)||1, photos:job.photos||[],
-  // เฉพาะจุดแวะที่เลือกจริงผ่าน Places API แล้วเท่านั้น (มีพิกัดจริง) — ช่องที่พิมพ์ค้างแต่ยังไม่ได้เลือกจะไม่นับ
-  waypoints:(job.waypoints||[]).filter(w=>w.lat!=null&&w.lng!=null).map(w=>({address:w.address,name:w.name||'',lat:w.lat,lng:w.lng,placeId:w.placeId||null})),
-  pickupLoc:job.pickupLoc||null, dropoffLoc:job.dropoffLoc||null,
-  distanceKm:(job._route&&job._route.distanceKm!=null)?job._route.distanceKm:null,
-  durationText:(job._route&&job._route.durationText)||null
+  detail:job.detail||'', note:job.note||'', qty:Number(job.qty||1)||1, photos:job.photos||[]
  }));
 }
 /* ---------- รูปสินค้า: ผูกกับ job.id ตรง ๆ กันรูปหายตอน re-render จากการจัดลำดับ/เพิ่ม-ลบงานอื่น ---------- */
@@ -1339,206 +1732,28 @@ function removePhotoFromJob(containerId,jobId,idx){
  const job=findJobById(containerId,jobId); if(!job) return;
  job.photos.splice(idx,1); renderJobPhotos(containerId,job);
 }
-/* ======================= แผนที่รายงาน (Grab-style: ค้นหาสถานที่จริง + ปักหมุด + เส้นทางจริงต่องาน) =======================
-   แต่ละงานมี Map instance/marker/route ของตัวเองแยกอิสระ (เก็บไว้ที่ job._map/_markers/_polyline) — งานหนึ่งจะไม่มี
-   ทางไปทับ/ชนกับอีกงานหนึ่งเด็ดขาด แม้แสดงหลายงานพร้อมกันบนหน้าเดียว (ตอบโจทย์ "ห้ามใช้ตัวแปร global ชุดเดียว") */
-function jobPointsSequence(job){
- // ลำดับจุดคงที่เสมอ: [จุดรับ, จุดแวะ..., จุดส่ง] — ใช้กำหนดตัวอักษร marker (A,B,C,...) ให้ตรงกับรายการด้านบนเสมอ
- const pts=[{role:'pickup',label:'จุดรับ',loc:job.pickupLoc}];
- job.waypoints.forEach((w,i)=>pts.push({role:'waypoint',wid:w.id,label:'จุดแวะที่ '+(i+1),loc:(w.lat!=null&&w.lng!=null)?{lat:w.lat,lng:w.lng,address:w.address,placeId:w.placeId}:null}));
- pts.push({role:'dropoff',label:'จุดส่ง',loc:job.dropoffLoc});
- pts.forEach((p,i)=>p.letter=String.fromCharCode(65+i));
- return pts;
-}
-async function initJobMap(containerId,job){
- if(!GOOGLE_MAPS_API_KEY) return;
- if(!document.getElementById('jobMapCanvas_'+job.id)) return;
- try{ await loadGoogleMapsApi(); }catch(e){ return; }
- const canvas=document.getElementById('jobMapCanvas_'+job.id); if(!canvas) return; // อาจถูก re-render ทิ้งไปแล้วระหว่างรอโหลดสคริปต์
- // แผนที่เป็นพื้นที่แสดงผลเส้นทาง/ตำแหน่งเท่านั้น — ไม่มี click listener สำหรับปักหมุด (เลือกสถานที่ผ่านช่องค้นหาเท่านั้น)
- job._map=new google.maps.Map(canvas,{center:UBU_CENTER,zoom:14,streetViewControl:false,mapTypeControl:false,fullscreenControl:false,gestureHandling:'greedy'});
- job._markers=[]; job._polyline=null;
- redrawJobMarkersAndRoute(containerId,job);
-}
-function redrawJobMarkersAndRoute(containerId,job){
- if(!job._map) return;
- const pts=jobPointsSequence(job);
- (job._markers||[]).forEach(m=>m.setMap(null));
- job._markers=[];
- const withLoc=pts.filter(p=>p.loc);
- withLoc.forEach(p=>{ job._markers.push(new google.maps.Marker({map:job._map,position:{lat:p.loc.lat,lng:p.loc.lng},label:p.letter,title:p.label})); });
- if(job._polyline){ job._polyline.setMap(null); job._polyline=null; }
- if(job._route&&job._route.encodedPolyline&&window.google&&google.maps.geometry){
-  const path=google.maps.geometry.encoding.decodePath(job._route.encodedPolyline);
-  job._polyline=new google.maps.Polyline({path,map:job._map,strokeColor:'#1769b0',strokeWeight:5,strokeOpacity:0.85});
-  const bounds=new google.maps.LatLngBounds(); path.forEach(p=>bounds.extend(p)); job._map.fitBounds(bounds,50);
- } else if(withLoc.length===1){ job._map.panTo(withLoc[0].loc); job._map.setZoom(15); }
- else if(withLoc.length>1){ const bounds=new google.maps.LatLngBounds(); withLoc.forEach(p=>bounds.extend(p.loc)); job._map.fitBounds(bounds,50); }
- renderJobRouteInfo(containerId,job);
-}
-function renderJobRouteInfo(containerId,job){
- const el=document.getElementById('jobRouteInfo_'+job.id); if(!el) return;
- if(job._route&&job._route.distanceKm!=null) el.textContent='ระยะทางจริง '+job._route.distanceKm+' กม. • เวลาประมาณ '+(job._route.durationText||'-');
- else if(job._routeLoading) el.textContent='กำลังคำนวณเส้นทาง...';
- else if(job._routeError) el.textContent=job._routeError;
- else if(!job.pickupLoc||!job.dropoffLoc) el.textContent='เลือกจุดรับและจุดส่งเพื่อคำนวณเส้นทาง';
- else el.textContent='';
-}
-// point มาจาก Places API (New) เท่านั้นเสมอ (ไม่มีทางมาจากการคลิกแผนที่อีกต่อไป) — {lat,lng,placeId,address,name}
-function applyPointToField(job,role,wid,point){
- if(role==='pickup'){ job.pickupLoc=point; job.pickup=point.name||point.address||''; }
- else if(role==='dropoff'){ job.dropoffLoc=point; job.dropoff=point.name||point.address||''; }
- else if(role==='waypoint'){ const w=job.waypoints.find(x=>x.id===wid); if(w){ w.lat=point.lat; w.lng=point.lng; w.placeId=point.placeId; w.address=point.address; w.name=point.name; } }
-}
-// ปุ่ม "ล้าง" บนการ์ดสถานที่ที่เลือกแล้ว — ล้างค่ากลับไปเป็นช่องค้นหาว่าง ให้เลือกสถานที่ใหม่ผ่าน Places API เท่านั้น
-function clearLocField(containerId,jobId,role,wid){
- const job=findJobById(containerId,jobId); if(!job) return;
- if(role==='pickup'){ job.pickupLoc=null; job.pickup=''; }
- else if(role==='dropoff'){ job.dropoffLoc=null; job.dropoff=''; }
- else if(role==='waypoint'){ const w=job.waypoints.find(x=>x.id===wid); if(w){ w.lat=null; w.lng=null; w.placeId=null; w.address=''; w.name=''; } }
- refreshLocField(containerId,job,role,wid);
- redrawJobMarkersAndRoute(containerId,job);
- computeJobRoute(containerId,job); // จุดถูกล้าง ต้องลบ route เก่า/คำนวณใหม่ (จะกลายเป็นข้อความ "เลือกจุดรับ-ส่ง..." ถ้ายังไม่ครบ)
- const el=document.getElementById(locInputId(job.id,role,wid)); if(el) el.focus();
-}
-function onLocInput(containerId,jobId,role,wid,value){
- const job=findJobById(containerId,jobId); if(!job) return;
- if(role==='pickup') job.pickup=value;
- else if(role==='dropoff') job.dropoff=value;
- else if(role==='waypoint'){ const w=job.waypoints.find(x=>x.id===wid); if(w) w.address=value; }
- schedulePlaceSuggest(containerId,job,role,wid,value);
-}
-function schedulePlaceSuggest(containerId,job,role,wid,value){
- const key=role+(wid||'');
- if(job._placeDebounce[key]) clearTimeout(job._placeDebounce[key]);
- const listEl=document.getElementById(locSuggestId(job.id,role,wid));
- if(!value.trim()){ if(listEl){ listEl.innerHTML=''; listEl.hidden=true; } return; }
- job._placeDebounce[key]=setTimeout(()=>fetchJobPlaceSuggestions(containerId,job,role,wid,value.trim()),350);
-}
-// ค้นหาสถานที่ด้วย Places API (New) โดยตรงผ่าน REST (places:autocomplete) — ไม่ใช้ widget google.maps.places.Autocomplete
-// เดิม เพราะ widget นั้นต้องเปิดใช้ "Places API" รุ่นเก่า ซึ่งโปรเจกต์นี้เปิดเฉพาะ "Places API (New)" เท่านั้น
-async function fetchJobPlaceSuggestions(containerId,job,role,wid,q){
- const listEl=document.getElementById(locSuggestId(job.id,role,wid)); if(!listEl) return;
- let data=null,ok=false;
- try{
-  const resp=await fetch('https://places.googleapis.com/v1/places:autocomplete',{
-   method:'POST',
-   headers:{'Content-Type':'application/json','X-Goog-Api-Key':GOOGLE_MAPS_API_KEY},
-   // regionCode:'TH' + locationBias รอบมหาวิทยาลัยอุบลราชธานี (ไม่ใช่ locationRestriction — ไม่ hard-block พื้นที่อื่น)
-   body:JSON.stringify({input:q,languageCode:'th',regionCode:'TH',
-    locationBias:{circle:{center:{latitude:UBU_CENTER.lat,longitude:UBU_CENTER.lng},radius:UBU_BIAS_RADIUS_M}}})
-  });
-  data=await resp.json().catch(()=>null); ok=resp.ok;
- }catch(e){ ok=false; }
- const suggestions=(ok&&data&&data.suggestions)||[];
- if(!suggestions.length){ listEl.innerHTML='<div class="place-sugg-empty">ไม่พบสถานที่</div>'; listEl.hidden=false; return; }
- // แสดงเฉพาะข้อมูลที่ Places API (New) ส่งกลับมาจริงเท่านั้น (mainText/secondaryText ถ้ามี ไม่งั้น fallback เป็น text เต็ม) ไม่มีการสร้างข้อมูลเพิ่มเอง
- listEl.innerHTML=suggestions.slice(0,6).map((s,i)=>{
-  const p=s.placePrediction; if(!p) return '';
-  const main=(p.structuredFormat&&p.structuredFormat.mainText&&p.structuredFormat.mainText.text)||(p.text&&p.text.text)||'';
-  const secondary=(p.structuredFormat&&p.structuredFormat.secondaryText&&p.structuredFormat.secondaryText.text)||'';
-  return `<div class="place-sugg-item" data-idx="${i}"><div class="place-sugg-main">${esc(main)}</div>${secondary?`<div class="place-sugg-sub">${esc(secondary)}</div>`:''}</div>`;
- }).join('');
- listEl._suggestions=suggestions;
- listEl.hidden=false;
- Array.from(listEl.querySelectorAll('.place-sugg-item')).forEach(el=>{
-  el.addEventListener('mousedown',(ev)=>{ ev.preventDefault(); const idx=Number(el.getAttribute('data-idx')); pickJobPlaceSuggestion(containerId,job,role,wid,listEl._suggestions[idx],listEl); });
- });
- // หน่วงการซ่อนลิสต์ตอน blur กันกรณีคลิกเลือกรายการไม่ทัน (mousedown บนลิสต์จะยิงก่อน blur เสร็จ)
- const inputEl=document.getElementById(locInputId(job.id,role,wid));
- if(inputEl&&!inputEl._blurBound){ inputEl._blurBound=true; inputEl.addEventListener('blur',()=>{ setTimeout(()=>{ if(listEl) listEl.hidden=true; },200); }); }
-}
-async function pickJobPlaceSuggestion(containerId,job,role,wid,sugg,listEl){
- const p=sugg&&sugg.placePrediction; if(!p) return;
- // mainText/secondaryText (ถ้า Places API ส่งมาให้) คือชื่อสถานที่เด่น+ที่อยู่รอง แบบเดียวกับแอปเรียกรถ —
- // ไม่งั้น fallback เป็น text เต็มตามที่ API ส่งมาจริงเท่านั้น (ไม่มีการสร้าง/แต่งข้อมูลเพิ่มเอง)
- const mainText=(p.structuredFormat&&p.structuredFormat.mainText&&p.structuredFormat.mainText.text)||(p.text&&p.text.text)||'';
- listEl.hidden=true;
- const placeId=p.placeId; if(!placeId) return;
- let data=null,ok=false;
- try{
-  const resp=await fetch('https://places.googleapis.com/v1/places/'+encodeURIComponent(placeId),{
-   headers:{'X-Goog-Api-Key':GOOGLE_MAPS_API_KEY,'X-Goog-FieldMask':'location,formattedAddress'}
-  });
-  data=await resp.json().catch(()=>null); ok=resp.ok;
- }catch(e){ ok=false; }
- if(!ok||!data||!data.location) return; // ดึงพิกัดจริงไม่สำเร็จ — ไม่ตั้งค่าอะไรเลย ให้ผู้ใช้ค้นหา/เลือกใหม่ (ไม่ fallback ไปปักหมุดเอง)
- const point={lat:data.location.latitude,lng:data.location.longitude,address:data.formattedAddress||'',placeId,name:mainText};
- applyPointToField(job,role,wid,point);
- refreshLocField(containerId,job,role,wid); // เปลี่ยนช่องนี้เป็นการ์ดสถานที่ที่เลือกแล้วทันที (ชื่อเด่น+ที่อยู่รอง)
- redrawJobMarkersAndRoute(containerId,job);
- computeJobRoute(containerId,job);
-}
-function addWaypointToJob(containerId,jobId){
- const job=findJobById(containerId,jobId); if(!job) return;
- job.waypoints.push({id:genWaypointId(),address:'',name:'',lat:null,lng:null,placeId:null});
- renderStopsContainer(containerId);
-}
-function removeWaypointFromJob(containerId,jobId,wid){
- const job=findJobById(containerId,jobId); if(!job) return;
- const removed=job.waypoints.find(w=>w.id===wid);
- job.waypoints=job.waypoints.filter(w=>w.id!==wid);
- renderStopsContainer(containerId);
- if(removed&&removed.lat!=null&&removed.lng!=null) computeJobRoute(containerId,job); // จุดแวะที่ลบเคยมีพิกัดจริง ต้องคำนวณเส้นทางใหม่
-}
-// แปลงค่า duration ที่ Routes API ส่งกลับมา (รูปแบบ "1234s") เป็นข้อความเวลาโดยประมาณภาษาไทยอ่านง่าย
-function formatDurationTh(durationStr){
- const sec=parseInt(String(durationStr||'').replace('s',''),10)||0;
- if(!sec) return '';
- const mins=Math.round(sec/60);
- if(mins<60) return Math.max(1,mins)+' นาที';
- const h=Math.floor(mins/60), m=mins%60;
- return h+' ชม.'+(m?(' '+m+' นาที'):'');
-}
-// เรียก Routes API (New) — computeRoutes — คำนวณเส้นทาง/ระยะทาง/เวลาเดินทางจริงตามถนน (ไม่ใช่เส้นตรง) เฉพาะงานนี้
-// รองรับหลายจุดแวะผ่าน intermediates (เฉพาะจุดแวะที่มีพิกัดจริงแล้วเท่านั้น เรียงตามลำดับ) ระยะทางที่ได้ป้อนเข้า
-// calcPricing() เดิมทันที (รวมเป็นผลรวมทุกงานที่ renderCustomerEstimate) — สูตรราคาเองไม่ถูกแก้เลย
-async function computeJobRoute(containerId,job){
- const mySeq=++job._routeSeq;
- if(!job.pickupLoc||!job.dropoffLoc||!GOOGLE_MAPS_API_KEY){
-  job._route={distanceKm:null,durationText:null,encodedPolyline:null}; job._routeLoading=false; job._routeError=null;
-  redrawJobMarkersAndRoute(containerId,job); afterStopsChange(containerId);
-  return;
- }
- job._routeLoading=true; job._routeError=null; renderJobRouteInfo(containerId,job);
- const intermediates=job.waypoints.filter(w=>w.lat!=null&&w.lng!=null).map(w=>({location:{latLng:{latitude:w.lat,longitude:w.lng}}}));
- let data=null,ok=false;
- try{
-  const resp=await fetch('https://routes.googleapis.com/directions/v2:computeRoutes',{
-   method:'POST',
-   headers:{'Content-Type':'application/json','X-Goog-Api-Key':GOOGLE_MAPS_API_KEY,'X-Goog-FieldMask':'routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline'},
-   body:JSON.stringify({
-    origin:{location:{latLng:{latitude:job.pickupLoc.lat,longitude:job.pickupLoc.lng}}},
-    destination:{location:{latLng:{latitude:job.dropoffLoc.lat,longitude:job.dropoffLoc.lng}}},
-    intermediates, travelMode:'DRIVE', routingPreference:'TRAFFIC_UNAWARE', units:'METRIC', languageCode:'th-TH'
-   })
-  });
-  data=await resp.json().catch(()=>null); ok=resp.ok;
- }catch(e){ ok=false; }
- if(mySeq!==job._routeSeq) return; // มีการเปลี่ยนจุดรับ-ส่ง/จุดแวะใหม่ระหว่างรอผลลัพธ์เก่านี้ — ทิ้งไปกันข้อมูลเก่ามาทับใหม่
- job._routeLoading=false;
- const route=data?.routes?.[0];
- if(!ok||!route){
-  job._route={distanceKm:null,durationText:null,encodedPolyline:null};
-  job._routeError='คำนวณเส้นทางไม่สำเร็จ (Routes API) ลองเลือกจุดรับ-ส่งใหม่ หรือตรวจสอบ API Key/Billing';
-  redrawJobMarkersAndRoute(containerId,job); afterStopsChange(containerId);
-  return;
- }
- const meters=Number(route.distanceMeters||0);
- job._route={distanceKm:Math.round((meters/1000)*10)/10,durationText:formatDurationTh(route.duration),encodedPolyline:route.polyline?.encodedPolyline||null};
- redrawJobMarkersAndRoute(containerId,job);
- afterStopsChange(containerId);
-}
-
+/* หมายเหตุ (เฟส Match Marketplace): ระบบแผนที่รายงาน (ค้นหาสถานที่จริง Places API/ปักหมุด/คำนวณเส้นทางจริง
+   Routes API ต่องาน — jobPointsSequence/initJobMap/redrawJobMarkersAndRoute/renderJobRouteInfo/
+   applyPointToField/clearLocField/onLocInput/schedulePlaceSuggest/fetchJobPlaceSuggestions/
+   pickJobPlaceSuggestion/addWaypointToJob/removeWaypointFromJob/formatDurationTh/computeJobRoute และฟิลด์ล็อก
+   สถานที่ทั้งหมด locWrapId/locInputId/locSuggestId/locFieldMeta/locFieldLoc/locFieldTyped/locFieldInner/
+   locFieldHTML/refreshLocField/jobLocFieldsHTML/jobMapHTML) เคยอยู่ตรงนี้ ผูกกับฟอร์มสร้างงานของลูกค้าเดิม
+   (custStops) โดยเฉพาะเท่านั้น — ถูกลบออกจากไฟล์นี้จริงทั้งหมดแล้วตามที่ระบุ ("ให้ตรวจโค้ดและลบ/ปรับ flow ที่
+   ไม่จำเป็นอย่างเป็นระบบ" ไม่ใช่แค่ซ่อน UI) เนื่องจาก Admin ไม่เคยเรียกใช้ฟังก์ชันกลุ่มนี้แม้แต่จุดเดียว
+   (adminStops ใช้ stopRowHTML แบบช่องข้อความล้วนเท่านั้น มาตั้งแต่ก่อนมีระบบแผนที่) การลบจึงไม่กระทบ Admin เลย */
 /* ======================= ชิ้นส่วน UI ที่ใช้ร่วมกัน ======================= */
 function statusBadge(s){return `<span class="badge st-${s}">${STATUS_LABEL[s]}</span>`}
 function chatWho(from){return {customer:'ลูกค้า',rider:'ไรเดอร์',admin:'แอดมิน'}[from]||from}
 // avatar: มีรูปใช้รูปจริง ไม่มีรูปใช้ตัวอักษรแรกของชื่อเป็น avatar เริ่มต้น
-function avatarHTML(name,photo,size){
+// accent (พารามิเตอร์ใหม่ เฟส "รื้อ Frontend ใหม่ตาม Reference"): ไม่บังคับ ค่าเริ่มต้นยังเป็นสีฟ้าเดิมเป๊ะ ๆ
+// (backward-compatible กับทุกจุดเรียกเดิมในระบบออเดอร์/แอดมิน) — ใส่ accent='brand' เฉพาะจุดที่อยู่ในดีไซน์ใหม่
+// (มาร์เก็ตเพลส MATCH สีส้ม) เพื่อให้ avatar ตัวอักษร (กรณีไม่มีรูปโปรไฟล์) ใช้โทนสีส้มของแบรนด์แทนสีฟ้าเดิม
+function avatarHTML(name,photo,size,accent){
  size=size||36;
  if(photo) return `<img class="avt" src="${photo}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:1px solid var(--line);flex:0 0 auto">`;
  const letter=(name||'?').trim().charAt(0).toUpperCase()||'?';
- return `<span class="avt" style="width:${size}px;height:${size}px;border-radius:50%;background:var(--blue);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:${Math.max(10,Math.round(size*0.45))}px;flex:0 0 auto">${esc(letter)}</span>`;
+ const bg=accent==='brand'?'var(--brand)':'var(--blue)';
+ return `<span class="avt" style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:${Math.max(10,Math.round(size*0.45))}px;flex:0 0 auto">${esc(letter)}</span>`;
 }
 // chatMsgHTML(viewer, order): ต้องใช้ order เพื่อรู้ว่าไรเดอร์/ลูกค้าคนไหนกำลังคุยด้วย (ชื่อ+รูปจริงล่าสุด ไม่ใช่แค่คำว่า "ลูกค้า"/"ไรเดอร์" ลอย ๆ)
 function chatMsgHTML(viewer,order){
@@ -1558,7 +1773,7 @@ function openLightbox(src){$('lightboxImg').src=src;$('lightbox').classList.remo
 function closeLightbox(){$('lightbox').classList.add('hidden');$('lightboxImg').src='';}
 
 /* ---------- แนบรูปในแชท: ตรวจสอบ/บีบอัด/แสดงตัวอย่างก่อนส่ง ---------- */
-const CHAT_IMAGE_MAX_BYTES=5*1024*1024; // 5 MB ก่อนอัปโหลด/บีบอัด
+const CHAT_IMAGE_MAX_BYTES=10*1024*1024; // 10 MB ก่อนบีบอัด (ไฟล์จริงที่ถูกส่งไปเก็บจะเล็กกว่านี้มากหลัง compressChatImage บีบอัดแล้ว)
 const CHAT_IMAGE_ACCEPTED=['image/jpeg','image/jpg','image/png','image/webp'];
 const CHAT_IMAGE_MAX_DIM=1920;
 let custPendingImage=null, riderPendingImage=null;
@@ -1587,13 +1802,13 @@ async function onChatImagePicked(input,role){
  const file=input.files&&input.files[0];
  input.value='';
  if(!file)return;
- if(!CHAT_IMAGE_ACCEPTED.includes(file.type)){ toast('รองรับเฉพาะไฟล์ JPG, JPEG, PNG และ WebP เท่านั้น'); return; }
- if(file.size>CHAT_IMAGE_MAX_BYTES){ toast('รูปภาพต้องมีขนาดไม่เกิน 5 MB'); return; }
+ if(!CHAT_IMAGE_ACCEPTED.includes(file.type)){ toast('รองรับเฉพาะไฟล์รูปภาพ JPG, PNG หรือ WebP เท่านั้น'); return; }
+ if(file.size>CHAT_IMAGE_MAX_BYTES){ toast('รูปภาพต้องมีขนาดไม่เกิน 10 MB'); return; }
  try{
   const compressed=await compressChatImage(file);
   if(role==='customer'){ custPendingImage=compressed; renderCustAttachPreview(); }
   else { riderPendingImage=compressed; renderRiderAttachPreview(); }
- }catch(e){ toast('ไม่สามารถประมวลผลรูปนี้ได้ ลองรูปอื่น'); }
+ }catch(e){ toast('ไม่สามารถใช้งานรูปนี้ได้ ลองเลือกรูปอื่น'); } // ข้อความสั้น เข้าใจง่าย ไม่โชว์ technical error ให้ลูกค้า
 }
 function renderCustAttachPreview(){
  const box=$('custAttachPreview'); if(!box)return;
@@ -1607,8 +1822,159 @@ function renderRiderAttachPreview(){
  box.classList.remove('hidden');
  box.innerHTML=`<div class="attach-chip"><img src="${riderPendingImage}"><button type="button" class="attach-remove" onclick="riderPendingImage=null;renderRiderAttachPreview()">×</button><span class="tag">พร้อมส่ง</span></div>`;
 }
+// ปุ่มแนบรูปในแชท (จุดเดียว รองรับทั้งถ่ายรูปจากกล้อง+เลือกจากคลัง): สาเหตุจริงที่ถ่ายรูปจากกล้องไม่ได้ (เดิม)
+// คือ accept ระบุ MIME type แบบ list ยาว (image/jpeg,image/png,image/webp,image/jpg — "image/jpg" ไม่ใช่ MIME
+// type มาตรฐานด้วย ค่าที่ถูกต้องคือ "image/jpeg") ซึ่งเป็นพฤติกรรมที่รู้กันดีว่า iOS Safari/Chrome บาง
+// เวอร์ชันจะตัดตัวเลือก "ถ่ายรูป" ออกจากเมนู เหลือแค่ "เลือกจากคลังรูป" เมื่อ accept ไม่ใช่ wildcard image/* ตรง
+// ๆ — แก้โดยเปลี่ยนเป็น accept="image/*" (ตามที่ระบุ) และไม่ใส่ capture เลย เพราะ input file ที่มี accept="image/*"
+// แบบไม่มี capture จะเปิดเมนูเนทีฟของอุปกรณ์เอง (ถ่ายรูปจากกล้อง / เลือกจากคลังรูป) ให้ผู้ใช้เลือกได้ทั้งสองทาง
+// ทั้ง iOS และ Android อยู่แล้วโดยไม่ต้องบังคับโหมดใดโหมดหนึ่ง — ถ้าใส่ capture="environment" แทน จะบังคับเปิด
+// กล้องอย่างเดียวบน iOS Safari (ตัดตัวเลือกคลังรูปออกไปเลย) ซึ่งขัดกับข้อกำหนด "ห้ามบังคับให้เปิดเฉพาะกล้อง"
+// โดยตรง จึงไม่ใส่ capture — ปุ่มเรียก input.click() ตรง ๆ แบบ synchronous ใน onclick (ไม่ผ่าน async callback)
+// ตามที่ต้องรักษาไว้ เพื่อไม่ให้ iOS บล็อกการเปิด picker (ต้องมาจาก user gesture โดยตรงเท่านั้น)
 function chatAttachButtonHTML(inputId,role){
- return `<button type="button" class="btn ghost chat-attach-btn" title="แนบรูปภาพ" onclick="$('${inputId}').click()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button><input type="file" id="${inputId}" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none" onchange="onChatImagePicked(this,'${role}')">`;
+ return `<button type="button" class="btn ghost chat-attach-btn" id="attachBtn_${inputId}" title="แนบรูปภาพ" onclick="$('${inputId}').click()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button><input type="file" id="${inputId}" accept="image/*" style="display:none" onchange="onChatImagePicked(this,'${role}')">`;
+}
+/* ======================= MATCH MARKETPLACE — ชิ้นส่วน UI ที่ใช้ร่วมกันระหว่างฝั่งลูกค้า/ผู้ให้บริการ =======================
+   เหตุผลที่แยกมาไว้ตรงนี้ (นอกเขต CUSTOMER/RIDER): รายการ MATCH/ห้องแชท MATCH/การ์ดข้อความ หน้าตาเหมือนกันทุก
+   ประการทั้งสองฝั่ง ต่างแค่ "อีกฝ่ายที่กำลังคุยด้วยคือใคร" และปุ่ม action เฉพาะ role — ใช้โค้ดชุดเดียวกันทั้งหมด
+   กันโค้ดซ้ำซ้อน/พฤติกรรมเพี้ยนกันระหว่างสองฝั่งโดยไม่ตั้งใจ */
+const MATCH_STATUS_LABEL={pending:'รอผู้ให้บริการตอบรับ',accepted:'ยอมรับแล้ว',declined:'ถูกปฏิเสธ',cancelled:'ยกเลิกแล้ว',active:'กำลังดำเนินงาน',completed:'เสร็จสิ้นแล้ว'};
+function customerMatchStatusLabel(s){ return MATCH_STATUS_LABEL[s]||s; }
+// แคชชื่อ/รูปของ "อีกฝ่าย" ใน MATCH แต่ละอัน — อ่านแบบ sync เสมอ (คืนค่า placeholder ทันทีถ้ายังไม่มีในแคช) แล้วค่อย
+// ยิง fetch จริงเบื้องหลัง เสร็จแล้วเรียก fireChange() ให้ทุกจอที่กำลังแสดงอยู่วาดใหม่อัตโนมัติ — รูปแบบเดียวกับที่ทั้ง
+// ไฟล์นี้ใช้อยู่แล้ว (realtime → upsert* → fireChange → dbListeners วาดใหม่) ไม่ต้องสร้างกลไก async ใหม่ซ้อน
+let MATCH_PROVIDER_CACHE={}, MATCH_PROVIDER_FETCHING={};
+let MATCH_CUSTOMER_CACHE={}, MATCH_CUSTOMER_FETCHING={};
+function getMatchProviderDisplay(id){
+ if(!id) return {name:'ผู้ให้บริการ',photo:null};
+ const fromDir=RIDER_DIRECTORY.find(r=>r.id===id);
+ if(fromDir) return {name:fromDir.name,photo:fromDir.photo||null};
+ if(MATCH_PROVIDER_CACHE[id]) return MATCH_PROVIDER_CACHE[id];
+ ensureMatchProviderCached(id);
+ return {name:'ผู้ให้บริการ',photo:null};
+}
+async function ensureMatchProviderCached(id){
+ if(MATCH_PROVIDER_CACHE[id]||MATCH_PROVIDER_FETCHING[id]) return;
+ MATCH_PROVIDER_FETCHING[id]=true;
+ try{
+  const {data,error}=await sbCustomer.from('rider_directory').select('*').eq('id',id).maybeSingle();
+  if(!error&&data){ MATCH_PROVIDER_CACHE[id]={name:data.name||'ผู้ให้บริการ',photo:data.photo||null}; fireChange(false); }
+ } finally { MATCH_PROVIDER_FETCHING[id]=false; }
+}
+function getMatchCustomerDisplay(id){
+ if(!id) return {name:'ลูกค้า',photo:null};
+ if(MATCH_CUSTOMER_CACHE[id]) return MATCH_CUSTOMER_CACHE[id];
+ ensureMatchCustomerCached(id);
+ return {name:'ลูกค้า',photo:null};
+}
+async function ensureMatchCustomerCached(id){
+ if(MATCH_CUSTOMER_CACHE[id]||MATCH_CUSTOMER_FETCHING[id]) return;
+ MATCH_CUSTOMER_FETCHING[id]=true;
+ try{
+  // อ่านได้เฉพาะลูกค้าของ MATCH ที่ผู้ให้บริการคนนี้เป็นคู่สนทนาอยู่จริงเท่านั้น (RLS: profiles_select_customer_by_match_provider ใน 0008_match_marketplace.sql)
+  const {data,error}=await sbRider.from('profiles').select('id,name,photo').eq('id',id).maybeSingle();
+  if(!error&&data){ MATCH_CUSTOMER_CACHE[id]={name:data.name||'ลูกค้า',photo:data.photo||null}; fireChange(false); }
+ } finally { MATCH_CUSTOMER_FETCHING[id]=false; }
+}
+// แถวเดียวในรายการ MATCH/แชท — ใช้ทั้งฝั่งลูกค้า (viewerRole='customer', เห็นชื่อผู้ให้บริการ) และฝั่งผู้ให้บริการ
+// (viewerRole='rider', เห็นชื่อลูกค้า)
+function matchListRowHTML(m,viewerRole){
+ const counterparty=viewerRole==='customer'?getMatchProviderDisplay(m.providerId):getMatchCustomerDisplay(m.customerId);
+ const openFn=viewerRole==='customer'?'customerOpenMatch':'riderOpenMatch';
+ const priceText=m.agreedPrice?(' • ตกลง '+baht(m.agreedPrice)):(m.proposedPrice?(' • เสนอ '+baht(m.proposedPrice)):'');
+ return `<div class="dk-match-row" onclick="${openFn}('${m.id}')">
+  ${avatarHTML(counterparty.name,counterparty.photo,40,'brand')}
+  <div class="mtext"><div class="mtitle">${esc(counterparty.name)}</div><div class="mmeta">${fmtTime(m.updatedAt||m.createdAt)}${priceText}</div></div>
+  <span class="dk-mstatus st-${m.status}">${customerMatchStatusLabel(m.status)}</span>
+ </div>`;
+}
+function renderMatchListInto(boxId,list,viewerRole){
+ const box=$(boxId); if(!box) return;
+ box.innerHTML=list.length? `<div class="dk-match-list">${list.map(m=>matchListRowHTML(m,viewerRole)).join('')}</div>` : '<div class="dk-empty">ยังไม่มีรายการ</div>';
+}
+// การ์ดข้อความในห้องแชท MATCH — ต่างจาก chatMsgHTML (ระบบออเดอร์เดิม) ตรงที่ต้องรองรับการ์ดข้อเสนอราคาพิเศษ
+// (kind='price_proposal') เพิ่มเติมจากข้อความปกติ ใช้ counterparty ที่ resolve ไว้แล้ว (sync) แทนการ query ซ้ำทุกข้อความ
+function matchChatMsgHTML(viewer,counterparty,match){
+ const self=viewer==='customer'?(currentCustomer()||{name:'ลูกค้า',photo:null}):(currentRider()||{name:'ผู้ให้บริการ',photo:null});
+ return (m)=>{
+  const mine=m.from===viewer;
+  const name=mine?(self.name||(viewer==='customer'?'ลูกค้า':'ผู้ให้บริการ')):counterparty.name;
+  const photo=mine?(self.photo||null):counterparty.photo;
+  const roleLabel=m.from==='customer'?'ลูกค้า':'ผู้ให้บริการ';
+  if(m.kind==='price_proposal'){
+   const meta=m.meta||{}; const price=meta.price; const status=meta.status||'pending';
+   const canRespond=viewer==='customer'&&status==='pending';
+   return `<div class="dk-proposal-card${mine?' me':''}">
+    <div class="pptitle">ข้อเสนอราคาจากผู้ให้บริการ</div>
+    <div class="ppprice">${baht(price)}</div>
+    ${status==='pending'
+     ? (canRespond?`<div class="ppactions"><button class="dk-btn primary" type="button" onclick="customerRespondProposal('${m.id}',true)">ยอมรับราคานี้</button><button class="dk-btn outline" type="button" onclick="customerRespondProposal('${m.id}',false)">ปฏิเสธ</button></div>`:`<div class="ppresult">รอลูกค้าตอบรับข้อเสนอ</div>`)
+     : status==='accepted' ? `<div class="ppresult accepted">${ICON_CHECK} ลูกค้ายอมรับข้อเสนอนี้แล้ว</div>`
+     : `<div class="ppresult rejected">ลูกค้าปฏิเสธข้อเสนอนี้</div>`}
+   </div>`;
+  }
+  return `<div class="chatmsg ${mine?'me':'other'}">
+   <div class="who">${avatarHTML(name,photo,18,'brand')}<span class="whoname">${esc(name)}</span><span class="whorole">${roleLabel}</span><span class="whotime">${fmtTime(m.at)}</span></div>
+   ${m.image?`<img class="chatimg" src="${m.image}" onclick="openLightbox(this.src)" alt="รูปแนบในแชท">`:''}
+   ${m.text?`<div>${esc(m.text)}</div>`:''}
+  </div>`;
+ };
+}
+// ห้องแชท MATCH เต็มรูปแบบ — ใช้ร่วมกันทั้งสองฝั่ง ต่างกันแค่ปุ่ม action (ตอบรับ/ปฏิเสธ/เสนอราคา/เสร็จสิ้นงาน เป็นของ
+// ผู้ให้บริการเท่านั้น) กับปลายทางปุ่ม "กลับ" ผู้เรียกต้อง render ต่อหลังจากนี้: ถ้า status==='completed' และ
+// viewerRole==='customer' ต้องเรียก renderMatchReviewBox(m.id) ต่อทันที (ต้อง query ตาราง reviews จริงก่อนรู้ว่าเคย
+// รีวิวไปหรือยัง — render sync ล่วงหน้าไม่ได้)
+/* ขั้นตอนของ MATCH — ใช้เติมพื้นที่หน้าจอตอนสถานะ pending ให้ไม่เหลือช่องว่างใหญ่ ๆ เปล่า ๆ (ตามที่ Reference
+   ไม่เคยปล่อยพื้นที่ว่าง) และบอกผู้ใช้จริง ๆ ว่าขั้นต่อไปคืออะไร — เป็นข้อความอธิบาย flow ของระบบเอง ไม่ใช่ข้อมูลปลอม */
+const MATCH_STEPS=[
+ {k:'pending',t:'ส่งคำขอ MATCH',d:'ส่งถึงผู้ให้บริการแล้ว'},
+ {k:'accepted',t:'ผู้ให้บริการตอบรับ',d:'แชทจะเปิดให้คุยรายละเอียดกันได้'},
+ {k:'proposed',t:'ตกลงรายละเอียดและราคา',d:'ผู้ให้บริการเสนอราคาในแชท แล้วคุณกดยอมรับ'},
+ {k:'active',t:'เริ่มงาน',d:'สถานะเปลี่ยนเป็นกำลังดำเนินงาน'},
+ {k:'completed',t:'จบงานและให้รีวิว',d:'ให้คะแนนผู้ให้บริการหลังงานเสร็จ'}
+];
+function matchStepsHTML(status){
+ const order=['pending','accepted','proposed','active','completed'];
+ const cur=order.indexOf(status==='accepted'?'accepted':status==='active'?'active':status==='completed'?'completed':'pending');
+ return `<div class="dk-steps">
+  <div class="dk-sechead" style="margin-bottom:12px"><h3>ขั้นตอนถัดไป</h3></div>
+  ${MATCH_STEPS.map((s,i)=>`<div class="dk-step${i<=cur?' done':''}"><span class="dk-step-dot">${i<=cur?'✓':i+1}</span><div><b>${s.t}</b><span>${s.d}</span></div></div>`).join('')}
+ </div>`;
+}
+function matchRoomHTML(m,viewerRole,counterparty){
+ const backFn=viewerRole==='customer'?"customerNavGo('chats')":"riderNavGo('matches')";
+ const chatInputId=viewerRole==='customer'?'dkChatInput':'dkRiderChatInput';
+ const chatImgInputId=chatInputId+'Img';
+ const sendFn=viewerRole==='customer'?'customerSendMatchChat()':'riderSendMatchChat()';
+ const canChat=['accepted','active','completed'].includes(m.status);
+ return `<div class="dk-card">
+  <div class="dk-head">
+   <div style="display:flex;align-items:center;gap:10px;min-width:0">${avatarHTML(counterparty.name,counterparty.photo,40,'brand')}<div style="min-width:0">
+    <h2 style="margin:0;font-size:15px">${esc(counterparty.name)}</h2>
+    <div class="dk-chathead-meta">${m.agreedPrice?`<b>ตกลงราคา ${baht(m.agreedPrice)}</b>`:(m.proposedPrice?`<b>เสนอ ${baht(m.proposedPrice)}</b>`:'<span>ยังไม่ตกลงราคา</span>')}<span class="dk-mstatus st-${m.status}">${customerMatchStatusLabel(m.status)}</span></div>
+   </div></div>
+   <button type="button" class="dk-btn outline" style="flex:0 0 auto;max-width:110px" onclick="${backFn}">${ICON_ARROWLEFT}&nbsp;กลับ</button>
+  </div>
+  ${m.status==='pending'&&viewerRole==='customer'?`<div class="dk-empty">รอผู้ให้บริการตอบรับคำขอ MATCH นี้ — แชทจะเปิดใช้งานทันทีที่ตอบรับ</div>
+   ${matchStepsHTML(m.status)}`:''}
+  ${m.status==='pending'&&viewerRole==='rider'?`<div class="dk-empty" style="margin-bottom:12px">มีคำขอ MATCH ใหม่จากลูกค้าคนนี้</div>
+   <div class="actions" style="display:flex;gap:10px;margin-bottom:6px"><button class="dk-btn primary" type="button" onclick="riderAcceptMatch('${m.id}')">ตอบรับ</button><button class="dk-btn outline" type="button" onclick="riderDeclineMatch('${m.id}')">ปฏิเสธ</button></div>`:''}
+  ${m.status==='declined'?`<div class="dk-empty">ผู้ให้บริการไม่สะดวกรับงานนี้</div>`:''}
+  ${m.status==='cancelled'?`<div class="dk-empty">MATCH นี้ถูกยกเลิกแล้ว</div>`:''}
+  ${canChat?`
+   <div class="dk-chatbox" id="dkChatBox">${m.chat.map(matchChatMsgHTML(viewerRole,counterparty,m)).join('')||'<div class="dk-empty">เริ่มต้นการสนทนาได้เลย</div>'}</div>
+   <div class="chat-attach-preview hidden" id="${viewerRole==='customer'?'custAttachPreview':'riderAttachPreview'}"></div>
+   ${viewerRole==='rider'&&m.status==='accepted'?(riderPriceProposeOpenFor===m.id?`
+    <div style="border:1px solid var(--brand-line);border-radius:var(--radius-md);padding:12px;margin-bottom:10px;background:#fffdfa">
+     <div class="field" style="margin-bottom:8px"><label>เสนอราคา (บาท)</label><input id="riderPriceInput" type="number" min="1" placeholder="เช่น 60" onkeydown="if(event.key==='Enter'){event.preventDefault();riderConfirmPriceProposal('${m.id}');}"></div>
+     <div class="actions" style="display:flex;gap:8px"><button class="dk-btn primary" type="button" onclick="riderConfirmPriceProposal('${m.id}')">ส่งข้อเสนอ</button><button class="dk-btn outline" type="button" onclick="riderPriceProposeOpenFor=null;riderBuiltMode=null;renderRiderRoot()">ยกเลิก</button></div>
+    </div>`:`<div class="actions" style="margin-bottom:10px"><button class="dk-btn primary" type="button" style="width:100%" onclick="riderOpenPricePrompt('${m.id}')">เสนอราคา</button></div>`):''}
+   ${viewerRole==='rider'&&m.status==='active'?`<div class="actions" style="margin-bottom:10px"><button class="dk-btn primary" type="button" style="width:100%" onclick="riderCompleteMatch('${m.id}')">เสร็จสิ้นงาน</button></div>`:''}
+   <div class="chatrow">${chatAttachButtonHTML(chatImgInputId,viewerRole)}<input id="${chatInputId}" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter'){event.preventDefault();${sendFn};}"><button class="dk-btn primary" type="button" id="${chatInputId}SendBtn" style="flex:0 0 auto;padding:11px 18px" onclick="${sendFn}">ส่ง</button></div>
+  `:''}
+  ${viewerRole==='customer'&&m.status==='completed'?'<div id="dkReviewBox" style="margin-top:14px"></div>':''}
+ </div>`;
 }
 function timelineHTML(o){return `<div class="timeline">${o.timeline.map(t=>`<div class="tlrow"><span>${fmtTime(t.at)}</span><b>${STATUS_LABEL[t.status]}</b></div>`).join('')}</div>`;}
 function openMaps(place){window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place),'_blank')}
@@ -2152,17 +2518,358 @@ async function adminResetPassword(type,id,customPassword){
  } finally { adminResetPwBusy=false; renderAdminUsersList(); }
 }
 
-/* ======================= CUSTOMER ======================= */
+/* ======================= CUSTOMER =======================
+   เฟส Match Marketplace: รื้อใหม่ทั้งหมด — ลูกค้าไม่สร้างงานอีกต่อไป เปลี่ยนเป็น "เลือกผู้ให้บริการ → MATCH →
+   แชท → ตกลงราคา → งานเสร็จ → รีวิว" (ดูรายละเอียดที่ matchRoomHTML/matchChatMsgHTML ในหมวด UI ที่ใช้ร่วมกันด้านบน) */
 let custBuiltMode=null;
 let customerAuthMode='login'; // 'login' | 'signup'
 let custAuthPendingPhoto=null; // รูปโปรไฟล์ที่เลือกไว้ระหว่างสมัครสมาชิกลูกค้า ก่อนกดยืนยัน
-let customerViewMode='dashboard'; // 'dashboard' | 'neworder' (การดูออเดอร์เดี่ยวใช้ URL param ?order= เป็นหลักเหมือนเดิม)
+let custProfilePendingPhoto=undefined; // undefined=ยังไม่แก้ไข, null=ลบรูปตั้งใจ, string=รูปใหม่ที่เลือกไว้ระหว่างแก้โปรไฟล์
+let customerViewMode='home'; // 'home' | 'matches' | 'chats' | 'profile' | 'riderProfile' | 'matchRoom' (การดูออเดอร์เดี่ยวเก่าใช้ URL param ?order= เป็นหลักเหมือนเดิม)
+let customerViewingProviderId=null; // กำลังดูโปรไฟล์ผู้ให้บริการคนไหนอยู่
+let customerViewingMatchId=null; // กำลังอยู่ในห้องแชท MATCH ไหนอยู่
+let riderDirectoryCategory='all'; // ชิปประเภทบริการที่เลือกกรองอยู่ในหน้าแรก
+let riderDirectorySearch='';
+const SERVICE_CATEGORIES=['รับหิ้ว','ส่งของ','ขนของ','ซื้อสินค้า','งานทั่วไป'];
+const CUSTOMER_TABS=[
+ {key:'home',label:'หน้าแรก',icon:ICON_HOME},
+ {key:'matches',label:'MATCH',icon:ICON_MATCH},
+ {key:'chats',label:'แชท',icon:ICON_CHAT},
+ {key:'profile',label:'โปรไฟล์',icon:ICON_USER}
+];
+function customerActiveTabKey(){
+ if(customerViewMode==='matches'||customerViewMode==='riderProfile') return 'matches';
+ if(customerViewMode==='chats'||customerViewMode==='matchRoom') return 'chats';
+ if(customerViewMode==='profile') return 'profile';
+ return 'home';
+}
+/* ---------- แถบนำทางลูกค้า (หน้าแรก/MATCH/แชท/โปรไฟล์) — เวอร์ชันเดสก์ท็อป (มือถือใช้ renderBottomNav() แทน) ---------- */
+function customerNavTabsHTML(){
+ const active=customerActiveTabKey();
+ return `<div class="dk-navtabs-desktop">${CUSTOMER_TABS.map(t=>`<button type="button" class="navtab${active===t.key?' active':''}" onclick="customerNavGo('${t.key}')">${t.icon}${t.label}</button>`).join('')}</div>`;
+}
+function customerNavGo(key){
+ const u=new URL(location.href); u.searchParams.delete('order'); history.pushState({},'',u.toString());
+ customerViewingMatchId=null;
+ customerViewMode=(key==='matches'||key==='chats'||key==='profile')?key:'home';
+ custBuiltMode=null; renderCustomerRoot();
+}
+/* ---------- หน้าแรก: มาร์เก็ตเพลสค้นหา/เลือกผู้ให้บริการโดยตรง ไม่ต้องอธิบายงานล่วงหน้า ---------- */
+function customerHomeHTML(cust){
+ return `${customerNavTabsHTML()}<div class="dk-card">
+  <div class="dk-head"><div><h2>สวัสดี คุณ${esc(cust.name)}</h2><div class="dk-sub">ค้นหาผู้ให้บริการที่ถูกใจ แล้วกด MATCH เพื่อเริ่มคุยรายละเอียดงานได้เลย</div></div></div>
+  <div class="dk-search-row"><input id="dkHomeSearch" placeholder="ค้นหาชื่อผู้ให้บริการ หรือประเภทบริการ..." value="${esc(riderDirectorySearch)}" oninput="customerSetProviderSearch(this.value)"></div>
+  <div class="dk-chip-row" id="dkCategoryChips">
+   <button type="button" class="dk-chip${riderDirectoryCategory==='all'?' active':''}" data-cat="all" onclick="customerSetProviderCategory('all')">ทั้งหมด</button>
+   ${SERVICE_CATEGORIES.map(c=>`<button type="button" class="dk-chip${riderDirectoryCategory===c?' active':''}" data-cat="${esc(c)}" onclick="customerSetProviderCategory('${esc(c)}')">${esc(c)}</button>`).join('')}
+  </div>
+  <div id="dkProviderGrid"><div class="dk-empty">กำลังโหลดรายชื่อผู้ให้บริการ...</div></div>
+ </div>`;
+}
+async function renderCustomerHomeView(){
+ await loadRiderDirectory();
+ renderProviderGrid();
+}
+const DK_STATUS_LABEL={available:'ว่าง',busy:'ไม่ว่าง',offline:'ออฟไลน์'};
+function dkProviderStatus(row){
+ const st=riderEffectiveStatus(row); // 'open'|'busy'|'closed'
+ return st==='open'?'available':st==='busy'?'busy':'offline';
+}
+function startingPriceHTML(row){
+ // ราคาเริ่มต้นเป็นข้อมูลจริงที่ผู้ให้บริการตั้งเองเท่านั้น (ไม่มีการคำนวณ/สุ่ม) — ถ้ายังไม่ตั้งค่า แสดงข้อความ
+ // ตรงไปตรงมาแทนตัวเลขหลอก
+ if(row.starting_price!=null&&row.starting_price!=='') return `<div class="dk-startprice">เริ่มต้น <b>${baht(row.starting_price)}</b></div>`;
+ return `<div class="dk-startprice muted">สอบถามราคาในแชท</div>`;
+}
+/* สถานะแบบ Reference: จุดสีเล็ก + ข้อความบาง ๆ มุมขวาบนของการ์ด (ไม่ใช่ป้ายทึบ) — ยังคำนวณจากข้อมูลจริง
+   (สวิตช์เปิดรับงานของผู้ให้บริการ + งานที่กำลังทำอยู่จริง) เหมือนเดิมทุกประการ ไม่มีสถานะปลอม */
+function dkStatusDotHTML(row){
+ const k=dkProviderStatus(row);
+ return `<span class="dk-onstatus st-${k}"><i></i>${DK_STATUS_LABEL[k]}</span>`;
+}
+/* คะแนนแบบ Reference: "★ 4.93 (127 งาน)" — ตัวเลขงานคือ completed_count จริงจากฐานข้อมูล
+   ถ้ายังไม่มีรีวิวเลย แสดงเฉพาะจำนวนงานจริง ไม่แสดงดาวหลอก */
+function dkRatingLineHTML(row){
+ if(row.review_count>0) return `<span class="dk-rating-num"><span class="dk-star">★</span> <b>${Number(row.avg_rating).toFixed(2)}</b> <span>(${row.completed_count} งาน)</span></span>`;
+ return `<span class="dk-rating-num dk-norating">ยังไม่มีรีวิว${row.completed_count?` • ${row.completed_count} งาน`:''}</span>`;
+}
+function providerCardHTML(row){
+ const st=dkProviderStatus(row);
+ const canMatch=st==='available';
+ const services=(row.services||'').split(',').map(s=>s.trim()).filter(Boolean);
+ return `<div class="dk-pcard" onclick="customerOpenProviderProfile('${row.id}')">
+  <div class="dk-pchead">
+   ${avatarHTML(row.name,row.photo,48,'brand')}
+   <div class="dk-pcbody">
+    <div class="dk-pctop">
+     <div class="dk-pcname">${esc(row.name)}</div>
+     ${dkStatusDotHTML(row)}
+    </div>
+    ${services.length?`<div class="dk-pcsub">${services.slice(0,3).map(esc).join(' • ')}</div>`:''}
+    <div class="dk-rating">${dkRatingLineHTML(row)}${row.service_area?`<span class="dk-area-inline">${ICON_MAPPIN}${esc(row.service_area)}</span>`:''}</div>
+    ${startingPriceHTML(row)}
+   </div>
+  </div>
+  <div class="dk-pcard-actions">
+   <button type="button" class="dk-btn outline" onclick="event.stopPropagation();customerOpenProviderProfile('${row.id}')">ดูโปรไฟล์</button>
+   <button type="button" class="dk-btn primary" ${canMatch?'':'disabled'} onclick="event.stopPropagation();customerStartMatch('${row.id}','${esc(row.name)}')">MATCH</button>
+  </div>
+ </div>`;
+}
+/* การ์ดแนวนอนขนาดเล็กสำหรับแถว "แนะนำสำหรับคุณ" ตาม Reference (คนที่เหมาะกับคุณ) — ข้อมูลจริงทั้งหมด */
+function providerMiniCardHTML(row){
+ const services=(row.services||'').split(',').map(s=>s.trim()).filter(Boolean);
+ return `<button type="button" class="dk-mini" onclick="customerOpenProviderProfile('${row.id}')">
+  <span class="dk-mini-av">${avatarHTML(row.name,row.photo,54,'brand')}<i class="dk-mini-dot st-${dkProviderStatus(row)}"></i></span>
+  <span class="dk-mini-name">${esc(row.name)}</span>
+  <span class="dk-mini-sub">${services.length?esc(services[0]):'ผู้ให้บริการ'}</span>
+  <span class="dk-mini-rate">${row.review_count>0?`<span class="dk-star">★</span> ${Number(row.avg_rating).toFixed(2)}`:`${row.completed_count} งาน`}</span>
+ </button>`;
+}
+function renderProviderGrid(){
+ const box=$('dkProviderGrid'); if(!box) return;
+ let rows=RIDER_DIRECTORY;
+ if(riderDirectoryCategory!=='all') rows=rows.filter(r=>(r.services||'').split(',').map(s=>s.trim()).includes(riderDirectoryCategory));
+ const q=riderDirectorySearch.trim().toLowerCase();
+ if(q) rows=rows.filter(r=>(r.name||'').toLowerCase().includes(q)||(r.services||'').toLowerCase().includes(q)||(r.bio||'').toLowerCase().includes(q)||(r.service_area||'').toLowerCase().includes(q));
+
+ // แถว "แนะนำสำหรับคุณ" ตาม Reference — คัดจากข้อมูลจริงเท่านั้น: เฉพาะคนที่ "ว่างรับงานอยู่จริง" ตอนนี้
+ // เรียงตามคะแนนจริงแล้วตามจำนวนงานจริง ไม่มีการสุ่ม/ยัดข้อมูลปลอม แสดงเฉพาะตอนดู "ทั้งหมด" และไม่ได้ค้นหาอยู่
+ // (เหมือน Reference ที่แถวแนะนำเป็นชุดคัดมาให้ ไม่ใช่ผลการค้นหา) และต้องมีอย่างน้อย 2 คนถึงจะคุ้มที่จะโชว์
+ let recHTML='';
+ if(riderDirectoryCategory==='all' && !q){
+  const rec=RIDER_DIRECTORY.filter(r=>dkProviderStatus(r)==='available')
+   .sort((a,b)=>(Number(b.avg_rating)||0)-(Number(a.avg_rating)||0)||(Number(b.completed_count)||0)-(Number(a.completed_count)||0))
+   .slice(0,8);
+  if(rec.length>=2){
+   recHTML=`<div class="dk-sechead"><h3>แนะนำสำหรับคุณ</h3><span>ว่างรับงานตอนนี้ ${rec.length} คน</span></div>
+   <div class="dk-hscroll">${rec.map(providerMiniCardHTML).join('')}</div>`;
+  }
+ }
+ const listHead=`<div class="dk-sechead" style="margin-top:${recHTML?'16px':'2px'}"><h3>${riderDirectoryCategory==='all'&&!q?'ผู้ให้บริการทั้งหมด':'ผลการค้นหา'}</h3><span>${rows.length} คน</span></div>`;
+ const listHTML=rows.length
+  ? `${listHead}<div class="dk-provider-grid">${rows.map(providerCardHTML).join('')}</div>`
+  : `${listHead}<div class="dk-empty">ไม่พบผู้ให้บริการที่ตรงกับเงื่อนไข ลองเปลี่ยนหมวดบริการหรือคำค้นหา</div>`;
+ box.innerHTML=recHTML+listHTML;
+}
+function customerSetProviderCategory(key){
+ riderDirectoryCategory=key;
+ const chipsBox=$('dkCategoryChips');
+ if(chipsBox) chipsBox.querySelectorAll('.dk-chip').forEach(b=>b.classList.toggle('active',b.dataset.cat===key));
+ renderProviderGrid();
+}
+function customerSetProviderSearch(v){ riderDirectorySearch=v; renderProviderGrid(); }
+/* ---------- โปรไฟล์ผู้ให้บริการเดี่ยว — ผลงานจริง (Storage) + รีวิวจริง (ตาราง reviews) + ปุ่ม MATCH เด่นชัด ---------- */
+function customerOpenProviderProfile(id){
+ customerViewingProviderId=id; customerViewMode='riderProfile'; custBuiltMode=null; renderCustomerRoot();
+}
+function customerProviderProfileHTML(){
+ return `${customerNavTabsHTML()}<div id="dkProviderProfileBox"><div class="dk-empty">กำลังโหลดโปรไฟล์...</div></div>`;
+}
+async function renderCustomerProviderProfileView(){
+ const id=customerViewingProviderId; if(!id) return;
+ let row=RIDER_DIRECTORY.find(r=>r.id===id);
+ if(!row){ await loadRiderDirectory(); row=RIDER_DIRECTORY.find(r=>r.id===id); }
+ const box=$('dkProviderProfileBox'); if(!box) return;
+ if(!row){ box.innerHTML='<div class="dk-card"><div class="dk-empty">ไม่พบผู้ให้บริการนี้ หรือบัญชีถูกระงับการใช้งานแล้ว</div></div>'; return; }
+ const st=dkProviderStatus(row);
+ const canMatch=st==='available';
+ const services=(row.services||'').split(',').map(s=>s.trim()).filter(Boolean);
+ // โครงหน้าโปรไฟล์ตาม Reference: หัวโปรไฟล์ (อวตาร+ชื่อ+สถานะ+บริการหลัก) → บรรทัดคะแนน → ปุ่มหลักเต็มความกว้าง
+ // → ทักษะ/บริการที่รับ → สถิติ 3 ช่อง → พื้นที่ → ผลงาน → รีวิว
+ // หมายเหตุ: Reference มีป้าย "ยืนยันตัวตน/เบอร์โทร/บัตรประชาชน" และ "% งานตรงเวลา" ด้วย แต่ระบบนี้ยังไม่มีข้อมูล
+ // จริงรองรับ จึงไม่ใส่ป้ายเหล่านั้น (ใส่ = ข้อมูลหลอก) — ช่องสถิติใช้เฉพาะตัวเลขที่มีจริงในฐานข้อมูล
+ box.innerHTML=`<div class="dk-card">
+  <button type="button" class="dk-btn outline" style="max-width:100px;margin-bottom:12px" onclick="customerNavGo('home')">${ICON_ARROWLEFT}&nbsp;กลับ</button>
+  <div class="dk-profile-hero">${avatarHTML(row.name,row.photo,76,'brand')}<div style="flex:1;min-width:180px">
+   <h2 style="margin:0 0 5px">${esc(row.name)}</h2>
+   ${dkStatusDotHTML(row)}
+   ${services.length?`<div class="dk-pcsub" style="margin-top:5px">${services.slice(0,3).map(esc).join(' • ')}</div>`:''}
+   <div class="dk-rating" style="margin-top:6px">${dkRatingLineHTML(row)}</div>
+  </div></div>
+  ${row.bio?`<p style="margin:14px 0 0;font-size:13px;color:var(--ink-soft);line-height:1.6">${esc(row.bio)}</p>`:''}
+  <div style="margin-top:12px">${startingPriceHTML(row)}</div>
+  <button type="button" class="dk-btn primary" style="width:100%;padding:14px;margin-top:14px" ${canMatch?'':'disabled'} onclick="customerStartMatch('${row.id}','${esc(row.name)}')">${canMatch?'MATCH กับผู้ให้บริการคนนี้':'ขณะนี้ไม่พร้อมรับ MATCH'}</button>
+ </div>
+ ${services.length?`<div class="dk-card"><div class="dk-sechead"><h3>บริการที่รับ</h3><span>${services.length} บริการ</span></div><div class="dk-tagrow">${services.map(s=>`<span class="dk-tag">${esc(s)}</span>`).join('')}</div></div>`:''}
+ <div class="dk-card">
+  <div class="dk-sechead"><h3>สถิติ</h3></div>
+  <div class="dk-stat-row" style="margin:0">
+   <div class="dk-stat"><b>${row.completed_count}</b><span>งานสำเร็จ</span></div>
+   <div class="dk-stat"><b>${row.review_count>0?Number(row.avg_rating).toFixed(2):'-'}</b><span>คะแนนเฉลี่ย</span></div>
+   <div class="dk-stat"><b>${row.review_count}</b><span>รีวิว</span></div>
+  </div>
+  ${row.service_area?`<div class="dk-area" style="margin:12px 0 0">${ICON_MAPPIN}<span>พื้นที่ให้บริการ: ${esc(row.service_area)}</span></div>`:''}
+ </div>
+ <div class="dk-card"><div class="dk-sechead"><h3>ผลงาน</h3></div><div id="dkProviderPortfolio"><div class="dk-empty">กำลังโหลดผลงาน...</div></div></div>
+ <div class="dk-card"><div class="dk-sechead"><h3>รีวิวจากลูกค้า</h3><span>${row.review_count} รีวิว</span></div><div id="dkProviderReviews"><div class="dk-empty">กำลังโหลดรีวิว...</div></div></div>`;
+ const items=await fetchRiderPortfolio(id,sbCustomer);
+ // ผลงานฝั่งลูกค้าแสดงเป็น "รายการ" ตาม Reference (รูปย่อซ้าย + คำบรรยาย + วันที่) ไม่ใช่ตารางรูปเปล่า ๆ
+ // คำบรรยาย/วันที่มาจากข้อมูลจริงในตาราง rider_portfolio (caption, created_at) — ถ้าไม่มีคำบรรยายก็ไม่ใส่ข้อความแทน
+ const pbox=$('dkProviderPortfolio');
+ if(pbox) pbox.innerHTML=items.length
+  ? `<div class="dk-worklist">${items.map(it=>`<div class="dk-work" onclick="openLightbox('${esc(it.image_url)}')">
+      <img src="${esc(it.image_url)}" loading="lazy" alt="ผลงาน">
+      <div class="dk-work-text"><b>${it.caption?esc(it.caption):'ผลงาน'}</b><span>${fmtTime(it.created_at)}</span></div>
+     </div>`).join('')}</div>`
+  : '<div class="dk-empty">ยังไม่มีผลงานให้ดู</div>';
+ const {data:revs,error:revErr}=await sbCustomer.from('reviews').select('*').eq('provider_id',id).order('created_at',{ascending:false});
+ const rbox=$('dkProviderReviews'); if(!rbox) return;
+ if(revErr||!revs||!revs.length){ rbox.innerHTML='<div class="dk-empty">ยังไม่มีรีวิว</div>'; return; }
+ rbox.innerHTML=revs.map(r=>`<div class="dk-review"><div class="dk-review-top"><span class="dk-review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span><span class="dk-review-time">${fmtTime(r.created_at)}</span></div>${r.comment?`<div class="dk-review-comment">${esc(r.comment)}</div>`:''}</div>`).join('');
+}
+/* ---------- สร้างคำขอ MATCH ---------- */
+let customerMatchBusy=false;
+async function customerStartMatch(providerId,providerName){
+ if(customerMatchBusy) return;
+ customerMatchBusy=true;
+ try{
+  const {data,error}=await sbCustomer.rpc('create_match_request',{p_provider_id:providerId});
+  if(error){ toast(error.message||'ส่งคำขอ MATCH ไม่สำเร็จ'); return; }
+  upsertMatch(data);
+  toast('ส่งคำขอ MATCH ถึง '+providerName+' แล้ว รอผู้ให้บริการตอบรับ');
+  customerOpenMatch(data.id);
+ } finally { customerMatchBusy=false; }
+}
+function customerOpenMatch(id){
+ const u=new URL(location.href); u.searchParams.delete('order'); history.pushState({},'',u.toString());
+ customerViewingMatchId=id; customerViewMode='matchRoom'; custBuiltMode=null; renderCustomerRoot();
+}
+/* ---------- แท็บ MATCH: รายการคำขอทั้งหมดของลูกค้า (ทุกสถานะ) ---------- */
+function customerMatchesHTML(){
+ return `${customerNavTabsHTML()}<div class="dk-card">
+  <div class="dk-head"><div><h2>คำขอ MATCH ของฉัน</h2><div class="dk-sub">ติดตามสถานะคำขอที่ส่งไปถึงผู้ให้บริการ</div></div></div>
+  <div id="dkMatchesList"><div class="dk-empty">ยังไม่มีรายการ</div></div>
+ </div>`;
+}
+/* ---------- แท็บแชท: เฉพาะ MATCH ที่เปิดคุยกันได้แล้ว (ยอมรับ/กำลังดำเนินงาน/เสร็จสิ้นแล้ว) ---------- */
+function customerChatsHTML(){
+ return `${customerNavTabsHTML()}<div class="dk-card">
+  <div class="dk-head"><div><h2>แชท</h2><div class="dk-sub">บทสนทนากับผู้ให้บริการที่ตอบรับคำขอแล้ว</div></div></div>
+  <div id="dkChatsList"><div class="dk-empty">ยังไม่มีบทสนทนา</div></div>
+ </div>`;
+}
+/* ---------- ให้คะแนน+รีวิวหลังงานเสร็จสิ้น ---------- */
+async function renderMatchReviewBox(matchId){
+ const box=$('dkReviewBox'); if(!box) return;
+ const {data,error}=await sbCustomer.from('reviews').select('*').eq('match_id',matchId).maybeSingle();
+ if(!error&&data){
+  box.innerHTML=`<div class="dk-card" style="margin-top:0"><h2 style="margin:0 0 8px">รีวิวของคุณ</h2><div class="dk-review-stars">${'★'.repeat(data.rating)}${'☆'.repeat(5-data.rating)}</div>${data.comment?`<div class="dk-review-comment" style="margin-top:6px">${esc(data.comment)}</div>`:''}</div>`;
+  return;
+ }
+ customerPickedStar=0;
+ box.innerHTML=`<div class="dk-card" style="margin-top:0">
+  <h2 style="margin:0 0 8px">ให้คะแนนงานนี้</h2>
+  <div class="dk-stars-picker" id="dkStarsPicker">${[1,2,3,4,5].map(n=>`<span data-n="${n}" onclick="customerPickStar(${n})">★</span>`).join('')}</div>
+  <textarea id="dkReviewComment" placeholder="เล่าประสบการณ์การใช้บริการ (ไม่บังคับ)" style="width:100%;min-height:70px;border:1px solid var(--brand-line);border-radius:10px;padding:10px;font-size:13px;box-sizing:border-box;font-family:inherit"></textarea>
+  <button type="button" class="dk-btn primary" style="width:100%;margin-top:10px" onclick="customerSubmitReview('${matchId}')">ส่งรีวิว</button>
+ </div>`;
+}
+let customerPickedStar=0;
+function customerPickStar(n){
+ customerPickedStar=n;
+ const picker=$('dkStarsPicker'); if(!picker) return;
+ picker.querySelectorAll('span').forEach(el=>el.classList.toggle('on',Number(el.dataset.n)<=n));
+}
+let customerReviewBusy=false;
+async function customerSubmitReview(matchId){
+ if(customerReviewBusy) return;
+ if(!customerPickedStar){ toast('กรุณาเลือกจำนวนดาว'); return; }
+ customerReviewBusy=true;
+ try{
+  const comment=$('dkReviewComment')?$('dkReviewComment').value:'';
+  const {error}=await sbCustomer.rpc('submit_review',{p_match_id:matchId,p_rating:customerPickedStar,p_comment:comment});
+  if(error){ toast(error.message||'ส่งรีวิวไม่สำเร็จ'); return; }
+  toast('ขอบคุณสำหรับรีวิว!');
+  renderMatchReviewBox(matchId);
+ } finally { customerReviewBusy=false; }
+}
+/* ---------- ตอบรับ/ปฏิเสธข้อเสนอราคาในแชท ---------- */
+let customerProposalBusy=false;
+async function customerRespondProposal(messageId,accept){
+ if(customerProposalBusy) return;
+ customerProposalBusy=true;
+ try{
+  const {data,error}=await sbCustomer.rpc('respond_price_proposal',{p_message_id:messageId,p_accept:accept});
+  if(error){ toast(error.message||'ดำเนินการไม่สำเร็จ'); return; }
+  upsertChatMessage(data);
+  // อัปเดตสถานะ MATCH ในเครื่อง (optimistic) ทันที ไม่รอ Realtime อย่างเดียว — เพราะ respond_price_proposal
+  // คืนค่าแค่แถวข้อความ ไม่ใช่แถว matches เอง ถ้าไม่อัปเดตตรงนี้ สถานะจะยังค้างเป็น "ยอมรับแล้ว" บนหน้าจอผู้ใช้ที่
+  // เพิ่งกดเอง จนกว่า Realtime event ของตาราง matches จะมาถึง (ปกติเร็วมาก แต่ไม่ควรพึ่งพาอย่างเดียวสำหรับ action ของตัวเอง)
+  const m=findMatch(data.match_id);
+  if(m){
+   if(accept){ m.status='active'; m.agreedPrice=data.meta&&data.meta.price!=null?Number(data.meta.price):m.proposedPrice; }
+   fireChange(false);
+  }
+  toast(accept?'ยอมรับข้อเสนอราคาแล้ว เริ่มงานได้เลย':'ปฏิเสธข้อเสนอราคาแล้ว');
+ } finally { customerProposalBusy=false; }
+}
+/* ---------- ส่งข้อความในห้องแชท MATCH ---------- */
+let custMatchChatSendBusy=false;
+async function customerSendMatchChat(){
+ if(custMatchChatSendBusy) return;
+ const id=customerViewingMatchId; if(!id) return;
+ const v=$('dkChatInput')?$('dkChatInput').value.trim():'';
+ if(!v&&!custPendingImage) return;
+ custMatchChatSendBusy=true;
+ if($('dkChatInputSendBtn')){ $('dkChatInputSendBtn').disabled=true; $('dkChatInputSendBtn').textContent='กำลังส่ง...'; }
+ if($('dkChatInput')) $('dkChatInput').disabled=true;
+ if($('attachBtn_dkChatInputImg')) $('attachBtn_dkChatInputImg').disabled=true;
+ try{
+  const ok=await addChatTo({matchId:id},'customer',v,custPendingImage);
+  if(ok){ if($('dkChatInput')) $('dkChatInput').value=''; custPendingImage=null; renderCustAttachPreview(); }
+ } finally {
+  custMatchChatSendBusy=false;
+  if($('dkChatInputSendBtn')){ $('dkChatInputSendBtn').disabled=false; $('dkChatInputSendBtn').textContent='ส่ง'; }
+  if($('dkChatInput')) $('dkChatInput').disabled=false;
+  if($('attachBtn_dkChatInputImg')) $('attachBtn_dkChatInputImg').disabled=false;
+ }
+}
+/* ---------- โปรไฟล์ลูกค้า (แท็บโปรไฟล์) ---------- */
+function customerProfileHTML(cust){
+ return `${customerNavTabsHTML()}<div class="dk-card">
+  <div class="dk-head"><div><h2>โปรไฟล์ของฉัน</h2><div class="dk-sub">แก้ไขชื่อและรูปโปรไฟล์ของคุณ</div></div>
+   <button class="dk-btn outline" type="button" style="flex:0 0 auto" onclick="customerLogout()">ออกจากระบบ</button></div>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+   ${avatarHTML(cust.name,custProfilePendingPhoto!==undefined?custProfilePendingPhoto:cust.photo,64,'brand')}
+   <div style="flex:1"><div class="photo" onclick="$('custProfilePhotoInput').click()">แตะเพื่อเปลี่ยนรูปโปรไฟล์</div>
+    <input type="file" id="custProfilePhotoInput" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none" onchange="onCustomerProfilePhotoPicked(this)">
+   </div>
+  </div>
+  <div class="field"><label>ชื่อ</label><input id="custProfileName" value="${esc(cust.name)}"></div>
+  <div class="field"><label>เบอร์โทรศัพท์</label><input value="${esc(cust.phone)}" disabled></div>
+  <button type="button" class="dk-btn primary" style="width:100%;margin-top:10px" onclick="onCustomerProfileSave()">บันทึกการเปลี่ยนแปลง</button>
+ </div>`;
+}
+async function onCustomerProfilePhotoPicked(input){
+ const file=input.files&&input.files[0]; input.value='';
+ if(!file) return;
+ if(!CHAT_IMAGE_ACCEPTED.includes(file.type)){ toast('รองรับเฉพาะไฟล์ JPG, JPEG, PNG และ WebP เท่านั้น'); return; }
+ if(file.size>CHAT_IMAGE_MAX_BYTES){ toast('รูปภาพต้องมีขนาดไม่เกิน 5 MB'); return; }
+ try{ custProfilePendingPhoto=await compressAvatarImage(file); renderCustomerRoot(); }
+ catch(e){ toast('ไม่สามารถประมวลผลรูปนี้ได้ ลองรูปอื่น'); }
+}
+let custProfileSaveBusy=false;
+async function onCustomerProfileSave(){
+ if(custProfileSaveBusy) return;
+ const cust=currentCustomer(); if(!cust) return;
+ const name=$('custProfileName')?$('custProfileName').value:'';
+ if(!name||!name.trim()){ toast('กรุณากรอกชื่อ'); return; }
+ custProfileSaveBusy=true;
+ try{
+  const r=await updateCustomerProfile(cust.id,{name,photo:custProfilePendingPhoto});
+  if(!r.ok){ toast(r.reason); return; }
+  custProfilePendingPhoto=undefined;
+  toast('บันทึกโปรไฟล์แล้ว');
+  renderCustomerRoot();
+ } finally { custProfileSaveBusy=false; }
+}
 /* ---------- ฟอร์มสมัคร/ล็อกอินลูกค้า (โครงเดียวกับไรเดอร์ แต่ไม่มีรูปโปรไฟล์ตามโจทย์) ---------- */
 function customerAuthFormHTML(){
  if(customerAuthMode==='signup'){
-  return `<div class="head"><div><h2>สมัครสมาชิกลูกค้า</h2><div class="sub">สมัครครั้งเดียว ใช้ลิงก์เดิมได้ตลอดโดยไม่ต้องสมัครซ้ำ</div></div></div>
+  return `<div class="dk-card"><div class="head"><div><h2>สมัครสมาชิกลูกค้า</h2><div class="sub">สมัครครั้งเดียว ใช้ลิงก์เดิมได้ตลอดโดยไม่ต้องสมัครซ้ำ</div></div></div>
    <div class="field"><label>รูปโปรไฟล์ (ไม่บังคับ)</label>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px" id="custSignupPhotoPreview">${avatarHTML($('custSignupName')?$('custSignupName').value:'',custAuthPendingPhoto,52)}<div class="photo" style="flex:1" onclick="$('custSignupPhotoInput').click()">+ แตะเพื่อแนบรูปโปรไฟล์</div>${custAuthPendingPhoto?`<button type="button" class="btn danger" onclick="custAuthPendingPhoto=null;renderCustomerRoot()">ยกเลิกรูป</button>`:''}</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px" id="custSignupPhotoPreview">${avatarHTML($('custSignupName')?$('custSignupName').value:'',custAuthPendingPhoto,52,'brand')}<div class="photo" style="flex:1" onclick="$('custSignupPhotoInput').click()">+ แตะเพื่อแนบรูปโปรไฟล์</div>${custAuthPendingPhoto?`<button type="button" class="dk-btn danger" style="flex:0 0 auto" onclick="custAuthPendingPhoto=null;renderCustomerRoot()">ยกเลิกรูป</button>`:''}</div>
     <input type="file" id="custSignupPhotoInput" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none" onchange="onCustomerAuthPhotoPicked(this)">
     <div class="photo-hint">รองรับ JPG, JPEG, PNG, WebP ขนาดไม่เกิน 5MB</div>
    </div>
@@ -2170,14 +2877,14 @@ function customerAuthFormHTML(){
    <div class="field"><label>เบอร์โทรศัพท์</label><input id="custSignupPhone" placeholder="เช่น 0891234567"></div></div>
    <div class="row"><div class="field"><label>รหัสผ่าน</label><input id="custSignupPassword" type="password" placeholder="อย่างน้อย 4 ตัวอักษร"></div>
    <div class="field"><label>ยืนยันรหัสผ่าน</label><input id="custSignupPassword2" type="password" placeholder="กรอกรหัสผ่านอีกครั้ง" onkeydown="if(event.key==='Enter')onCustomerSignupSubmit()"></div></div>
-   <div class="actions"><button class="btn green" type="button" onclick="onCustomerSignupSubmit()">สมัครสมาชิก</button>
-   <button class="btn ghost" type="button" onclick="customerAuthMode='login';custAuthPendingPhoto=null;renderCustomerRoot()">มีบัญชีแล้ว? เข้าสู่ระบบ</button></div>`;
+   <div class="actions"><button class="dk-btn primary" type="button" onclick="onCustomerSignupSubmit()">สมัครสมาชิก</button>
+   <button class="dk-btn outline" type="button" onclick="customerAuthMode='login';custAuthPendingPhoto=null;renderCustomerRoot()">มีบัญชีแล้ว? เข้าสู่ระบบ</button></div></div>`;
  }
- return `<div class="head"><div><h2>เข้าสู่ระบบลูกค้า</h2><div class="sub">เข้าสู่ระบบด้วยเบอร์โทรศัพท์และรหัสผ่านของคุณ</div></div></div>
+ return `<div class="dk-card"><div class="head"><div><h2>เข้าสู่ระบบลูกค้า</h2><div class="sub">เข้าสู่ระบบด้วยเบอร์โทรศัพท์และรหัสผ่านของคุณ</div></div></div>
   <div class="field"><label>เบอร์โทรศัพท์</label><input id="custLoginPhone" placeholder="เบอร์โทรศัพท์ที่สมัครไว้"></div>
   <div class="field"><label>รหัสผ่าน</label><input id="custLoginPassword" type="password" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter')onCustomerLoginSubmit()"></div>
-  <div class="actions"><button class="btn primary" type="button" onclick="onCustomerLoginSubmit()">เข้าสู่ระบบ</button>
-  <button class="btn ghost" type="button" onclick="customerAuthMode='signup';renderCustomerRoot()">ยังไม่มีบัญชี? สมัครสมาชิก</button></div>`;
+  <div class="actions"><button class="dk-btn primary" type="button" onclick="onCustomerLoginSubmit()">เข้าสู่ระบบ</button>
+  <button class="dk-btn outline" type="button" onclick="customerAuthMode='signup';renderCustomerRoot()">ยังไม่มีบัญชี? สมัครสมาชิก</button></div></div>`;
 }
 async function onCustomerAuthPhotoPicked(input){
  const file=input.files&&input.files[0]; input.value='';
@@ -2202,7 +2909,7 @@ async function onCustomerSignupSubmit(){
   if(!r.ok){ toast(r.reason); return; }
   custAuthPendingPhoto=null;
   setCustomerSession(r.customer.id);
-  customerViewMode='dashboard'; custBuiltMode=null;
+  customerViewMode='home'; custBuiltMode=null;
   toast('สมัครสมาชิกสำเร็จ ยินดีต้อนรับ '+r.customer.name);
   renderCustomerRoot();
   activateRoleSync('customer');
@@ -2216,7 +2923,7 @@ async function onCustomerLoginSubmit(){
   const r=await customerLogin(phone,pw);
   if(!r.ok){ toast(r.reason); return; }
   setCustomerSession(r.customer.id);
-  customerViewMode='dashboard'; custBuiltMode=null;
+  customerViewMode='home'; custBuiltMode=null;
   toast('ยินดีต้อนรับกลับมา '+r.customer.name);
   renderCustomerRoot();
   activateRoleSync('customer');
@@ -2226,123 +2933,11 @@ function customerLogout(){
  sbCustomer.auth.signOut().catch(()=>{});
  clearCustomerSession();
  deactivateRoleSync('customer');
- customerAuthMode='login'; customerViewMode='dashboard'; custBuiltMode=null;
+ customerAuthMode='login'; customerViewMode='home'; custBuiltMode=null;
  const u=new URL(location.href); u.searchParams.delete('order'); history.pushState({},'',u.toString());
  toast('ออกจากระบบแล้ว');
  renderCustomerRoot();
 }
-/* ---------- Dashboard ลูกค้า ---------- */
-function customerOrdersOf(custId){ return DB.orders.filter(o=>o.customerId===custId); }
-function customerActiveOrder(custId){ return DB.orders.find(o=>o.customerId===custId && !['DONE','CANCELLED'].includes(o.status)); }
-function customerHistoryOrders(custId){ return DB.orders.filter(o=>o.customerId===custId && ['DONE','CANCELLED'].includes(o.status)); }
-function customerGoNewOrder(){ customerViewMode='neworder'; custBuiltMode=null; renderCustomerRoot(); }
-function customerOpenOrder(id){
- const u=new URL(location.href); u.searchParams.set('view','customer'); u.searchParams.set('order',id);
- history.pushState({},'',u.toString()); custBuiltMode=null; renderCustomerRoot();
-}
-function customerBackToDashboard(){
- const u=new URL(location.href); u.searchParams.delete('order'); history.pushState({},'',u.toString());
- customerViewMode='dashboard'; custBuiltMode=null; renderCustomerRoot();
-}
-function customerDashboardHTML(cust){
- const active=customerActiveOrder(cust.id);
- const history=customerHistoryOrders(cust.id);
- return `<div class="grid">
- <div>
-  <div class="card">
-   <div class="head"><div><h2>สวัสดี คุณ${esc(cust.name)}</h2><div class="sub">แดชบอร์ดลูกค้า • เด็กเดิน</div></div>
-    <button class="btn ghost" type="button" onclick="customerLogout()">ออกจากระบบ</button></div>
-   ${active?`
-    <div class="rider-stop" style="align-items:flex-start">
-     <div class="rnum">🚴</div>
-     <div style="flex:1">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>งานที่กำลังดำเนินการ #${active.id}</b>${statusBadge(active.status)}</div>
-      <div class="tag" style="margin-top:6px">${active.stops.length} งาน • สถานะล่าสุด: ${STATUS_LABEL[active.status]}</div>
-      <div class="actions" style="margin-top:8px"><button class="btn primary" type="button" onclick="customerOpenOrder('${active.id}')">ดูรายละเอียด</button></div>
-     </div>
-    </div>
-    <div class="actions" style="margin-top:14px"><button class="btn green" type="button" onclick="customerGoNewOrder()">+ สร้างออเดอร์ใหม่</button></div>
-   `:`
-    <div class="empty" style="padding:30px 20px">
-     <p style="margin:0 0 14px;color:var(--muted)">ตอนนี้ยังไม่มีงานที่กำลังดำเนินการ</p>
-     <button class="btn green" type="button" style="width:100%;font-size:16px;padding:16px" onclick="customerGoNewOrder()">+ สร้างออเดอร์ใหม่</button>
-    </div>
-   `}
-  </div>
-  <div class="card">
-   <div class="head"><div><h2>ประวัติออเดอร์</h2><div class="sub">งานที่เสร็จสิ้นหรือยกเลิกแล้ว</div></div></div>
-   ${history.length? history.map(o=>`
-    <div class="stop" style="cursor:pointer" onclick="customerOpenOrder('${o.id}')">
-     <div class="jobhead"><div><b>#${o.id}</b> ${statusBadge(o.status)}</div><div class="jobmini">${fmtTime(o.createdAt)}</div></div>
-     <div class="jobmini">${o.stops.length} งาน • ยอดรวม ${baht(o.pricing.total)}</div>
-    </div>`).join('') : '<div class="empty">ยังไม่มีประวัติออเดอร์</div>'}
-  </div>
- </div>
- <aside class="summary">
-  <div class="card"><h2>บัญชีของฉัน</h2>
-   <div class="line"><span>ชื่อ</span><b>${esc(cust.name)}</b></div>
-   <div class="line total"><span>เบอร์โทร</span><b>${esc(cust.phone)}</b></div>
-  </div>
- </aside>
- </div>`;
-}
-/* ---------- ค่าคงที่พื้นที่ให้บริการหลัก: มหาวิทยาลัยอุบลราชธานี อ.วารินชำราบ จ.อุบลราชธานี ----------
-   พิกัดอ้างอิงจาก Wikipedia (infobox หน้า Ubon Ratchathani University): 15.1180417°N, 104.9013750°E
-   ใช้เป็นทั้งจุดกึ่งกลางแผนที่เริ่มต้นของทุกงาน (ห้าม default กรุงเทพฯ) และจุดศูนย์กลาง locationBias ตอนค้นหาสถานที่
-   (ฟังก์ชันแผนที่ต่อรายงานจริงทั้งหมด — ค้นหา/ปักหมุด/เส้นทาง — อยู่ใน STOP EDITOR ด้านบน ผูกกับแต่ละงานโดยตรง) */
-const UBU_CENTER={lat:15.1180417,lng:104.9013750};
-const UBU_BIAS_RADIUS_M=20000; // รัศมี bias ~20กม. ครอบคลุม ม.อุบล/วารินชำราบ/ตัวเมืองอุบลฯ (ไม่ hard-block พื้นที่อื่น)
-/* ---------- ฟอร์มสร้างออเดอร์ใหม่ (เริ่มที่ "งานที่ 1" เพียงงานเดียวเสมอ) ---------- */
-function customerFormHTML(){
- const cust=currentCustomer();
- return `<div class="grid">
- <div>
-  <div class="card">
-   <div class="head"><div><h2>ให้เราช่วยหิ้วให้คุณ</h2><div class="sub">ส่งในนามคุณ ${cust?esc(cust.name)+' ('+esc(cust.phone)+')':''}</div></div>
-    <button class="btn ghost" type="button" onclick="customerBackToDashboard()">← กลับไป Dashboard</button></div>
-   <div class="field"><label>หมายเหตุงาน (ถ้ามี)</label><textarea id="cNote" placeholder="เช่น ฝากซื้อ 3 ร้าน ส่งที่หอพัก..."></textarea></div>
-  </div>
-  <div class="card">
-   <div class="head"><div><h2>รายการงาน</h2><div class="sub">พิมพ์ค้นหาชื่อร้าน สถานที่ หรือที่อยู่ แล้วเลือกจากรายการที่แสดง ระบบจะคำนวณเส้นทางจริงให้อัตโนมัติ • เริ่มที่งานที่ 1 หนึ่งงาน • กด "+ เพิ่มงาน" เพื่อเพิ่มงานถัดไปได้เอง</div></div></div>
-   <div id="custStops"></div>
-   <button class="btn ghost" type="button" style="width:100%" onclick="addStopTo('custStops')">+ เพิ่มงาน</button>
-  </div>
-  <div class="card" id="custReview"></div>
-  <div class="actions"><button class="btn green" type="button" onclick="customerSubmit()"> ยืนยันส่งงาน</button></div>
- </div>
- <aside class="summary">
-  <div class="card">
-   <div class="head"><div><h2>ราคาประมาณการ</h2><div class="sub">อัปเดตทันทีตามจำนวนงาน • ยังไม่ส่งงานจนกว่าจะกดยืนยัน</div></div></div>
-   <div class="field"><label>มูลค่าสินค้ารวมโดยประมาณ (บาท)</label><input id="cGoods" type="number" min="0" value="0" oninput="renderCustomerEstimate()"></div>
-   <div class="pricebox"><small>ยอดรวมประมาณการ</small><div class="pricebig" id="cTotal">0 ฿</div></div>
-   <div id="cJobBreakdown"></div>
-   <div class="line"><span>ค่าสินค้า</span><b id="cSumGoods">0 ฿</b></div>
-   <div class="line"><span>ค่าหิ้ว/บริการรวม</span><b id="cSumFee">0 ฿</b></div>
-   <div class="line"><span>จำนวนงาน</span><b id="cSumStops">1</b></div>
-   <div class="line total"><span>รวมทั้งหมด</span><b id="cSumTotal">0 ฿</b></div>
-  </div>
- </aside>
- </div>`;
-}
-function renderCustomerEstimate(){
- if(!$('custStops'))return;
- const stops=collectStopsFrom('custStops');
- const goods=Number($('cGoods')?.value||0);
- // ระยะทางรวม = ผลรวมระยะทางจริงจาก Routes API ของทุกงาน (แต่ละงานคำนวณเส้นทางของตัวเองอิสระ) ป้อนเข้าสูตรราคาเดิม
- // (calcPricing) ทันทีที่มีการเปลี่ยนแปลง — งานที่ยังไม่มีระยะทางจริง (ยังไม่ได้เลือกจุดรับ-ส่ง) นับเป็น 0 กม.
- const totalDistanceKm=(stopsState.custStops||[]).reduce((sum,job)=>sum+((job._route&&job._route.distanceKm)||0),0);
- const p=calcPricing(stops.length,goods,totalDistanceKm);
- const fees=perJobFees(stops.length);
- if($('cTotal'))$('cTotal').textContent=baht(p.total);
- if($('cSumGoods'))$('cSumGoods').textContent=baht(p.goods);
- if($('cSumFee'))$('cSumFee').textContent=baht(p.fee);
- if($('cSumStops'))$('cSumStops').textContent=stops.length;
- if($('cSumTotal'))$('cSumTotal').textContent=baht(p.total);
- if($('cJobBreakdown')) $('cJobBreakdown').innerHTML=fees.length?
-  `<div class="jobmini">${fees.map((f,i)=>'ราคางานที่ '+(i+1)+' ('+baht(f)+')').join(' + ')}${p.distanceFee>0?(' + ค่าระยะทาง '+p.distanceKm+' กม. ('+baht(p.distanceFee)+')'):''} = รวม ${baht(p.fee)}</div>` : '';
- if($('custReview')) $('custReview').innerHTML='<h2>สรุปรายการงาน</h2>'+(stops.length? stops.map((s,i)=>`<div class="jobmini">งานที่ ${i+1}: รับ <b>${esc(s.pickup)||'-'}</b> → ส่ง <b>${esc(s.dropoff)||'-'}</b>${s.detail?(' • '+esc(s.detail)):''}${s.qty?(' • จำนวน '+esc(s.qty)):''}</div>`).join('') : '<div class="empty">ยังไม่มีงาน</div>');
-}
-let customerSubmitBusy=false;
 // เฟส 3 (fix): ดึง user.id จาก Supabase Auth จริง (auth.getUser()) เสมอ ก่อนเขียน customer_id/sender_id ลง
 // Supabase ทุกครั้ง — ห้ามเชื่อ id จาก local mirror (CUSTOMERS.customers / currentCustomer()) เพียงอย่างเดียว
 // เพราะเป็นแค่สำเนาในเครื่องที่อาจไม่ตรงกับ session จริง (เช่น กรณี localStorage เก่าค้างจากยุคก่อนเชื่อม Supabase)
@@ -2361,43 +2956,16 @@ async function requireRiderAuthId(){
  if(error||!data||!data.user||!isUuid(data.user.id)) return null;
  return data.user.id;
 }
-async function customerSubmit(){
- if(customerSubmitBusy) return;
- const cust=currentCustomer(); if(!cust){ toast('กรุณาเข้าสู่ระบบก่อน'); return; }
- const stops=collectStopsFrom('custStops');
- const bad=stops.findIndex(s=>!s.pickup||!s.dropoff);
- if(bad!==-1){toast('กรุณากรอกจุดรับและจุดส่งของงานที่ '+(bad+1)+' ให้ครบ');return}
- const goods=Number($('cGoods').value||0);
- customerSubmitBusy=true;
- let o;
- try{
-  const authId=await requireCustomerAuthId();
-  if(!authId){ toast('เซสชันหมดอายุหรือไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่'); clearCustomerSession(); renderCustomerRoot(); return; }
-  // พิกัดระดับออเดอร์ (คอลัมน์ pickup_lat/pickup_lng/dropoff_lat/dropoff_lng/distance_km เดิมจาก 0006_google_maps.sql)
-  // ตอนนี้เก็บเป็นค่ารวมของหลายงาน: จุดรับของงานแรก, จุดส่งของงานสุดท้าย, และผลรวมระยะทางจริงทุกงาน — ไม่ต้องเพิ่ม
-  // migration ใหม่ ใช้คอลัมน์เดิมได้ครบ (รายละเอียดต่องานจริง ๆ อยู่ใน stops[].pickupLoc/.dropoffLoc/.distanceKm แล้ว)
-  const jobsNow=stopsState.custStops||[];
-  const firstPickupLoc=jobsNow[0]&&jobsNow[0].pickupLoc;
-  const lastDropoffLoc=jobsNow[jobsNow.length-1]&&jobsNow[jobsNow.length-1].dropoffLoc;
-  const totalDistanceKmNow=jobsNow.reduce((sum,j)=>sum+((j._route&&j._route.distanceKm)||0),0);
-  o=await createOrder({customerId:authId,customerName:cust.name,customerContact:cust.phone,customerNote:$('cNote').value,stops,goodsTotal:goods,createdBy:'customer',
-   pickupLat:firstPickupLoc?firstPickupLoc.lat:null, pickupLng:firstPickupLoc?firstPickupLoc.lng:null,
-   dropoffLat:lastDropoffLoc?lastDropoffLoc.lat:null, dropoffLng:lastDropoffLoc?lastDropoffLoc.lng:null,
-   distanceKm:totalDistanceKmNow>0?Math.round(totalDistanceKmNow*10)/10:null});
- }
- finally{ customerSubmitBusy=false; }
- if(!o) return;
- toast('ส่งงานสำเร็จ! เลขออเดอร์ '+o.id);
- customerViewMode='dashboard';
- const u=new URL(location.href); u.searchParams.set('view','customer'); u.searchParams.set('order',o.id); location.href=u.toString();
-}
+// เฟส Match Marketplace: ลูกค้าไม่สร้างออเดอร์เองอีกต่อไป (createOrder/customerSubmit ถูกลบออกจากฝั่งลูกค้า) แต่
+// ระบบออเดอร์เดิม (แอดมินรับแจ้งทางแชท/โทรศัพท์แล้วสร้างให้ + ไรเดอร์รับงานในห้องกลาง) ยังทำงานอยู่เต็มรูปแบบ — ลูกค้า
+// เข้าดู/แชท/ยกเลิกออเดอร์เดิมของตัวเองได้ผ่านลิงก์ ?order=xxx เหมือนเดิมทุกประการ (customerTrackingHTML ด้านล่างนี้)
 function customerTrackingHTML(o){
  const riderInfo=o.rider?resolveRiderDisplay(o):null;
  return `<div class="grid">
  <div>
   <div class="card">
    <div class="head"><div><h2>ติดตามงานของคุณ</h2><div class="sub">รหัสงาน <b>${o.id}</b></div></div>
-    <div style="display:flex;align-items:center;gap:8px">${statusBadge(o.status)}<button class="btn ghost" type="button" onclick="customerBackToDashboard()">← Dashboard</button></div></div>
+    <div style="display:flex;align-items:center;gap:8px">${statusBadge(o.status)}<button class="btn ghost" type="button" onclick="customerNavGo('home')">← กลับหน้าแรก</button></div></div>
    <p class="sub">สถานะปัจจุบัน: <b>${STATUS_LABEL[o.status]}</b></p>
    ${riderInfo?`<div class="rider-stop" style="border-top:1px solid var(--line);padding-top:12px;margin-top:4px">${avatarHTML(riderInfo.name,riderInfo.photo,46)}<div><b>${esc(riderInfo.name)}</b><div class="tag">ไรเดอร์ของคุณ${riderInfo.phone?(' • '+esc(riderInfo.phone)):''}</div></div></div>`:''}
   </div>
@@ -2407,7 +2975,7 @@ function customerTrackingHTML(o){
    ${riderInfo?`<div class="chat-partner">${avatarHTML(riderInfo.name,riderInfo.photo,28)}<div><b>${esc(riderInfo.name)}</b><div class="tag">ไรเดอร์ของคุณ</div></div></div>`:''}
    <div class="chatbox" id="custChatMsgs">${o.chat.map(chatMsgHTML('customer',o)).join('')||'<div class="empty">ยังไม่มีข้อความ</div>'}</div>
    <div class="chat-attach-preview hidden" id="custAttachPreview"></div>
-   <div class="chatrow">${chatAttachButtonHTML('custImgInput','customer')}<input id="custChatInput" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter')customerSendChat()"><button class="btn primary" type="button" onclick="customerSendChat()">ส่ง</button></div>
+   <div class="chatrow">${chatAttachButtonHTML('custImgInput','customer')}<input id="custChatInput" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter'){event.preventDefault();customerSendChat();}"><button class="btn primary" type="button" id="custChatSendBtn" onclick="customerSendChat()">ส่ง</button></div>
   </div>
  </div>
  <aside class="summary">
@@ -2418,20 +2986,34 @@ function customerTrackingHTML(o){
   </div>
   <div class="card"><h2>ประวัติสถานะ</h2>${timelineHTML(o)}</div>
   ${o.status==='PENDING'?`<div class="card"><button class="btn danger" style="width:100%" type="button" onclick="customerCancel('${o.id}')">ยกเลิกงานนี้</button></div>`:''}
-  ${o.status==='DONE'?`<div class="card"><button class="btn green" style="width:100%" type="button" onclick="customerGoNewOrder2()">+ สร้างออเดอร์ใหม่</button></div>`:''}
+  ${o.status==='DONE'?`<div class="card"><button class="btn green" style="width:100%" type="button" onclick="customerNavGo('home')">กลับหน้าแรก</button></div>`:''}
  </aside>
  </div>`;
 }
-function customerGoNewOrder2(){
- const u=new URL(location.href); u.searchParams.delete('order'); history.pushState({},'',u.toString());
- customerViewMode='neworder'; custBuiltMode=null; renderCustomerRoot();
-}
-function customerSendChat(){
+let custChatSendBusy=false;
+// ส่งข้อความ/รูปแบบ async จริง: กันกดส่งซ้ำระหว่างรอ (custChatSendBusy), แสดงสถานะ "กำลังส่ง..." บนปุ่ม, ปิดปุ่ม
+// แนบรูป+ช่องพิมพ์ระหว่างส่ง และเคลียร์ข้อความ/รูปที่แนบไว้ "เฉพาะตอนส่งสำเร็จจริง" เท่านั้น — ถ้าส่งไม่สำเร็จ
+// (เช่น เน็ตหลุด/RLS ปฏิเสธ) ข้อความ/รูปจะยังค้างอยู่ในกล่องให้กดส่งใหม่ได้ทันที ไม่หายไปเฉย ๆ ทั้งที่ไม่ได้ส่งจริง
+// หมายเหตุ: หน้าติดตามออเดอร์อาจถูก re-render จาก realtime ระหว่างรอ (root.innerHTML ใหม่ทั้งก้อน) จึงต้อง
+// ค้นหา element ด้วย $() ใหม่ทุกครั้งที่ใช้งาน (ไม่ cache ตัวแปรไว้ข้าม await) กัน element เก่าหลุดจาก DOM
+async function customerSendChat(){
+ if(custChatSendBusy) return;
  const params=new URLSearchParams(location.search); const id=params.get('order'); if(!id)return;
- const v=$('custChatInput').value.trim();
+ const v=$('custChatInput')?$('custChatInput').value.trim():'';
  if(!v&&!custPendingImage)return;
- addChat(id,'customer',v,custPendingImage);
- $('custChatInput').value=''; custPendingImage=null; renderCustAttachPreview();
+ custChatSendBusy=true;
+ if($('custChatSendBtn')){ $('custChatSendBtn').disabled=true; $('custChatSendBtn').textContent='กำลังส่ง...'; }
+ if($('custChatInput')) $('custChatInput').disabled=true;
+ if($('attachBtn_custImgInput')) $('attachBtn_custImgInput').disabled=true;
+ try{
+  const ok=await addChat(id,'customer',v,custPendingImage);
+  if(ok){ if($('custChatInput')) $('custChatInput').value=''; custPendingImage=null; renderCustAttachPreview(); }
+ } finally {
+  custChatSendBusy=false;
+  if($('custChatSendBtn')){ $('custChatSendBtn').disabled=false; $('custChatSendBtn').textContent='ส่ง'; }
+  if($('custChatInput')) $('custChatInput').disabled=false;
+  if($('attachBtn_custImgInput')) $('attachBtn_custImgInput').disabled=false;
+ }
 }
 async function customerCancel(id){
  const {data,error}=await sbCustomer.rpc('cancel_order',{p_order_id:id});
@@ -2449,14 +3031,16 @@ function renderCustomerRoot(){
   root.innerHTML=customerAuthFormHTML();
   Object.keys(keep).forEach(id=>{ if($(id)) $(id).value=keep[id]; });
   custBuiltMode='auth';
+  renderBottomNav();
   return;
  }
  const params=new URLSearchParams(location.search);
  const orderId=params.get('order');
+ // ลิงก์ติดตามออเดอร์เดิม (ระบบแอดมินรับแจ้งทางแชท/โทรศัพท์) ต้องเช็คก่อนเสมอ — สำคัญที่สุดของระบบเดิมที่ต้องคงไว้
  if(orderId){
   const o=findOrder(orderId);
   // เห็นได้เฉพาะออเดอร์ของบัญชีตัวเอง หรือออเดอร์ที่แอดมินสร้างให้ทางแชท/โทรศัพท์ (ไม่ผูกบัญชีใคร) เท่านั้น — ห้ามเห็นออเดอร์ของลูกค้าคนอื่น
-  if(!o || (o.customerId && o.customerId!==cust.id)){ root.innerHTML='<div class="card"><div class="empty">ไม่พบออเดอร์นี้</div></div>'; custBuiltMode=null; return; }
+  if(!o || (o.customerId && o.customerId!==cust.id)){ root.innerHTML='<div class="card"><div class="empty">ไม่พบออเดอร์นี้</div></div>'; custBuiltMode=null; renderBottomNav(); return; }
   const savedVal=$('custChatInput')?$('custChatInput').value:'';
   const prevBox=$('custChatMsgs');
   const wasNearBottom=prevBox?(prevBox.scrollHeight-prevBox.scrollTop-prevBox.clientHeight<80):true;
@@ -2466,51 +3050,101 @@ function renderCustomerRoot(){
   const nextBox=$('custChatMsgs');
   if(nextBox&&wasNearBottom) nextBox.scrollTop=nextBox.scrollHeight;
   custBuiltMode='track:'+orderId;
+  renderBottomNav();
   return;
  }
- if(customerViewMode==='neworder'){
-  if(custBuiltMode!=='form'){
-   root.innerHTML=customerFormHTML();
-   stopsState.custStops=[]; // เข้าฟอร์มสร้างออเดอร์ใหม่ทุกครั้ง ล้างงานของฟอร์มก่อนหน้าทิ้ง (คนละออเดอร์กัน)
-   addStopTo('custStops'); // เริ่มที่ "งานที่ 1" เพียงงานเดียวเสมอ ไม่ auto-copy ข้อมูลใด ๆ (เรียก renderCustomerEstimate ในตัวอยู่แล้ว)
-   custBuiltMode='form';
-  }
+ if(customerViewMode==='riderProfile'){
+  if(custBuiltMode!=='riderProfile:'+customerViewingProviderId){ root.innerHTML=customerProviderProfileHTML(); custBuiltMode='riderProfile:'+customerViewingProviderId; renderCustomerProviderProfileView(); }
+  renderBottomNav();
   return;
  }
- root.innerHTML=customerDashboardHTML(cust);
- custBuiltMode='dashboard';
+ if(customerViewMode==='matchRoom'){
+  const m=findMatch(customerViewingMatchId);
+  if(!m||m.customerId!==cust.id){ root.innerHTML=`<div class="dk-card"><button type="button" class="dk-btn outline" style="max-width:100px;margin-bottom:12px" onclick="customerNavGo('chats')">${ICON_ARROWLEFT}&nbsp;กลับ</button><div class="dk-empty">ไม่พบ MATCH นี้ หรือคุณไม่มีสิทธิ์เข้าถึง</div></div>`; custBuiltMode=null; renderBottomNav(); return; }
+  const savedVal=$('dkChatInput')?$('dkChatInput').value:'';
+  const prevBox=$('dkChatBox');
+  const wasNearBottom=prevBox?(prevBox.scrollHeight-prevBox.scrollTop-prevBox.clientHeight<80):true;
+  root.innerHTML=matchRoomHTML(m,'customer',getMatchProviderDisplay(m.providerId));
+  if($('dkChatInput')) $('dkChatInput').value=savedVal;
+  if(custPendingImage) renderCustAttachPreview();
+  const nextBox=$('dkChatBox');
+  if(nextBox&&wasNearBottom) nextBox.scrollTop=nextBox.scrollHeight;
+  if(m.status==='completed') renderMatchReviewBox(m.id);
+  custBuiltMode='matchRoom:'+m.id;
+  renderBottomNav();
+  return;
+ }
+ if(customerViewMode==='matches'){
+  if(custBuiltMode!=='matches'){ root.innerHTML=customerMatchesHTML(); custBuiltMode='matches'; }
+  renderMatchListInto('dkMatchesList', matchesFor('customer',cust.id).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt)), 'customer');
+  renderBottomNav();
+  return;
+ }
+ if(customerViewMode==='chats'){
+  if(custBuiltMode!=='chats'){ root.innerHTML=customerChatsHTML(); custBuiltMode='chats'; }
+  renderMatchListInto('dkChatsList', matchesFor('customer',cust.id).filter(m=>['accepted','active','completed'].includes(m.status)).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt)), 'customer');
+  renderBottomNav();
+  return;
+ }
+ if(customerViewMode==='profile'){
+  root.innerHTML=customerProfileHTML(cust);
+  custBuiltMode='profile';
+  renderBottomNav();
+  return;
+ }
+ if(custBuiltMode!=='home'){ root.innerHTML=customerHomeHTML(cust); custBuiltMode='home'; }
+ renderCustomerHomeView();
+ renderBottomNav();
 }
 
-/* ======================= RIDER ======================= */
+/* ======================= RIDER =======================
+   เฟส Match Marketplace: รื้อ IA ใหม่เป็น 4 แท็บ (Match ใหม่ / กำลังดำเนินการ / ประวัติงาน / โปรไฟล์) ระบบรับงาน
+   เดิม (ห้องรับงานกลางที่แอดมินสร้างออเดอร์ให้ทางแชท/โทรศัพท์) ยังใช้งานได้เต็มรูปแบบ แต่ย้ายไปไว้ในกล่องพับเก็บ
+   ในแท็บโปรไฟล์แทน (ดู riderProfileTabHTML) — ไม่ได้ลบทิ้ง ตามที่ระบุว่าแอดมินยังต้องใช้ระบบนี้อยู่ */
 let riderBuilt=false;
+let riderBuiltMode=null;
 let riderAuthMode='login'; // 'login' | 'signup'
 let riderAuthPendingPhoto=null; // รูปที่เลือกไว้ระหว่างสมัครสมาชิก ก่อนกดยืนยัน
 let riderProfilePendingPhoto=undefined; // undefined=ยังไม่แก้ไข, null=ลบรูปตั้งใจ, string=รูปใหม่ที่เลือกไว้ระหว่างแก้โปรไฟล์
+let riderPendingServices=undefined; // undefined=ยังไม่แก้ไข, string=รายการบริการ (คั่นจุลภาค) ที่กำลังแก้ไข
+let riderViewMode='matches'; // 'matches' | 'active' | 'history' | 'profile' | 'matchRoom'
+let riderViewingMatchId=null;
+const RIDER_TABS=[
+ {key:'matches',label:'Match ใหม่',icon:ICON_MATCH},
+ {key:'active',label:'กำลังดำเนินการ',icon:ICON_CLOCK},
+ {key:'history',label:'ประวัติงาน',icon:ICON_LIST},
+ {key:'profile',label:'โปรไฟล์',icon:ICON_USER}
+];
+function riderActiveTabKey(){
+ if(riderViewMode==='matchRoom') return 'matches';
+ return riderViewMode;
+}
+function riderNavTabsHTML(){
+ const active=riderActiveTabKey();
+ return `<div class="dk-navtabs-desktop">${RIDER_TABS.map(t=>`<button type="button" class="navtab${active===t.key?' active':''}" onclick="riderNavGo('${t.key}')">${t.icon}${t.label}</button>`).join('')}</div>`;
+}
+function riderNavGo(key){
+ riderViewingMatchId=null;
+ riderViewMode=['matches','active','history','profile'].includes(key)?key:'matches';
+ riderBuiltMode=null;
+ renderRiderRoot();
+}
+function riderOpenMatch(id){
+ riderViewingMatchId=id; riderViewMode='matchRoom'; riderBuiltMode=null; renderRiderRoot();
+}
 function riderRootHTML(){
- return `<div class="grid">
- <div>
-  <div class="card hidden" id="riderAuthCard"></div>
-  <div id="riderAppBox" class="hidden">
-   <div class="card" id="riderProfileCard"></div>
-   <div class="card hidden" id="riderCreditCard"></div>
-   <div class="card hidden" id="riderInviteBox"></div>
-   <div class="card">
-    <div class="head"><div><h2>ห้องรับงานกลาง</h2><div class="sub">งานใหม่ที่ยังไม่มีคนรับ • กดรับงานได้ทันที • มีเสียงอินโทรแจ้งเตือนเมื่อมีงานใหม่</div></div></div>
-    <div id="riderJobRoom"></div>
-   </div>
-   <div class="card hidden" id="riderMyJobCard"></div>
-  </div>
- </div>
- <aside class="summary">
-  <div class="card"><h2>หมายเหตุ</h2><p class="sub">ถ้าสินค้าหรือพิกัดไม่ตรง ให้ติดต่อแอดมินก่อนซื้อ</p></div>
- </aside>
+ // เฟส "รื้อ Frontend ใหม่ตาม Reference": ตัดโครง .grid สองคอลัมน์ + aside "หมายเหตุ" (มรดกจากระบบออเดอร์เดิม
+ // ที่ไม่เกี่ยวกับ MATCH Marketplace เลย) ออก — ใช้คอลัมน์เดียวแบบเดียวกับฝั่งลูกค้า (dk-shell) มือถือเป็นหลัก
+ return `<div class="dk-shell">
+  <div class="dk-card hidden" id="riderAuthCard"></div>
+  <div id="riderAppBox" class="hidden"><div id="riderMain"></div></div>
  </div>`;
 }
 function riderAuthFormHTML(){
  if(riderAuthMode==='signup'){
-  return `<div class="head"><div><h2>สมัครสมาชิกไรเดอร์</h2><div class="sub">กรอกข้อมูลเพื่อสร้างบัญชีไรเดอร์ของคุณ</div></div></div>
+  return `<div class="head"><div><h2>สมัครสมาชิกผู้ให้บริการ</h2><div class="sub">กรอกข้อมูลเพื่อสร้างบัญชีผู้ให้บริการของคุณ</div></div></div>
    <div class="field"><label>รูปโปรไฟล์ (ไม่บังคับ)</label>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px" id="riderSignupPhotoPreview">${avatarHTML($('riderSignupName')?$('riderSignupName').value:'',riderAuthPendingPhoto,52)}<div class="photo" style="flex:1" onclick="$('riderSignupPhotoInput').click()">+ แตะเพื่อแนบรูปโปรไฟล์</div>${riderAuthPendingPhoto?`<button type="button" class="btn danger" onclick="riderAuthPendingPhoto=null;renderRiderAuthState()">ยกเลิกรูป</button>`:''}</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px" id="riderSignupPhotoPreview">${avatarHTML($('riderSignupName')?$('riderSignupName').value:'',riderAuthPendingPhoto,52,'brand')}<div class="photo" style="flex:1" onclick="$('riderSignupPhotoInput').click()">+ แตะเพื่อแนบรูปโปรไฟล์</div>${riderAuthPendingPhoto?`<button type="button" class="dk-btn danger" style="flex:0 0 auto" onclick="riderAuthPendingPhoto=null;renderRiderAuthState()">ยกเลิกรูป</button>`:''}</div>
     <input type="file" id="riderSignupPhotoInput" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none" onchange="onRiderAuthPhotoPicked(this)">
     <div class="photo-hint">รองรับ JPG, JPEG, PNG, WebP ขนาดไม่เกิน 5MB</div>
    </div>
@@ -2518,14 +3152,14 @@ function riderAuthFormHTML(){
    <div class="field"><label>เบอร์โทรศัพท์</label><input id="riderSignupPhone" placeholder="เช่น 0891234567"></div></div>
    <div class="row"><div class="field"><label>รหัสผ่าน</label><input id="riderSignupPassword" type="password" placeholder="อย่างน้อย 4 ตัวอักษร"></div>
    <div class="field"><label>ยืนยันรหัสผ่าน</label><input id="riderSignupPassword2" type="password" placeholder="กรอกรหัสผ่านอีกครั้ง" onkeydown="if(event.key==='Enter')onRiderSignupSubmit()"></div></div>
-   <div class="actions"><button class="btn green" type="button" onclick="onRiderSignupSubmit()">สมัครสมาชิก</button>
-   <button class="btn ghost" type="button" onclick="riderAuthMode='login';riderAuthPendingPhoto=null;renderRiderAuthState()">มีบัญชีแล้ว? เข้าสู่ระบบ</button></div>`;
+   <div class="actions"><button class="dk-btn primary" type="button" onclick="onRiderSignupSubmit()">สมัครสมาชิก</button>
+   <button class="dk-btn outline" type="button" onclick="riderAuthMode='login';riderAuthPendingPhoto=null;renderRiderAuthState()">มีบัญชีแล้ว? เข้าสู่ระบบ</button></div>`;
  }
- return `<div class="head"><div><h2>เข้าสู่ระบบไรเดอร์</h2><div class="sub">เข้าสู่ระบบด้วยเบอร์โทรศัพท์และรหัสผ่านของคุณ</div></div></div>
+ return `<div class="head"><div><h2>เข้าสู่ระบบผู้ให้บริการ</h2><div class="sub">เข้าสู่ระบบด้วยเบอร์โทรศัพท์และรหัสผ่านของคุณ</div></div></div>
   <div class="field"><label>เบอร์โทรศัพท์</label><input id="riderLoginPhone" placeholder="เบอร์โทรศัพท์ที่สมัครไว้"></div>
   <div class="field"><label>รหัสผ่าน</label><input id="riderLoginPassword" type="password" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter')onRiderLoginSubmit()"></div>
-  <div class="actions"><button class="btn primary" type="button" onclick="onRiderLoginSubmit()">เข้าสู่ระบบ</button>
-  <button class="btn ghost" type="button" onclick="riderAuthMode='signup';renderRiderAuthState()">ยังไม่มีบัญชี? สมัครสมาชิก</button></div>`;
+  <div class="actions"><button class="dk-btn primary" type="button" onclick="onRiderLoginSubmit()">เข้าสู่ระบบ</button>
+  <button class="dk-btn outline" type="button" onclick="riderAuthMode='signup';renderRiderAuthState()">ยังไม่มีบัญชี? สมัครสมาชิกเป็นผู้ให้บริการ</button></div>`;
 }
 async function onRiderAuthPhotoPicked(input){
  const file=input.files&&input.files[0]; input.value='';
@@ -2573,22 +3207,44 @@ function riderLogout(){
  clearRiderSession();
  deactivateRoleSync('rider');
  riderAuthMode='login';
+ riderViewMode='matches'; riderViewingMatchId=null; riderBuiltMode=null;
+ riderPortfolioLoaded=false; riderPendingPortfolioPhoto=null; riderPendingPortfolioFile=null; riderPendingPortfolioCaption='';
  toast('ออกจากระบบแล้ว');
  renderRiderRoot();
+}
+// Platform v2: สรุปสถิติจริงของไรเดอร์คนนี้ (ไม่ hardcode) — งานวันนี้/งานที่กำลังทำ/งานสำเร็จสะสม
+function isToday(iso){ try{ const d=new Date(iso),n=new Date(); return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()&&d.getDate()===n.getDate(); }catch(e){ return false; } }
+function riderStatsHTML(r){
+ const jobsToday=DB.orders.filter(o=>o.rider&&o.rider.riderId===r.id&&isToday(o.createdAt)).length;
+ // เฟส Match Marketplace: "กำลังทำอยู่" นับทั้งงานระบบเดิม (orders) และ MATCH ที่ active อยู่จริง
+ const activeNow=(myActiveOrder()?1:0)+matchesFor('rider',r.id).filter(m=>m.status==='active').length;
+ const s=riderCreditSummary(r.id);
+ return `<div class="dk-stat-row">
+  <div class="dk-stat"><b>${jobsToday}</b><span>งานวันนี้</span></div>
+  <div class="dk-stat"><b>${activeNow}</b><span>กำลังทำอยู่</span></div>
+  <div class="dk-stat"><b>${s.completedCount}</b><span>สำเร็จสะสม</span></div>
+ </div>`;
 }
 function riderProfileCardHTML(){
  const r=currentRider(); if(!r) return '';
  const previewPhoto=riderProfilePendingPhoto!==undefined?riderProfilePendingPhoto:r.photo;
- return `<div class="head">${avatarHTML(r.name,r.photo,44)}<div style="flex:1"><h2 style="margin:0">${esc(r.name)}</h2><div class="sub">${esc(r.phone)}</div></div>
-  <button class="btn ghost" type="button" onclick="riderLogout()">ออกจากระบบ</button></div>
-  <details class="collapse"><summary>แก้ไขโปรไฟล์ของฉัน</summary>
+ const isOpen=(r.availabilityStatus||'available')==='available';
+ const currentServices=(riderPendingServices!==undefined?riderPendingServices:(r.services||'')).split(',').map(s=>s.trim()).filter(Boolean);
+ return `<div class="dk-head">${avatarHTML(r.name,r.photo,44,'brand')}<div style="flex:1;min-width:180px"><h2 style="margin:0;font-size:17px;color:var(--ink)">${esc(r.name)}</h2><div class="dk-sub">${esc(r.phone)}</div></div>
+  <button class="dk-btn outline" style="flex:0 0 auto;max-width:120px" type="button" onclick="riderLogout()">ออกจากระบบ</button></div>
+  <div class="dk-avail-switch">
+   <div class="swlabel"><b>${isOpen?'พร้อมรับ MATCH':'ไม่พร้อมรับ MATCH'}</b><small>${isOpen?'ลูกค้าเห็นคุณในหน้ามาร์เก็ตเพลสและกด MATCH หาคุณได้':'ลูกค้าจะไม่เห็นคุณในหน้ามาร์เก็ตเพลส และ MATCH หาคุณไม่ได้ชั่วคราว'}</small></div>
+   <label class="switch"><input type="checkbox" ${isOpen?'checked':''} ${riderAvailabilityBusy?'disabled':''} onchange="riderSetAvailability(this.checked?'available':'unavailable')"><span class="slider"></span></label>
+  </div>
+  ${riderStatsHTML(r)}
+  <details class="collapse" open><summary>แก้ไขโปรไฟล์ของฉัน</summary>
    <div class="inner">
     <div class="field"><label>รูปโปรไฟล์</label>
      <div style="display:flex;align-items:center;gap:12px">
-      ${avatarHTML(r.name,previewPhoto,64)}
+      ${avatarHTML(r.name,previewPhoto,64,'brand')}
       <div class="actions">
-       <button class="btn ghost" type="button" onclick="$('riderProfilePhotoInput').click()">เปลี่ยนรูป</button>
-       ${previewPhoto?`<button class="btn danger" type="button" onclick="riderProfilePendingPhoto=null;renderRiderProfileCard()">ลบรูป</button>`:''}
+       <button class="dk-btn outline" type="button" onclick="$('riderProfilePhotoInput').click()">เปลี่ยนรูป</button>
+       ${previewPhoto?`<button class="dk-btn danger" type="button" onclick="riderProfilePendingPhoto=null;renderRiderProfileCard()">ลบรูป</button>`:''}
       </div>
      </div>
      <input type="file" id="riderProfilePhotoInput" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none" onchange="onRiderProfilePhotoPicked(this)">
@@ -2596,17 +3252,31 @@ function riderProfileCardHTML(){
     </div>
     <div class="row"><div class="field"><label>ชื่อจริง</label><input id="riderProfileName" value="${esc(r.name)}"></div>
     <div class="field"><label>เบอร์โทรศัพท์</label><input id="riderProfilePhone" value="${esc(r.phone)}"></div></div>
+    <div class="field"><label>ประเภทบริการที่รับ (แตะเพื่อเลือก แสดงในหน้ามาร์เก็ตเพลสให้ลูกค้าเห็น)</label>
+     <div class="dk-services-edit">${SERVICE_CATEGORIES.map(c=>`<button type="button" class="dk-service-pick${currentServices.includes(c)?' on':''}" onclick="riderToggleServiceChip('${esc(c)}')">${esc(c)}</button>`).join('')}</div>
+    </div>
+    <div class="field"><label>คำแนะนำตัว (แสดงในหน้าโปรไฟล์ก่อนลูกค้ากด MATCH)</label><textarea id="riderProfileBio" placeholder="เช่น รับหิ้วของ ส่งไว บริการสุภาพ พื้นที่รอบมหาวิทยาลัย">${esc(r.bio||'')}</textarea></div>
+    <div class="field"><label>พื้นที่ให้บริการ (แสดงในหน้าค้นหาให้ลูกค้าเห็น)</label><input id="riderProfileServiceArea" value="${esc(r.serviceArea||'')}" placeholder="เช่น รอบมหาวิทยาลัยอุบลราชธานี, ตัวเมืองวารินชำราบ"></div>
+    <div class="field"><label>ราคาเริ่มต้น (บาท — แสดงในการ์ดหน้าแรกให้ลูกค้าเห็นก่อนตัดสินใจ MATCH ไม่บังคับกรอก)</label><input id="riderProfileStartingPrice" type="number" min="0" value="${r.startingPrice!=null?esc(r.startingPrice):''}" placeholder="เว้นว่างถ้าต้องการให้ลูกค้าสอบถามราคาในแชทแทน"></div>
     <div class="row"><div class="field"><label>รหัสผ่านใหม่ (เว้นว่างถ้าไม่เปลี่ยน)</label><input id="riderProfilePassword" type="password" placeholder="รหัสผ่านใหม่"></div>
     <div class="field"><label>ยืนยันรหัสผ่านใหม่</label><input id="riderProfilePassword2" type="password" placeholder="ยืนยันรหัสผ่านใหม่"></div></div>
-    <div class="actions"><button class="btn green" type="button" onclick="onRiderProfileSave()">บันทึกการเปลี่ยนแปลง</button></div>
+    <div class="actions"><button class="dk-btn primary" type="button" style="width:100%" onclick="onRiderProfileSave()">บันทึกการเปลี่ยนแปลง</button></div>
    </div>
   </details>`;
+}
+function riderToggleServiceChip(cat){
+ const r=currentRider(); if(!r) return;
+ const cur=(riderPendingServices!==undefined?riderPendingServices:(r.services||'')).split(',').map(s=>s.trim()).filter(Boolean);
+ const idx=cur.indexOf(cat);
+ if(idx>=0) cur.splice(idx,1); else cur.push(cat);
+ riderPendingServices=cur.join(',');
+ renderRiderProfileCard();
 }
 function renderRiderProfileCard(){
  const c=$('riderProfileCard'); if(!c)return;
  const wasOpen=c.querySelector('details.collapse')?.open;
  const keep={};
- ['riderProfileName','riderProfilePhone','riderProfilePassword','riderProfilePassword2'].forEach(id=>{ if($(id)) keep[id]=$(id).value; });
+ ['riderProfileName','riderProfilePhone','riderProfilePassword','riderProfilePassword2','riderProfileServiceArea','riderProfileBio','riderProfileStartingPrice'].forEach(id=>{ if($(id)) keep[id]=$(id).value; });
  c.innerHTML=riderProfileCardHTML();
  if(wasOpen && c.querySelector('details.collapse')) c.querySelector('details.collapse').open=true;
  Object.keys(keep).forEach(id=>{ if($(id)) $(id).value=keep[id]; });
@@ -2635,14 +3305,87 @@ async function onRiderProfileSave(){
  const patch={name,phone};
  if(pw) patch.password=pw;
  if(riderProfilePendingPhoto!==undefined) patch.photo=riderProfilePendingPhoto;
+ if($('riderProfileServiceArea')) patch.serviceArea=$('riderProfileServiceArea').value;
+ if(riderPendingServices!==undefined) patch.services=riderPendingServices;
+ if($('riderProfileBio')) patch.bio=$('riderProfileBio').value;
+ if($('riderProfileStartingPrice')){ const spv=$('riderProfileStartingPrice').value; patch.startingPrice=(spv===''||spv==null)?null:Number(spv); }
  riderProfileSaveBusy=true;
  let r;
  try{ r=await updateRiderProfile(rider.id,patch); } finally { riderProfileSaveBusy=false; }
  if(!r.ok){ toast(r.reason); return; }
  riderProfilePendingPhoto=undefined;
+ riderPendingServices=undefined;
  toast('บันทึกโปรไฟล์แล้ว');
  // ชื่อ/รูปใหม่ต้องอัปเดตทันทีทุกที่ที่แสดงอยู่ (แชท, งานที่กำลังทำ, รายการแอดมิน, หน้าติดตามของลูกค้า)
  renderRiderRoot(); renderAdminList(); renderCustomerRoot();
+}
+/* ---------- Platform v2: จัดการผลงานของไรเดอร์ (เพิ่ม/ลบ/จัดลำดับ) — เก็บไฟล์จริงใน Supabase Storage เสมอ
+   (riderAddPortfolioPhoto/riderDeletePortfolioItem/riderMovePortfolioItem นิยามไว้แล้วข้างบน) ---------- */
+let riderPendingPortfolioPhoto=null, riderPendingPortfolioCaption='';
+function riderPortfolioAddHTML(){
+ return `<div class="row" style="align-items:flex-end">
+  <div class="field" style="margin-bottom:0"><label>คำบรรยายผลงาน (ไม่บังคับ)</label><input id="riderPortfolioCaption" value="${esc(riderPendingPortfolioCaption)}" placeholder="เช่น ส่งอาหารตรงเวลา บรรจุดีมาก" oninput="riderPendingPortfolioCaption=this.value">
+   ${riderPendingPortfolioPhoto?`<div class="thumbs" style="margin-top:8px"><div class="thumb"><img src="${riderPendingPortfolioPhoto}"><button type="button" class="thumb-remove" onclick="riderPendingPortfolioPhoto=null;renderRiderPortfolioAdd()">×</button></div></div>`:''}
+  </div>
+  <div class="field" style="margin-bottom:0;flex:0 0 auto">
+   <input type="file" id="riderPortfolioFileInput" accept="image/*" style="display:none" onchange="onRiderPortfolioFilePicked(this)">
+   <button class="dk-btn outline" type="button" onclick="$('riderPortfolioFileInput').click()">${ICON_CAMERA}เลือกรูป</button>
+  </div>
+  <div class="field" style="margin-bottom:0;flex:0 0 auto"><button class="dk-btn primary" type="button" ${riderPortfolioUploadBusy?'disabled':''} onclick="onRiderPortfolioAdd()">${riderPortfolioUploadBusy?'กำลังอัปโหลด...':'+ เพิ่มผลงาน'}</button></div>
+ </div>`;
+}
+function renderRiderPortfolioAdd(){ const box=$('riderPortfolioAdd'); if(box) box.innerHTML=riderPortfolioAddHTML(); }
+let riderPendingPortfolioFile=null;
+async function onRiderPortfolioFilePicked(input){
+ const file=input.files&&input.files[0]; input.value='';
+ if(!file) return;
+ if(!CHAT_IMAGE_ACCEPTED.includes(file.type)){ toast('รองรับเฉพาะไฟล์รูปภาพ JPG, PNG หรือ WebP เท่านั้น'); return; }
+ if(file.size>CHAT_IMAGE_MAX_BYTES){ toast('รูปภาพต้องมีขนาดไม่เกิน 10 MB'); return; }
+ // เก็บ preview (data URL) ไว้แสดงตัวอย่างเฉยๆ แต่ตอนอัปโหลดจริงใช้ไฟล์ต้นฉบับ (ผ่าน compressImageToBlob) เสมอ ไม่ใช้ preview นี้
+ try{ riderPendingPortfolioPhoto=await fileToDataURL(file); }catch(e){ toast('ไม่สามารถอ่านไฟล์รูปนี้ได้ ลองรูปอื่น'); return; }
+ riderPendingPortfolioFile=file;
+ renderRiderPortfolioAdd();
+}
+async function onRiderPortfolioAdd(){
+ if(!riderPendingPortfolioFile){ toast('กรุณาเลือกรูปผลงานก่อน'); return; }
+ const ok=await riderAddPortfolioPhoto(riderPendingPortfolioFile,riderPendingPortfolioCaption);
+ if(!ok) return;
+ riderPendingPortfolioPhoto=null; riderPendingPortfolioFile=null; riderPendingPortfolioCaption='';
+ toast('เพิ่มผลงานแล้ว');
+ renderRiderPortfolioAdd();
+ renderRiderPortfolioGrid();
+}
+function riderPortfolioGridHTML(items){
+ if(!items.length) return '<div class="dk-empty">ยังไม่มีผลงาน — เพิ่มรูปผลงานแรกของคุณด้านบนได้เลย</div>';
+ return `<div class="portfolio-grid">${items.map((it,i)=>`<div class="portfolio-item">
+   <img src="${esc(it.image_url)}" loading="lazy" alt="ผลงาน" onclick="openLightbox('${esc(it.image_url)}')">
+   ${it.caption?`<div class="pcap">${esc(it.caption)}</div>`:''}
+   <div class="portfolio-move">
+    <button type="button" title="เลื่อนขึ้น" ${i===0?'disabled':''} onclick="event.stopPropagation();onRiderPortfolioMove('${it.id}',-1)">${ICON_UP}</button>
+    <button type="button" title="เลื่อนลง" ${i===items.length-1?'disabled':''} onclick="event.stopPropagation();onRiderPortfolioMove('${it.id}',1)">${ICON_DOWN}</button>
+   </div>
+   <button type="button" class="premove" title="ลบผลงานนี้" onclick="event.stopPropagation();onRiderPortfolioDelete('${it.id}')">${ICON_X}</button>
+  </div>`).join('')}</div>`;
+}
+async function renderRiderPortfolioGrid(){
+ const rider=currentRider(); const box=$('riderPortfolioGrid'); if(!rider||!box) return;
+ const items=await fetchRiderPortfolio(rider.id,sbRider);
+ const box2=$('riderPortfolioGrid'); if(box2) box2.innerHTML=riderPortfolioGridHTML(items);
+}
+async function onRiderPortfolioMove(itemId,dir){
+ const ok=await riderMovePortfolioItem(itemId,dir);
+ if(ok) renderRiderPortfolioGrid();
+}
+async function onRiderPortfolioDelete(itemId){
+ const rider=currentRider(); if(!rider) return;
+ const item=(RIDER_PORTFOLIO_CACHE[rider.id]||[]).find(x=>x.id===itemId); if(!item) return;
+ const ok=await riderDeletePortfolioItem(item);
+ if(ok){ toast('ลบผลงานแล้ว'); renderRiderPortfolioGrid(); }
+}
+function renderRiderPortfolioCard(){
+ const c=$('riderPortfolioCard'); if(!c||!currentRider()) return;
+ renderRiderPortfolioAdd();
+ renderRiderPortfolioGrid();
 }
 function riderCreditCardHTML(){
  const r=currentRider(); if(!r) return '';
@@ -2722,11 +3465,26 @@ async function riderAdvance(id){
   playStatusChime();
  }
 }
-function riderSendChat(id){
- const v=$('riderChatInput').value.trim();
+let riderChatSendBusy=false;
+// เหมือน customerSendChat ทุกประการ (async จริง, กันกดซ้ำ, สถานะกำลังส่ง, เคลียร์เฉพาะตอนสำเร็จ, ค้นหา element
+// ใหม่ทุกครั้งกันหน้าติดตามงานถูก re-render จาก realtime ระหว่างรอ)
+async function riderSendChat(id){
+ if(riderChatSendBusy) return;
+ const v=$('riderChatInput')?$('riderChatInput').value.trim():'';
  if(!v&&!riderPendingImage)return;
- addChat(id,'rider',v,riderPendingImage);
- $('riderChatInput').value=''; riderPendingImage=null; renderRiderAttachPreview();
+ riderChatSendBusy=true;
+ if($('riderChatSendBtn')){ $('riderChatSendBtn').disabled=true; $('riderChatSendBtn').textContent='กำลังส่ง...'; }
+ if($('riderChatInput')) $('riderChatInput').disabled=true;
+ if($('attachBtn_riderImgInput')) $('attachBtn_riderImgInput').disabled=true;
+ try{
+  const ok=await addChat(id,'rider',v,riderPendingImage);
+  if(ok){ if($('riderChatInput')) $('riderChatInput').value=''; riderPendingImage=null; renderRiderAttachPreview(); }
+ } finally {
+  riderChatSendBusy=false;
+  if($('riderChatSendBtn')){ $('riderChatSendBtn').disabled=false; $('riderChatSendBtn').textContent='ส่ง'; }
+  if($('riderChatInput')) $('riderChatInput').disabled=false;
+  if($('attachBtn_riderImgInput')) $('attachBtn_riderImgInput').disabled=false;
+ }
 }
 function renderRiderMyJob(){
  const card=$('riderMyJobCard'); if(!card)return;
@@ -2749,12 +3507,123 @@ function renderRiderMyJob(){
   <div class="chat-partner">${avatarHTML(o.customer.name,null,28)}<div><b>${esc(o.customer.name||'ลูกค้า')}</b><div class="tag">ลูกค้าของออเดอร์นี้${o.customer.contact?(' • '+esc(o.customer.contact)):''}</div></div></div>
   <div class="chatbox" id="riderChatMsgs">${o.chat.map(chatMsgHTML('rider',o)).join('')||'<div class="empty">ยังไม่มีข้อความ</div>'}</div>
   <div class="chat-attach-preview hidden" id="riderAttachPreview"></div>
-  <div class="chatrow">${chatAttachButtonHTML('riderImgInput','rider')}<input id="riderChatInput" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter')riderSendChat('${o.id}')"><button class="btn primary" type="button" onclick="riderSendChat('${o.id}')">ส่ง</button></div>
+  <div class="chatrow">${chatAttachButtonHTML('riderImgInput','rider')}<input id="riderChatInput" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter'){event.preventDefault();riderSendChat('${o.id}');}"><button class="btn primary" type="button" id="riderChatSendBtn" onclick="riderSendChat('${o.id}')">ส่ง</button></div>
  `;
  if($('riderChatInput')) $('riderChatInput').value=savedChat;
  if(riderPendingImage) renderRiderAttachPreview();
  const nextBox=$('riderChatMsgs');
  if(nextBox&&wasNearBottom) nextBox.scrollTop=nextBox.scrollHeight;
+}
+/* ---------- เฟส Match Marketplace: เนื้อหา 4 แท็บใหม่ของผู้ให้บริการ ---------- */
+function riderMatchesTabHTML(){
+ return `${riderNavTabsHTML()}<div class="dk-card">
+  <div class="dk-head"><div><h2>คำขอ MATCH ใหม่</h2><div class="dk-sub">ลูกค้าที่ต้องการจับคู่กับคุณ — ตอบรับเพื่อเริ่มแชทและเสนอราคา</div></div></div>
+  <div id="dkRiderMatchesList"><div class="dk-empty">ยังไม่มีคำขอใหม่</div></div>
+ </div>`;
+}
+function riderActiveTabHTML(){
+ return `${riderNavTabsHTML()}<div class="dk-card">
+  <div class="dk-head"><div><h2>กำลังดำเนินการ</h2><div class="dk-sub">คุยรายละเอียด เสนอราคา และอัปเดตความคืบหน้างาน</div></div></div>
+  <div id="dkRiderActiveList"><div class="dk-empty">ยังไม่มีงานที่กำลังดำเนินการ</div></div>
+ </div>`;
+}
+function riderHistoryTabHTML(){
+ return `${riderNavTabsHTML()}<div class="dk-card">
+  <div class="dk-head"><div><h2>ประวัติงาน</h2><div class="dk-sub">งานที่เสร็จสิ้น ถูกปฏิเสธ หรือยกเลิกแล้ว</div></div></div>
+  <div id="dkRiderHistoryList"><div class="dk-empty">ยังไม่มีประวัติ</div></div>
+ </div>`;
+}
+function riderProfileTabHTML(){
+ // เฟส "รื้อ Frontend ใหม่ตาม Reference": ย้าย "เครดิตของฉัน" (คอมมิชชั่น) เข้าไปในกล่องพับเก็บระบบเดิมด้วย —
+ // ตัวเลขนี้ผูกกับระบบออเดอร์เดิม (rider_credit_entries) เท่านั้น ไม่เกี่ยวกับ MATCH เลย ผู้ให้บริการที่ใช้แต่ MATCH
+ // ล้วน (ยังไม่เคยมีออเดอร์เดิมแม้แต่งานเดียว) ไม่ควรเห็นการ์ด "ยอดที่ต้องชำระ ฿0" ค้างอยู่หน้าโปรไฟล์หลักโดยไม่จำเป็น
+ // (ไม่ได้ลบฟีเจอร์ — ยังใช้งานได้ครบเหมือนเดิมสำหรับคนที่ยังมีออเดอร์เดิมอยู่ แค่ย้ายที่อยู่ให้สอดคล้องกับของเดิม)
+ return `${riderNavTabsHTML()}
+  <div class="dk-card" id="riderProfileCard"></div>
+  <div class="dk-card" id="riderPortfolioCard">
+   <div class="dk-head"><div><h2>ผลงานของฉัน</h2><div class="dk-sub">รูปผลงาน/บริการของคุณ ให้ลูกค้าเห็นตอนดูโปรไฟล์ก่อนกด MATCH</div></div></div>
+   <div id="riderPortfolioAdd"></div>
+   <div id="riderPortfolioGrid"><div class="dk-empty">กำลังโหลดผลงาน...</div></div>
+  </div>
+  <details class="collapse" id="riderLegacyCard" style="margin-bottom:16px">
+   <summary>ระบบรับงานเดิม (สำหรับออเดอร์ที่แอดมินสร้างให้ทางแชท/โทรศัพท์)</summary>
+   <div class="inner">
+    <div class="card hidden" id="riderInviteBox"></div>
+    <div class="card hidden" id="riderCreditCard"></div>
+    <div class="card" id="riderJobRoomCard">
+     <div class="head"><div><h2>ห้องรับงานกลาง</h2><div class="sub">งานใหม่ที่ยังไม่มีคนรับ • กดรับงานได้ทันที • มีเสียงอินโทรแจ้งเตือนเมื่อมีงานใหม่</div></div></div>
+     <div id="riderJobRoom"></div>
+    </div>
+    <div class="card hidden" id="riderMyJobCard"></div>
+   </div>
+  </details>`;
+}
+/* ---------- เฟส Match Marketplace: ตอบรับ/ปฏิเสธคำขอ MATCH, เสนอราคา, เสร็จสิ้นงาน ---------- */
+let riderMatchActionBusy=false;
+async function riderAcceptMatch(id){
+ if(riderMatchActionBusy) return;
+ riderMatchActionBusy=true;
+ try{
+  const {data,error}=await sbRider.rpc('accept_match',{p_match_id:id});
+  if(error){ toast(error.message||'ตอบรับไม่สำเร็จ'); return; }
+  upsertMatch(data);
+  toast('ตอบรับคำขอ MATCH แล้ว เริ่มคุยรายละเอียดได้เลย');
+ } finally { riderMatchActionBusy=false; }
+}
+async function riderDeclineMatch(id){
+ if(riderMatchActionBusy) return;
+ riderMatchActionBusy=true;
+ try{
+  const {data,error}=await sbRider.rpc('decline_match',{p_match_id:id});
+  if(error){ toast(error.message||'ปฏิเสธไม่สำเร็จ'); return; }
+  upsertMatch(data);
+  toast('ปฏิเสธคำขอนี้แล้ว');
+  if(riderViewingMatchId===id) riderNavGo('matches');
+ } finally { riderMatchActionBusy=false; }
+}
+// เสนอราคา: เปิดฟอร์มกรอกราคาแบบฝังในหน้า (ไม่ใช้ window.prompt() ให้สอดคล้องกับดีไซน์ระบบส่วนอื่นทั้งหมด)
+let riderPriceProposeOpenFor=null;
+function riderOpenPricePrompt(id){ riderPriceProposeOpenFor=id; riderBuiltMode=null; renderRiderRoot(); }
+let riderProposeBusy=false;
+async function riderConfirmPriceProposal(id){
+ if(riderProposeBusy) return;
+ const val=$('riderPriceInput')?Number($('riderPriceInput').value):NaN;
+ if(!val||val<=0){ toast('กรุณากรอกราคาที่ถูกต้อง'); return; }
+ riderProposeBusy=true;
+ try{
+  const {data,error}=await sbRider.rpc('propose_match_price',{p_match_id:id,p_price:val});
+  if(error){ toast(error.message||'เสนอราคาไม่สำเร็จ'); return; }
+  upsertChatMessage(data);
+  riderPriceProposeOpenFor=null;
+  toast('ส่งข้อเสนอราคาแล้ว');
+ } finally { riderProposeBusy=false; }
+}
+async function riderCompleteMatch(id){
+ const {data,error}=await sbRider.rpc('complete_match',{p_match_id:id});
+ if(error){ toast(error.message||'ปิดงานไม่สำเร็จ'); return; }
+ upsertMatch(data);
+ toast('งานเสร็จสิ้นแล้ว — ลูกค้าจะให้คะแนนและรีวิวได้ในแชท');
+}
+/* ---------- ส่งข้อความในห้องแชท MATCH (ฝั่งผู้ให้บริการ) ---------- */
+let riderMatchChatSendBusy=false;
+async function riderSendMatchChat(){
+ if(riderMatchChatSendBusy) return;
+ const id=riderViewingMatchId; if(!id) return;
+ const v=$('dkRiderChatInput')?$('dkRiderChatInput').value.trim():'';
+ if(!v&&!riderPendingImage) return;
+ riderMatchChatSendBusy=true;
+ if($('dkRiderChatInputSendBtn')){ $('dkRiderChatInputSendBtn').disabled=true; $('dkRiderChatInputSendBtn').textContent='กำลังส่ง...'; }
+ if($('dkRiderChatInput')) $('dkRiderChatInput').disabled=true;
+ if($('attachBtn_dkRiderChatInputImg')) $('attachBtn_dkRiderChatInputImg').disabled=true;
+ try{
+  const ok=await addChatTo({matchId:id},'rider',v,riderPendingImage);
+  if(ok){ if($('dkRiderChatInput')) $('dkRiderChatInput').value=''; riderPendingImage=null; renderRiderAttachPreview(); }
+ } finally {
+  riderMatchChatSendBusy=false;
+  if($('dkRiderChatInputSendBtn')){ $('dkRiderChatInputSendBtn').disabled=false; $('dkRiderChatInputSendBtn').textContent='ส่ง'; }
+  if($('dkRiderChatInput')) $('dkRiderChatInput').disabled=false;
+  if($('attachBtn_dkRiderChatInputImg')) $('attachBtn_dkRiderChatInputImg').disabled=false;
+ }
 }
 function renderRiderAuthState(){
  const authCard=$('riderAuthCard'), appBox=$('riderAppBox');
@@ -2762,7 +3631,6 @@ function renderRiderAuthState(){
  if(currentRider()){
   authCard.classList.add('hidden'); authCard.innerHTML='';
   appBox.classList.remove('hidden');
-  renderRiderProfileCard();
  }else{
   appBox.classList.add('hidden');
   authCard.classList.remove('hidden');
@@ -2773,27 +3641,97 @@ function renderRiderAuthState(){
   Object.keys(keep).forEach(id=>{ if($(id)) $(id).value=keep[id]; });
  }
 }
-function renderRiderRoot(){
- const root=$('riderRoot'); if(!root)return;
- if(!riderBuilt){ root.innerHTML=riderRootHTML(); riderBuilt=true; }
- renderRiderAuthState();
- if(!currentRider()) return; // ยังไม่ล็อกอิน — ไม่ต้องเรนเดอร์ห้องรับงาน/งานของฉัน
+// เฟส Match Marketplace: เนื้อหาหลักของแอปไรเดอร์ทั้งหมดตอนนี้สลับตามแท็บ (riderViewMode) — ต่างจาก
+// renderRiderAuthState (สลับแค่การ์ดล็อกอิน/แอป) โครงสร้างเดียวกับ renderCustomerRoot ฝั่งลูกค้า
+function renderRiderMain(){
+ const main=$('riderMain'); if(!main) return;
+ const rider=currentRider(); if(!rider) return;
+ if(riderViewMode==='matchRoom'){
+  const m=findMatch(riderViewingMatchId);
+  if(!m||m.providerId!==rider.id){ main.innerHTML=`<div class="dk-card"><button type="button" class="dk-btn outline" style="max-width:100px;margin-bottom:12px" onclick="riderNavGo('matches')">${ICON_ARROWLEFT}&nbsp;กลับ</button><div class="dk-empty">ไม่พบ MATCH นี้ หรือคุณไม่มีสิทธิ์เข้าถึง</div></div>`; riderBuiltMode=null; return; }
+  const savedVal=$('dkRiderChatInput')?$('dkRiderChatInput').value:'';
+  const prevBox=$('dkChatBox');
+  const wasNearBottom=prevBox?(prevBox.scrollHeight-prevBox.scrollTop-prevBox.clientHeight<80):true;
+  main.innerHTML=matchRoomHTML(m,'rider',getMatchCustomerDisplay(m.customerId));
+  if($('dkRiderChatInput')) $('dkRiderChatInput').value=savedVal;
+  if(riderPendingImage) renderRiderAttachPreview();
+  const nextBox=$('dkChatBox');
+  if(nextBox&&wasNearBottom) nextBox.scrollTop=nextBox.scrollHeight;
+  riderBuiltMode='matchRoom:'+m.id;
+  return;
+ }
+ if(riderViewMode==='matches'){
+  if(riderBuiltMode!=='matches'){ main.innerHTML=riderMatchesTabHTML(); riderBuiltMode='matches'; }
+  renderMatchListInto('dkRiderMatchesList', matchesFor('rider',rider.id).filter(m=>m.status==='pending').slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)), 'rider');
+  return;
+ }
+ if(riderViewMode==='active'){
+  if(riderBuiltMode!=='active'){ main.innerHTML=riderActiveTabHTML(); riderBuiltMode='active'; }
+  renderMatchListInto('dkRiderActiveList', matchesFor('rider',rider.id).filter(m=>['accepted','active'].includes(m.status)).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt)), 'rider');
+  return;
+ }
+ if(riderViewMode==='history'){
+  if(riderBuiltMode!=='history'){ main.innerHTML=riderHistoryTabHTML(); riderBuiltMode='history'; }
+  renderMatchListInto('dkRiderHistoryList', matchesFor('rider',rider.id).filter(m=>['completed','declined','cancelled'].includes(m.status)).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt)), 'rider');
+  return;
+ }
+ // 'profile' — รวมโปรไฟล์/สถานะพร้อมรับ MATCH/ผลงาน/เครดิต/ระบบรับงานเดิม (พับเก็บ)
+ if(riderBuiltMode!=='profile'){ main.innerHTML=riderProfileTabHTML(); riderBuiltMode='profile'; }
+ renderRiderProfileCard();
  const params=new URLSearchParams(location.search);
  renderRiderInvite(params.get('order'));
  renderRiderJobRoom();
  renderRiderMyJob();
  renderRiderCreditCard();
+ if(!riderPortfolioLoaded){ riderPortfolioLoaded=true; renderRiderPortfolioCard(); } // โหลดผลงานครั้งเดียวต่อ session ล็อกอิน (เพิ่ม/ลบ/แก้ไขเรียก render ของตัวเองอยู่แล้ว ไม่ต้องโหลดซ้ำทุกครั้งที่ realtime ยิง)
 }
+function renderRiderRoot(){
+ const root=$('riderRoot'); if(!root)return;
+ if(!riderBuilt){ root.innerHTML=riderRootHTML(); riderBuilt=true; }
+ renderRiderAuthState();
+ if(!currentRider()){ renderBottomNav(); return; } // ยังไม่ล็อกอิน — ไม่ต้องเรนเดอร์เนื้อหาแท็บใด ๆ
+ renderRiderMain();
+ renderBottomNav();
+}
+let riderPortfolioLoaded=false;
 
 /* ======================= ROLE / ROUTER ======================= */
+// เฟส Match Marketplace: Bottom Navigation ใช้ร่วมกันทั้งลูกค้า/ผู้ให้บริการ (มือถือเท่านั้น — เดสก์ท็อปใช้
+// customerNavTabsHTML/riderNavTabsHTML ที่ฝังอยู่ในตัวเนื้อหาแต่ละหน้าแทน ดู .dk-bottomnav/.dk-navtabs-desktop
+// ใน CSS) อ่าน currentNotifRole() ตัวเดียวกับที่ระบบแจ้งเตือนใช้อยู่แล้ว เพื่อตัดสินว่าตอนนี้ควรโชว์แท็บของใคร
+function renderBottomNav(){
+ const nav=$('dkBottomNav'); if(!nav) return;
+ const role=currentNotifRole();
+ if(role==='customer'){
+  const cust=currentCustomer();
+  if(!cust){ nav.classList.add('hidden'); nav.innerHTML=''; return; }
+  nav.classList.remove('hidden');
+  const active=customerActiveTabKey();
+  nav.innerHTML=CUSTOMER_TABS.map(t=>`<button type="button" class="bnitem${active===t.key?' active':''}" onclick="customerNavGo('${t.key}')">${t.icon}<span>${t.label}</span></button>`).join('');
+ }else if(role==='rider'){
+  const rider=currentRider();
+  if(!rider){ nav.classList.add('hidden'); nav.innerHTML=''; return; }
+  nav.classList.remove('hidden');
+  const active=riderActiveTabKey();
+  nav.innerHTML=RIDER_TABS.map(t=>`<button type="button" class="bnitem${active===t.key?' active':''}" onclick="riderNavGo('${t.key}')">${t.icon}<span>${t.label}</span></button>`).join('');
+ }else{
+  nav.classList.add('hidden'); nav.innerHTML='';
+ }
+}
 function setRole(role){
  document.querySelectorAll('.role').forEach(b=>b.classList.toggle('active',b.dataset.role===role));
  ['admin','customer','rider'].forEach(r=>$(r+'View').classList.toggle('hidden',r!==role));
  if(role==='admin'){ $('heroTitle').textContent='จัดการงานรับหิ้ว';$('heroText').textContent='ดูงานทั้งหมดแบบเรียลไทม์ กรอง ค้นหา และดูรายละเอียดทุกจุดรับ-ส่ง'}
- if(role==='customer'){ $('heroTitle').textContent='ให้เราช่วยหิ้วให้คุณ';$('heroText').textContent='เช็คราคา เพิ่มจุดรับ-ส่งได้หลายจุด แนบรูป แล้วส่งงานได้ทันที'}
- if(role==='rider'){ $('heroTitle').textContent='ห้องรับงานไรเดอร์';$('heroText').textContent='เห็นงานใหม่ทันที กดรับงาน อัปเดตสถานะ และแชทกับลูกค้าได้ในที่เดียว'}
+ if(role==='customer'){ $('heroTitle').textContent='เด็กเดิน (Dekdein)';$('heroText').textContent='เลือกผู้ให้บริการที่ถูกใจ กด MATCH คุยรายละเอียด ตกลงราคา แล้วเริ่มงานได้ทันที'}
+ if(role==='rider'){ $('heroTitle').textContent='แอปผู้ให้บริการ';$('heroText').textContent='รับคำขอ MATCH ใหม่ คุยรายละเอียดกับลูกค้า เสนอราคา และอัปเดตความคืบหน้างานได้ในที่เดียว'}
+ // เฟส "รื้อ Frontend ใหม่ตาม Reference": Customer Flow หลัก (ลูกค้า/ผู้ให้บริการ) ใช้หัวเว็บแบบสะอาด ไม่มีแบนเนอร์
+ // ไล่สีกรมท่า/ปุ่ม dev เช่นสลับ role หรือทดสอบเสียงปนอยู่ — เฉพาะแอดมินเท่านั้นที่ยังเห็นหัวเว็บ/แบนเนอร์แบบเดิม
+ const dkMode=(role==='customer'||role==='rider');
+ if($('appTopBar')) $('appTopBar').classList.toggle('dk-mode',dkMode);
+ if($('heroSection')) $('heroSection').classList.toggle('hidden',dkMode);
  if($('notifPanel')) $('notifPanel').classList.add('hidden');
  renderBellBadge();
+ renderBottomNav();
 }
 document.querySelectorAll('.role').forEach(b=>b.onclick=()=>setRole(b.dataset.role));
 
@@ -2819,8 +3757,10 @@ function boot(){
  dbListeners.push(()=>renderAdminList());
  dbListeners.push(()=>renderCustomerRoot());
  dbListeners.push(()=>{renderRiderJobRoom();renderRiderMyJob();});
+ dbListeners.push(()=>renderRiderMain()); // เฟส Match Marketplace: อัปเดตแท็บ Match ใหม่/กำลังดำเนินการ/ประวัติงาน/ห้องแชท MATCH แบบสดผ่าน realtime เดียวกับออเดอร์
  dbListeners.push(()=>checkForNotifiableEvents());
  dbListeners.push(()=>{renderRiderCreditCard();renderAdminCreditList();}); // เครดิต/เครดิตการชำระเงินอัปเดตสดผ่าน realtime เดียวกับออเดอร์
+ dbListeners.push(()=>renderBottomNav()); // ป้าย/สถานะที่ Bottom Nav อาจต้องสะท้อนข้อมูลใหม่ (เช่นสถานะ MATCH เปลี่ยน)
 
  // เมื่อโปรไฟล์ไรเดอร์เปลี่ยน (ชื่อ/รูป) จากแท็บใดก็ตาม ต้องอัปเดตทุกหน้าที่แสดงชื่อ/รูปไรเดอร์ทันที
  riderStoreListeners.push(()=>{ renderAdminList(); renderCustomerRoot(); renderRiderRoot(); if(adminTab==='users') renderAdminUsersList(); });
