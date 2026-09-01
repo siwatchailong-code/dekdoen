@@ -820,6 +820,23 @@ async function subscribeRealtimeForRole(role){
   ch.on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles',filter:'id=eq.'+selfId},payload=>{
    if(payload.new&&payload.new.banned) handleSelfBanned(role);
   });
+  // บั๊กจริงที่ตรวจพบระหว่าง Production Integration Test (เฟส 16): ระบบ MATCH เขียนแถวแจ้งเตือนจริงลงตาราง
+  // notifications ถูกต้องทุกจุดอยู่แล้ว (create_match_request/accept_match/decline_match/propose_match_price/
+  // respond_price_proposal/complete_match/submit_review ทุกตัว insert into notifications จริง — ยืนยันด้วยการ
+  // query ตรงหลังทดสอบจริง) แต่กระดิ่งแจ้งเตือนบน header ไม่เคย subscribe ตาราง notifications เลยสักจุด อ่านจาก
+  // NOTIF_RIDER/NOTIF_CUSTOMER/NOTIF_ADMIN (คำนวณจาก DB.orders/แชทของออเดอร์เดิมในเครื่องเท่านั้น) กระดิ่งจึงไม่ขึ้น
+  // เลยเมื่อมีคำขอ MATCH ใหม่/ตอบรับ/ปฏิเสธ/เสนอราคา/ยอมรับราคา/งานเสร็จ/รีวิวใหม่ ถึงแม้ Realtime ของตาราง matches/
+  // chat_messages เองจะทำงานถูกต้อง (ข้อมูลมาถึงจริง แค่กระดิ่งไม่รู้จัก) แก้เฉพาะจุดนี้: subscribe ตาราง
+  // notifications แบบ real-time แล้วส่งเข้า pushNotification เดิมเมื่อเป็นแถวของ MATCH (match_id ไม่เป็น null)
+  // เท่านั้น — จงใจไม่แตะแถวของออเดอร์เดิม (order_id ไม่เป็น null) เพราะฝั่งออเดอร์แจ้งเตือนถูกต้องอยู่แล้วผ่านการ
+  // เทียบสถานะในเครื่อง (checkRiderJobNotifications ฯลฯ) การเพิ่มแหล่งที่สองสำหรับออเดอร์จะทำให้แจ้งเตือนซ้ำ 2 ครั้ง
+  ch.on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications'},payload=>{
+   const row=payload.new;
+   if(!row||row.match_id==null) return; // เฉพาะแจ้งเตือนของระบบ MATCH เท่านั้น
+   if(row.recipient_id&&row.recipient_id!==selfId) return;
+   if(!row.recipient_id&&row.recipient_role!==role) return;
+   handleIncomingMatchNotification(role,row);
+  });
  }
  // ตรวจสอบทั้งระบบ (End-to-End, เฟส 4): เฉพาะแอดมินเท่านั้นที่ subscribe แบบไม่กรอง table ทั้งหมด
  // (RLS ของ profiles อนุญาตให้ is_admin() อ่านได้ทุกแถวอยู่แล้ว — realtime สืบสิทธิ์จาก RLS เดียวกันเสมอ ไม่ใช่
@@ -946,6 +963,19 @@ function pushNotification(role,{title,body,orderId}){
  store.list.unshift(n);
  if(store.list.length>200) store.list.length=200; // กันโตไม่จำกัด
  return n;
+}
+// เฟส 16: รับแถวแจ้งเตือนจริงของระบบ MATCH จากตาราง notifications ผ่าน Realtime (ดูจุด subscribe ใน
+// subscribeRealtimeForRole ด้านบน) แล้วดันเข้ากระดิ่งเดิมทันที ไม่รอ reload — กันแจ้งซ้ำด้วย seen.dbNotifIds
+// เผื่อ Realtime reconnect แล้ว replay event เดิมมาอีกรอบ (เหมือนแพทเทิร์น seen.* ที่มีอยู่แล้วของระบบออเดอร์เดิม)
+function handleIncomingMatchNotification(role,row){
+ const store=storeForRole(role);
+ if(!store.seen.dbNotifIds) store.seen.dbNotifIds=[];
+ if(store.seen.dbNotifIds.includes(row.id)) return;
+ store.seen.dbNotifIds.push(row.id);
+ if(store.seen.dbNotifIds.length>500) store.seen.dbNotifIds=store.seen.dbNotifIds.slice(-500);
+ pushNotification(role,{title:row.title,body:row.body});
+ saveForRole(role);
+ if(currentNotifRole()===role) notifySoundAndToast(row.title,'order');
 }
 // เฟส 3: เรียกจาก activateRoleSync() หลังโหลดข้อมูลจริงจาก Supabase เสร็จ "เฉพาะของ role ที่เพิ่ง sync" เท่านั้น
 // (ไม่ใช่ตอน boot() แบบเดิมอีกต่อไป เพราะตอนนั้น DB.orders ยังว่างเปล่า ยังไม่ทัน sync จริง) — ระบุ role เพื่อกัน
