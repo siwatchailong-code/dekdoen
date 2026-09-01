@@ -168,6 +168,38 @@ const SUPABASE_PUBLISHABLE_KEY='sb_publishable_4MpZOC76iZsraUonFXyqAw_Dvxv1bWM';
 const sbCustomer=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:'dekdoen-sb-customer',storage:window.localStorage,persistSession:true,autoRefreshToken:true}});
 const sbRider=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:'dekdoen-sb-rider',storage:window.sessionStorage,persistSession:true,autoRefreshToken:true}});
 const sbAdmin=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:'dekdoen-sb-admin',storage:window.sessionStorage,persistSession:true,autoRefreshToken:true}});
+
+/* ======================= Google Maps (จุดรับ-ส่งบนแผนที่ ตอนสร้างออเดอร์ลูกค้า) =======================
+   *** ใส่ Google Maps API Key ของคุณเองตรงบรรทัดถัดไป (ค่าว่างตอนนี้โดยตั้งใจ) ***
+   คีย์นี้เป็นคนละประเภทกับ SUPABASE_SERVICE_ROLE_KEY: Google Maps API Key ถูกออกแบบมาให้ใช้งานฝั่ง frontend
+   ได้ตามปกติ (จำกัดสิทธิ์การใช้งานด้วย "HTTP referrer restriction" ที่ตั้งค่าใน Google Cloud Console แทน ไม่ใช่
+   การซ่อนคีย์) ต้องเปิดใช้งาน API ต่อไปนี้ในโปรเจกต์ Google Cloud ของคุณก่อน (เปิดแล้ว: Maps JavaScript API,
+   Routes API — ตรวจสอบแล้วจากสถานะที่ผู้ใช้แจ้ง): Maps JavaScript API, Places API (New), Routes API — คีย์
+   เดียวกันนี้ถูกใช้ทั้ง 3 อย่าง (แสดงแผนที่/ค้นหาสถานที่/คำนวณเส้นทาง-ระยะทาง-เวลาจริงผ่าน Routes API computeRoutes)
+   ถ้ายังไม่ใส่คีย์ (ค่าว่าง) ระบบแผนที่จะปิดใช้งานอัตโนมัติแบบไม่มี error โดยไม่กระทบการสร้างออเดอร์แบบเดิมเลย
+   (จุดรับ-ส่งบนแผนที่เป็นฟีเจอร์เสริม ไม่บังคับต้องใช้ถึงจะส่งงานได้) */
+const GOOGLE_MAPS_API_KEY='AIzaSyBhFw8W8_K2E4JZ2Xko08B6boq3xDeuVkA';
+// โหลด Google Maps JavaScript API แบบ lazy (โหลดครั้งแรกที่ลูกค้าเปิดฟอร์มสร้างออเดอร์เท่านั้น ไม่โหลดทุกหน้า)
+// ผ่าน callback ตามแนวทางปัจจุบันของ Google (loading=async) กันปัญหาบล็อก main thread ตอนโหลดหน้าเว็บ
+let googleMapsLoadPromise=null;
+function loadGoogleMapsApi(){
+ if(googleMapsLoadPromise) return googleMapsLoadPromise;
+ googleMapsLoadPromise=new Promise((resolve,reject)=>{
+  if(!GOOGLE_MAPS_API_KEY){ reject(new Error('NO_KEY')); return; }
+  if(window.google&&window.google.maps&&window.google.maps.geometry){ resolve(); return; }
+  window.__onGoogleMapsLoaded=()=>resolve();
+  const s=document.createElement('script');
+  // libraries=geometry: ใช้ decode polyline ที่ได้จาก Routes API สำหรับวาดเส้นทางบนแผนที่ (ค้นหาสถานที่ใช้
+  // Places API (New) ผ่าน REST fetch ตรง ๆ แยกต่างหาก ไม่ใช้ library "places" ของ Maps JS API เดิม เพราะ
+  // widget เดิม google.maps.places.Autocomplete ต้องเปิดใช้ "Places API" รุ่นเก่า ซึ่งโปรเจกต์นี้ไม่ได้เปิด
+  // เปิดไว้เฉพาะ "Places API (New)" เท่านั้น)
+  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(GOOGLE_MAPS_API_KEY)+'&libraries=geometry&language=th&region=TH&loading=async&callback=__onGoogleMapsLoaded';
+  s.async=true;
+  s.onerror=()=>reject(new Error('LOAD_FAILED'));
+  document.head.appendChild(s);
+ });
+ return googleMapsLoadPromise;
+}
 // แปลงเบอร์โทร(หรือ username แอดมิน)เป็น "email ภายใน" ปลอมสำหรับ Supabase Auth เท่านั้น — ผู้ใช้ไม่เห็นค่านี้เลย
 // ยังคงกรอกแค่เบอร์โทร+รหัสผ่านในหน้าเว็บเหมือนเดิมทุกจุด (role ต่อท้าย domain กันเบอร์เดียวกันชนกันข้าม role)
 function phoneToInternalEmail(identifier,role){ return String(identifier||'').trim().toLowerCase()+'@'+role+'.dekdoen.internal'; }
@@ -314,14 +346,19 @@ window.addEventListener('focus',()=>{
  RIDERS=loadRiders();riderStoreListeners.forEach(fn=>{try{fn(true)}catch(e){}});
 });
 
-function calcPricing(stopsCount,goods){
+// เพิ่มพารามิเตอร์ตัวเลือก distanceKm (ระยะทางจริงจาก Google Maps หน่วยกิโลเมตร) — ถ้าไม่ส่งมา (undefined)
+// จะเท่ากับ 0 พฤติกรรมเดิมทุกประการ (ราคาที่คำนวณไม่เปลี่ยนแปลงจากเดิมเลยถ้าไม่ได้ใช้แผนที่) ใช้ค่า
+// rates_config.km (ค่าบริการต่อกิโลเมตร ที่มีอยู่แล้วในระบบตั้งแต่เฟส 1 แต่ยังไม่เคยถูกใช้จริงในสูตรราคา) —
+// ไม่ได้สร้างระบบราคาใหม่ซ้อน แค่เติมองค์ประกอบระยะทางเข้าไปในฟังก์ชันราคาเดิมฟังก์ชันเดียวที่ใช้อยู่ทั้งระบบ
+function calcPricing(stopsCount,goods,distanceKm){
  const r=DB.rates;
  const extra=Math.max(0,stopsCount-1)*Number(r.perStop||0);
- const fee=Number(r.base||0)+extra;
+ const distanceFee=Number(distanceKm||0)*Number(r.km||0);
+ const fee=Number(r.base||0)+extra+distanceFee;
  const commission=Math.round(fee*Number(r.commission||0)/100);
  const riderEarn=fee-commission;
  const total=Number(goods||0)+fee;
- return {goods:Number(goods||0),fee,extra,commission,riderEarn,total};
+ return {goods:Number(goods||0),fee,extra,distanceFee,distanceKm:Number(distanceKm||0),commission,riderEarn,total};
 }
 // ราคาแยกรายงาน (งานที่ 1 = ค่าบริการเริ่มต้น, งานที่ 2 เป็นต้นไป = ค่าบริการต่อจุดเพิ่ม) — ใช้สูตรราคาเดิมทุกประการ แค่แยกแสดงเป็นรายการ
 function perJobFees(stopsCount){
@@ -334,14 +371,20 @@ function mutateOrder(id,fn){const o=findOrder(id);if(!o)return null;fn(o);saveDB
 /* เฟส 3: createOrder บันทึกลง Supabase จริง (ไม่ใช่ localStorage อีกต่อไป) — id/pricing/timeline คำนวณฝั่ง
    server เสมอ (ดู trigger set_order_id/compute_order_pricing ใน 0001_init.sql) คืนค่า order ที่แปลงเป็น
    รูปทรงเดิมทุกฟิลด์ (ผ่าน mapOrderRow ด้านล่าง) ให้โค้ด UI เดิมใช้งานต่อได้โดยไม่ต้องแก้ */
-async function createOrder({customerId,customerName,customerContact,customerNote,stops,goodsTotal,createdBy}){
+async function createOrder({customerId,customerName,customerContact,customerNote,stops,goodsTotal,createdBy,pickupLat,pickupLng,dropoffLat,dropoffLng,distanceKm}){
  const client=createdBy==='admin'?sbAdmin:sbCustomer;
  const payload={
   created_by:createdBy||'customer',
   customer_id:customerId||null, // ผูกกับบัญชีลูกค้าจริง (null = ออเดอร์ที่แอดมินสร้างให้ทางแชท/โทรศัพท์ ไม่ผูกบัญชี)
   customer_name:customerName||'', customer_contact:customerContact||'', customer_note:customerNote||'',
   stops:(stops||[]).map((s,i)=>({seq:i+1,pickup:s.pickup||'',dropoff:s.dropoff||'',detail:s.detail||'',note:s.note||'',qty:Number(s.qty||1),photos:s.photos||[],done:false})),
-  goods_total:Number(goodsTotal||0)
+  goods_total:Number(goodsTotal||0),
+  // เฟส Google Maps: พิกัดจุดรับ-ส่งและระยะทางจริงระดับออเดอร์ (ไม่บังคับ — null ได้ถ้าไม่ได้ใช้แผนที่ ไม่กระทบออเดอร์แบบเดิมเลย)
+  pickup_lat:(pickupLat===undefined||pickupLat===null)?null:Number(pickupLat),
+  pickup_lng:(pickupLng===undefined||pickupLng===null)?null:Number(pickupLng),
+  dropoff_lat:(dropoffLat===undefined||dropoffLat===null)?null:Number(dropoffLat),
+  dropoff_lng:(dropoffLng===undefined||dropoffLng===null)?null:Number(dropoffLng),
+  distance_km:(distanceKm===undefined||distanceKm===null)?null:Number(distanceKm)
  };
  const {data,error}=await client.from('orders').insert(payload).select().single();
  if(error){ toast('สร้างออเดอร์ไม่สำเร็จ: '+error.message); return null; }
@@ -365,6 +408,9 @@ function mapOrderRow(row){
   customer:{name:row.customer_name||'',contact:row.customer_contact||'',note:row.customer_note||''},
   stops:row.stops||[], pricing:row.pricing||{}, timeline:row.timeline||[],
   rider:row.rider_id?{riderId:row.rider_id,name:row.rider_name||''}:null,
+  pickupLat:row.pickup_lat??null, pickupLng:row.pickup_lng??null,
+  dropoffLat:row.dropoff_lat??null, dropoffLng:row.dropoff_lng??null,
+  distanceKm:row.distance_km??null,
   chat:[] // เติมทีหลังจาก chat_messages แยกต่างหาก — ดู upsertOrder/upsertChatMessage
  };
 }
@@ -1897,6 +1943,173 @@ function customerDashboardHTML(cust){
  </aside>
  </div>`;
 }
+/* ---------- Google Maps: จุดรับ-ส่งบนแผนที่ ตอนสร้างออเดอร์ (ฟีเจอร์เสริม order-level แยกจากรายการงานหลายจุดเดิม
+   ไม่บังคับต้องใช้ถึงจะส่งงานได้ ไม่แก้/ไม่แทนที่ .f-pickup/.f-dropoff รายจุดเดิมเลย) ---------- */
+let orderMap=null, orderMapPickupMarker=null, orderMapDropoffMarker=null, orderRoutePolyline=null;
+let mapPickupPoint=null, mapDropoffPoint=null; // {lat,lng,address} หรือ null ถ้ายังไม่ได้เลือก
+let mapDistanceKm=null; // null = ยังไม่ได้เลือกจุดรับ-ส่งบนแผนที่ (ไม่กระทบราคาปกติเลย)
+let mapDurationText=null; // เวลาเดินทางโดยประมาณ แสดงผลอย่างเดียว ไม่ถูกบันทึกลงออเดอร์ (ราคายังอิงระยะทางเหมือนเดิม)
+let mapRouteFetchSeq=0; // กันผลลัพธ์ค้นหาเก่ามาทับผลใหม่ ถ้าผู้ใช้เปลี่ยนจุดรับ-ส่งเร็ว ๆ ระหว่างรอ Routes API ตอบกลับ
+let mapPlacesDebounce={pickup:null,dropoff:null}; // debounce timer ต่ออินพุต กันยิง request ทุกตัวอักษรที่พิมพ์
+function resetOrderMapState(){
+ orderMap=null; orderMapPickupMarker=null; orderMapDropoffMarker=null; orderRoutePolyline=null;
+ mapPickupPoint=null; mapDropoffPoint=null; mapDistanceKm=null; mapDurationText=null;
+ if(mapPlacesDebounce.pickup) clearTimeout(mapPlacesDebounce.pickup);
+ if(mapPlacesDebounce.dropoff) clearTimeout(mapPlacesDebounce.dropoff);
+ mapPlacesDebounce={pickup:null,dropoff:null};
+}
+// เริ่มระบบแผนที่ในฟอร์มสร้างออเดอร์ — ทำงานแบบไม่บังคับเสมอ: ถ้าไม่มี key หรือโหลดไม่สำเร็จ จะแสดงข้อความเฉย ๆ
+// ไม่ throw ไม่บล็อกการกรอกฟอร์ม/ส่งออเดอร์แบบเดิม (เรียกจาก renderCustomerRoot ตอนสร้างฟอร์มครั้งแรกเท่านั้น)
+async function initOrderMap(){
+ const statusEl=$('orderMapStatus');
+ if(!GOOGLE_MAPS_API_KEY){ if(statusEl) statusEl.textContent='ยังไม่ได้เปิดใช้งานแผนที่ (ไม่บังคับ) — ระบุจุดรับ-ส่งเป็นข้อความในรายการงานด้านล่างได้ตามปกติ'; return; }
+ if(statusEl) statusEl.textContent='กำลังโหลดแผนที่...';
+ try{ await loadGoogleMapsApi(); }
+ catch(e){ if(statusEl) statusEl.textContent='โหลดแผนที่ไม่สำเร็จ ระบุจุดรับ-ส่งเป็นข้อความในรายการงานด้านล่างได้ตามปกติ'; return; }
+ const canvas=$('orderMapCanvas'); if(!canvas) return; // ผู้ใช้อาจออกจากฟอร์มไปแล้วระหว่างรอโหลดสคริปต์
+ const center={lat:13.7563,lng:100.5018}; // ค่ากลางเริ่มต้น: กรุงเทพฯ (ก่อนเลือกจุดใด)
+ orderMap=new google.maps.Map(canvas,{center,zoom:12});
+ setupPlacesAutocomplete($('mapPickupInput'),'pickup',$('mapPickupSuggest'));
+ setupPlacesAutocomplete($('mapDropoffInput'),'dropoff',$('mapDropoffSuggest'));
+ if(statusEl) statusEl.textContent='พิมพ์ค้นหาจุดรับและจุดส่งด้านบนได้เลย';
+}
+// ค้นหาสถานที่ด้วย Places API (New) โดยตรงผ่าน REST (places:autocomplete) — ไม่ใช้ widget
+// google.maps.places.Autocomplete เดิม เพราะ widget นั้นต้องเปิดใช้ "Places API" รุ่นเก่า ซึ่งโปรเจกต์นี้ไม่ได้
+// เปิดไว้ (เปิดเฉพาะ "Places API (New)") จึงสร้างช่องค้นหา+ลิสต์ผลลัพธ์เอง ผูกกับ input ธรรมดาที่มีอยู่แล้ว
+function setupPlacesAutocomplete(inputEl,which,listEl){
+ if(!inputEl||!listEl) return;
+ inputEl.addEventListener('input',()=>{
+  const q=inputEl.value.trim();
+  if(mapPlacesDebounce[which]) clearTimeout(mapPlacesDebounce[which]);
+  if(!q){ listEl.innerHTML=''; listEl.hidden=true; return; }
+  mapPlacesDebounce[which]=setTimeout(()=>fetchPlaceSuggestions(q,which,listEl),350);
+ });
+ // หน่วงการซ่อนลิสต์ตอน blur กันกรณีคลิกเลือกรายการไม่ทัน (mousedown บนลิสต์จะยิงก่อน blur เสร็จ)
+ inputEl.addEventListener('blur',()=>{ setTimeout(()=>{ listEl.hidden=true; },200); });
+}
+async function fetchPlaceSuggestions(q,which,listEl){
+ let data=null,ok=false;
+ try{
+  const resp=await fetch('https://places.googleapis.com/v1/places:autocomplete',{
+   method:'POST',
+   headers:{'Content-Type':'application/json','X-Goog-Api-Key':GOOGLE_MAPS_API_KEY},
+   body:JSON.stringify({input:q,languageCode:'th',regionCode:'TH'})
+  });
+  data=await resp.json().catch(()=>null); ok=resp.ok;
+ }catch(e){ ok=false; }
+ const suggestions=(ok&&data&&data.suggestions)||[];
+ if(!suggestions.length){ listEl.innerHTML='<div style="padding:10px 12px;color:var(--muted)">ไม่พบสถานที่</div>'; listEl.hidden=false; return; }
+ listEl.innerHTML=suggestions.slice(0,6).map((s,i)=>{
+  const p=s.placePrediction; if(!p) return '';
+  return `<div class="place-sugg-item" data-idx="${i}" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--line)">${esc(p.text&&p.text.text||'')}</div>`;
+ }).join('');
+ listEl._suggestions=suggestions;
+ listEl.hidden=false;
+ Array.from(listEl.querySelectorAll('.place-sugg-item')).forEach(el=>{
+  el.addEventListener('mousedown',(ev)=>{ ev.preventDefault(); const idx=Number(el.getAttribute('data-idx')); pickPlaceSuggestion(listEl._suggestions[idx],which,listEl); });
+ });
+}
+async function pickPlaceSuggestion(sugg,which,listEl){
+ const p=sugg&&sugg.placePrediction; if(!p) return;
+ const inputEl=which==='pickup'?$('mapPickupInput'):$('mapDropoffInput');
+ if(inputEl) inputEl.value=(p.text&&p.text.text)||'';
+ listEl.hidden=true;
+ const placeId=p.placeId; if(!placeId) return;
+ let data=null,ok=false;
+ try{
+  const resp=await fetch('https://places.googleapis.com/v1/places/'+encodeURIComponent(placeId),{
+   headers:{'X-Goog-Api-Key':GOOGLE_MAPS_API_KEY,'X-Goog-FieldMask':'location,formattedAddress'}
+  });
+  data=await resp.json().catch(()=>null); ok=resp.ok;
+ }catch(e){ ok=false; }
+ if(!ok||!data||!data.location) return;
+ const point={lat:data.location.latitude,lng:data.location.longitude,address:data.formattedAddress||(p.text&&p.text.text)||''};
+ if(which==='pickup') mapPickupPoint=point; else mapDropoffPoint=point;
+ updateOrderMapMarkers();
+ tryDrawRoute();
+}
+function updateOrderMapMarkers(){
+ if(!orderMap) return;
+ if(mapPickupPoint){
+  if(!orderMapPickupMarker) orderMapPickupMarker=new google.maps.Marker({map:orderMap,label:'A'});
+  orderMapPickupMarker.setPosition(mapPickupPoint);
+ }
+ if(mapDropoffPoint){
+  if(!orderMapDropoffMarker) orderMapDropoffMarker=new google.maps.Marker({map:orderMap,label:'B'});
+  orderMapDropoffMarker.setPosition(mapDropoffPoint);
+ }
+ const pts=[mapPickupPoint,mapDropoffPoint].filter(Boolean);
+ if(pts.length===1){ orderMap.panTo(pts[0]); orderMap.setZoom(15); }
+ else if(pts.length===2){ const bounds=new google.maps.LatLngBounds(); pts.forEach(p=>bounds.extend(p)); orderMap.fitBounds(bounds,60); }
+}
+// แปลงค่า duration ที่ Routes API ส่งกลับมา (รูปแบบ "1234s") เป็นข้อความเวลาโดยประมาณภาษาไทยอ่านง่าย
+function formatDurationTh(durationStr){
+ const sec=parseInt(String(durationStr||'').replace('s',''),10)||0;
+ if(!sec) return '';
+ const mins=Math.round(sec/60);
+ if(mins<60) return Math.max(1,mins)+' นาที';
+ const h=Math.floor(mins/60), m=mins%60;
+ return h+' ชม.'+(m?(' '+m+' นาที'):'');
+}
+// วาดเส้นทางบนแผนที่จาก encoded polyline ที่ได้จาก Routes API (ต้องโหลด library "geometry" ไว้แล้วตอน initOrderMap)
+function drawRoutePolyline(encoded){
+ if(orderRoutePolyline){ orderRoutePolyline.setMap(null); orderRoutePolyline=null; }
+ if(!encoded||!orderMap||!google.maps.geometry) return;
+ const path=google.maps.geometry.encoding.decodePath(encoded);
+ orderRoutePolyline=new google.maps.Polyline({path,map:orderMap,strokeColor:'#2563eb',strokeWeight:5,strokeOpacity:0.85});
+ const bounds=new google.maps.LatLngBounds();
+ path.forEach(p=>bounds.extend(p));
+ orderMap.fitBounds(bounds,60);
+}
+// เรียก Routes API (New) — computeRoutes — เพื่อคำนวณเส้นทาง/ระยะทาง/เวลาเดินทางจริงตามถนน (ไม่ใช่เส้นตรง)
+// เรียกตรงจากฝั่ง browser ด้วย GOOGLE_MAPS_API_KEY เดียวกับที่ใช้กับ Maps JavaScript API/Places API (คีย์ตัวเดียว
+// จำกัดสิทธิ์ด้วย HTTP referrer restriction ใน Google Cloud Console — ไม่ใช่ secret ที่ต้องซ่อน) ระยะทางที่ได้
+// ใช้ป้อนเข้าสูตรราคาเดิม (calcPricing) ต่อทันที ส่วนเวลาเดินทางแสดงผลให้ลูกค้าดูเฉย ๆ ไม่มีผลต่อราคา
+async function tryDrawRoute(){
+ const distEl=$('orderMapDistance');
+ const mySeq=++mapRouteFetchSeq;
+ if(!mapPickupPoint||!mapDropoffPoint||!GOOGLE_MAPS_API_KEY){
+  mapDistanceKm=null; mapDurationText=null;
+  if(distEl) distEl.textContent='';
+  if(orderRoutePolyline){ orderRoutePolyline.setMap(null); orderRoutePolyline=null; }
+  renderCustomerEstimate();
+  return;
+ }
+ if(distEl) distEl.textContent='กำลังคำนวณเส้นทาง...';
+ let data=null, ok=false;
+ try{
+  const resp=await fetch('https://routes.googleapis.com/directions/v2:computeRoutes',{
+   method:'POST',
+   headers:{
+    'Content-Type':'application/json',
+    'X-Goog-Api-Key':GOOGLE_MAPS_API_KEY,
+    'X-Goog-FieldMask':'routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline'
+   },
+   body:JSON.stringify({
+    origin:{location:{latLng:{latitude:mapPickupPoint.lat,longitude:mapPickupPoint.lng}}},
+    destination:{location:{latLng:{latitude:mapDropoffPoint.lat,longitude:mapDropoffPoint.lng}}},
+    travelMode:'DRIVE', routingPreference:'TRAFFIC_UNAWARE', units:'METRIC', languageCode:'th-TH'
+   })
+  });
+  data=await resp.json().catch(()=>null);
+  ok=resp.ok;
+ }catch(e){ ok=false; }
+ if(mySeq!==mapRouteFetchSeq) return; // ผู้ใช้เปลี่ยนจุดรับ-ส่งใหม่ระหว่างรอ — ทิ้งผลลัพธ์เก่านี้
+ const route=data?.routes?.[0];
+ if(!ok||!route){
+  mapDistanceKm=null; mapDurationText=null;
+  if(distEl) distEl.textContent='คำนวณเส้นทางไม่สำเร็จ (Routes API) ลองเลือกจุดรับ-ส่งใหม่ หรือตรวจสอบ API Key/Billing';
+  renderCustomerEstimate();
+  return;
+ }
+ const meters=Number(route.distanceMeters||0);
+ mapDistanceKm=Math.round((meters/1000)*10)/10; // ปัดทศนิยม 1 ตำแหน่ง
+ mapDurationText=formatDurationTh(route.duration);
+ drawRoutePolyline(route.polyline?.encodedPolyline);
+ updateOrderMapMarkers();
+ if(distEl) distEl.textContent='ระยะทางจริง '+mapDistanceKm+' กม.'+(mapDurationText?(' • เวลาโดยประมาณ '+mapDurationText):'');
+ renderCustomerEstimate();
+}
 /* ---------- ฟอร์มสร้างออเดอร์ใหม่ (เริ่มที่ "งานที่ 1" เพียงงานเดียวเสมอ) ---------- */
 function customerFormHTML(){
  const cust=currentCustomer();
@@ -1906,6 +2119,14 @@ function customerFormHTML(){
    <div class="head"><div><h2>ให้เราช่วยหิ้วให้คุณ</h2><div class="sub">ส่งในนามคุณ ${cust?esc(cust.name)+' ('+esc(cust.phone)+')':''}</div></div>
     <button class="btn ghost" type="button" onclick="customerBackToDashboard()">← กลับไป Dashboard</button></div>
    <div class="field"><label>หมายเหตุงาน (ถ้ามี)</label><textarea id="cNote" placeholder="เช่น ฝากซื้อ 3 ร้าน ส่งที่หอพัก..."></textarea></div>
+  </div>
+  <div class="card">
+   <div class="head"><div><h2>จุดรับ-ส่งบนแผนที่ (ไม่บังคับ)</h2><div class="sub">ใช้ค้นหาตำแหน่งจริงเพื่อคำนวณระยะทางและแสดงเส้นทางให้ไรเดอร์ — ถ้าไม่ระบุ ระบบจะคิดราคาแบบเดิมทุกประการ</div></div></div>
+   <div class="field" style="position:relative"><label>จุดรับ</label><input id="mapPickupInput" placeholder="พิมพ์ค้นหาสถานที่จุดรับ..." autocomplete="off"><div id="mapPickupSuggest" hidden style="position:absolute;left:0;right:0;top:100%;z-index:50;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-top:4px;max-height:220px;overflow:auto;box-shadow:0 4px 14px rgba(0,0,0,.12)"></div></div>
+   <div class="field" style="position:relative"><label>จุดส่ง</label><input id="mapDropoffInput" placeholder="พิมพ์ค้นหาสถานที่จุดส่ง..." autocomplete="off"><div id="mapDropoffSuggest" hidden style="position:absolute;left:0;right:0;top:100%;z-index:50;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-top:4px;max-height:220px;overflow:auto;box-shadow:0 4px 14px rgba(0,0,0,.12)"></div></div>
+   <div id="orderMapStatus" class="sub" style="margin:6px 0"></div>
+   <div id="orderMapCanvas" style="height:320px;border-radius:12px;border:1px solid var(--line);background:#eef2f6"></div>
+   <div id="orderMapDistance" class="jobmini" style="margin-top:8px"></div>
   </div>
   <div class="card">
    <div class="head"><div><h2>รายการงาน</h2><div class="sub">เริ่มที่งานที่ 1 หนึ่งงาน • กด "+ เพิ่มงาน" เพื่อเพิ่มงานถัดไปได้เอง</div></div></div>
@@ -1933,7 +2154,7 @@ function renderCustomerEstimate(){
  if(!$('custStops'))return;
  const stops=collectStopsFrom('custStops');
  const goods=Number($('cGoods')?.value||0);
- const p=calcPricing(stops.length,goods);
+ const p=calcPricing(stops.length,goods,mapDistanceKm);
  const fees=perJobFees(stops.length);
  if($('cTotal'))$('cTotal').textContent=baht(p.total);
  if($('cSumGoods'))$('cSumGoods').textContent=baht(p.goods);
@@ -1941,7 +2162,7 @@ function renderCustomerEstimate(){
  if($('cSumStops'))$('cSumStops').textContent=stops.length;
  if($('cSumTotal'))$('cSumTotal').textContent=baht(p.total);
  if($('cJobBreakdown')) $('cJobBreakdown').innerHTML=fees.length?
-  `<div class="jobmini">${fees.map((f,i)=>'ราคางานที่ '+(i+1)+' ('+baht(f)+')').join(' + ')} = รวม ${baht(p.fee)}</div>` : '';
+  `<div class="jobmini">${fees.map((f,i)=>'ราคางานที่ '+(i+1)+' ('+baht(f)+')').join(' + ')}${p.distanceFee>0?(' + ค่าระยะทาง '+p.distanceKm+' กม. ('+baht(p.distanceFee)+')'):''} = รวม ${baht(p.fee)}</div>` : '';
  if($('custReview')) $('custReview').innerHTML='<h2>สรุปรายการงาน</h2>'+(stops.length? stops.map((s,i)=>`<div class="jobmini">งานที่ ${i+1}: รับ <b>${esc(s.pickup)||'-'}</b> → ส่ง <b>${esc(s.dropoff)||'-'}</b>${s.detail?(' • '+esc(s.detail)):''}${s.qty?(' • จำนวน '+esc(s.qty)):''}</div>`).join('') : '<div class="empty">ยังไม่มีงาน</div>');
 }
 let customerSubmitBusy=false;
@@ -1975,7 +2196,10 @@ async function customerSubmit(){
  try{
   const authId=await requireCustomerAuthId();
   if(!authId){ toast('เซสชันหมดอายุหรือไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่'); clearCustomerSession(); renderCustomerRoot(); return; }
-  o=await createOrder({customerId:authId,customerName:cust.name,customerContact:cust.phone,customerNote:$('cNote').value,stops,goodsTotal:goods,createdBy:'customer'});
+  o=await createOrder({customerId:authId,customerName:cust.name,customerContact:cust.phone,customerNote:$('cNote').value,stops,goodsTotal:goods,createdBy:'customer',
+   pickupLat:mapPickupPoint?mapPickupPoint.lat:null, pickupLng:mapPickupPoint?mapPickupPoint.lng:null,
+   dropoffLat:mapDropoffPoint?mapDropoffPoint.lat:null, dropoffLng:mapDropoffPoint?mapDropoffPoint.lng:null,
+   distanceKm:mapDistanceKm});
  }
  finally{ customerSubmitBusy=false; }
  if(!o) return;
@@ -2065,6 +2289,8 @@ function renderCustomerRoot(){
    root.innerHTML=customerFormHTML();
    addStopTo('custStops'); // เริ่มที่ "งานที่ 1" เพียงงานเดียวเสมอ ไม่ auto-copy ข้อมูลใด ๆ
    renderCustomerEstimate();
+   resetOrderMapState();
+   initOrderMap(); // แผนที่เป็นฟีเจอร์เสริม โหลดแบบ async ไม่บล็อกการแสดงฟอร์ม/การกรอกงาน
    custBuiltMode='form';
   }
   return;
