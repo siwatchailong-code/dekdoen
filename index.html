@@ -1945,15 +1945,21 @@ function customerDashboardHTML(cust){
 }
 /* ---------- Google Maps: จุดรับ-ส่งบนแผนที่ ตอนสร้างออเดอร์ (ฟีเจอร์เสริม order-level แยกจากรายการงานหลายจุดเดิม
    ไม่บังคับต้องใช้ถึงจะส่งงานได้ ไม่แก้/ไม่แทนที่ .f-pickup/.f-dropoff รายจุดเดิมเลย) ---------- */
+// ศูนย์กลางพื้นที่ให้บริการหลัก: มหาวิทยาลัยอุบลราชธานี อ.วารินชำราบ จ.อุบลราชธานี
+// พิกัดอ้างอิงจาก Wikipedia (infobox หน้า Ubon Ratchathani University): 15.1180417°N, 104.9013750°E
+// ใช้เป็นทั้งจุดกึ่งกลางแผนที่เริ่มต้น (ห้าม default กรุงเทพฯ) และจุดศูนย์กลาง locationBias ตอนค้นหาสถานที่
+const UBU_CENTER={lat:15.1180417,lng:104.9013750};
+const UBU_BIAS_RADIUS_M=20000; // รัศมี bias ~20กม. ครอบคลุม ม.อุบล/วารินชำราบ/ตัวเมืองอุบลฯ (ไม่ hard-block พื้นที่อื่น)
 let orderMap=null, orderMapPickupMarker=null, orderMapDropoffMarker=null, orderRoutePolyline=null;
-let mapPickupPoint=null, mapDropoffPoint=null; // {lat,lng,address} หรือ null ถ้ายังไม่ได้เลือก
+let mapPickupPoint=null, mapDropoffPoint=null; // {lat,lng,address,placeId} หรือ null ถ้ายังไม่ได้เลือก — state แยกกันชัดเจนคนละตัวแปร
+let mapClickMode='pickup'; // โหมดตอนคลิกแผนที่: 'pickup' หรือ 'dropoff' — สลับผ่านปุ่ม/auto-switch หลังปักจุดรับ
 let mapDistanceKm=null; // null = ยังไม่ได้เลือกจุดรับ-ส่งบนแผนที่ (ไม่กระทบราคาปกติเลย)
 let mapDurationText=null; // เวลาเดินทางโดยประมาณ แสดงผลอย่างเดียว ไม่ถูกบันทึกลงออเดอร์ (ราคายังอิงระยะทางเหมือนเดิม)
 let mapRouteFetchSeq=0; // กันผลลัพธ์ค้นหาเก่ามาทับผลใหม่ ถ้าผู้ใช้เปลี่ยนจุดรับ-ส่งเร็ว ๆ ระหว่างรอ Routes API ตอบกลับ
 let mapPlacesDebounce={pickup:null,dropoff:null}; // debounce timer ต่ออินพุต กันยิง request ทุกตัวอักษรที่พิมพ์
 function resetOrderMapState(){
  orderMap=null; orderMapPickupMarker=null; orderMapDropoffMarker=null; orderRoutePolyline=null;
- mapPickupPoint=null; mapDropoffPoint=null; mapDistanceKm=null; mapDurationText=null;
+ mapPickupPoint=null; mapDropoffPoint=null; mapDistanceKm=null; mapDurationText=null; mapClickMode='pickup';
  if(mapPlacesDebounce.pickup) clearTimeout(mapPlacesDebounce.pickup);
  if(mapPlacesDebounce.dropoff) clearTimeout(mapPlacesDebounce.dropoff);
  mapPlacesDebounce={pickup:null,dropoff:null};
@@ -1967,11 +1973,53 @@ async function initOrderMap(){
  try{ await loadGoogleMapsApi(); }
  catch(e){ if(statusEl) statusEl.textContent='โหลดแผนที่ไม่สำเร็จ ระบุจุดรับ-ส่งเป็นข้อความในรายการงานด้านล่างได้ตามปกติ'; return; }
  const canvas=$('orderMapCanvas'); if(!canvas) return; // ผู้ใช้อาจออกจากฟอร์มไปแล้วระหว่างรอโหลดสคริปต์
- const center={lat:13.7563,lng:100.5018}; // ค่ากลางเริ่มต้น: กรุงเทพฯ (ก่อนเลือกจุดใด)
- orderMap=new google.maps.Map(canvas,{center,zoom:12});
+ // ค่ากลางเริ่มต้น: มหาวิทยาลัยอุบลราชธานี (พื้นที่ให้บริการหลัก) — ห้าม default กรุงเทพฯ ตามที่ระบุ
+ // zoom:14 เหมาะกับการใช้งานในพื้นที่ (เห็นระดับถนน/ย่านรอบมหาวิทยาลัย ไม่กว้างเกินไปแบบ zoom ระดับจังหวัด)
+ orderMap=new google.maps.Map(canvas,{center:UBU_CENTER,zoom:14});
  setupPlacesAutocomplete($('mapPickupInput'),'pickup',$('mapPickupSuggest'));
  setupPlacesAutocomplete($('mapDropoffInput'),'dropoff',$('mapDropoffSuggest'));
- if(statusEl) statusEl.textContent='พิมพ์ค้นหาจุดรับและจุดส่งด้านบนได้เลย';
+ orderMap.addListener('click',(ev)=>{ if(ev&&ev.latLng) handleMapClick(ev.latLng.lat(),ev.latLng.lng()); });
+ updateMapClickModeButtons();
+ if(statusEl) statusEl.textContent='พิมพ์ค้นหาจุดรับ-ส่ง หรือแตะบนแผนที่เพื่อปักหมุดได้เลย';
+}
+// สลับโหมด "กำลังปักหมุดจุดรับ" / "กำลังปักหมุดจุดส่ง" ตอนคลิกแผนที่ — ปุ่มอยู่ในการ์ดแผนที่ (customerFormHTML)
+function setMapClickMode(mode){ mapClickMode=(mode==='dropoff')?'dropoff':'pickup'; updateMapClickModeButtons(); }
+function updateMapClickModeButtons(){
+ const bp=$('mapModePickupBtn'), bd=$('mapModeDropoffBtn');
+ if(bp) bp.classList.toggle('primary',mapClickMode==='pickup');
+ if(bp) bp.classList.toggle('ghost',mapClickMode!=='pickup');
+ if(bd) bd.classList.toggle('primary',mapClickMode==='dropoff');
+ if(bd) bd.classList.toggle('ghost',mapClickMode!=='dropoff');
+}
+// คลิกบนแผนที่เพื่อปักหมุด (ตามโหมดที่เลือกอยู่) — แปลงพิกัดเป็นที่อยู่ถ้าทำได้ (reverseGeocode มี fallback เอง)
+// ไม่ว่า reverse geocode จะสำเร็จหรือไม่ ก็ยังปักหมุด/คำนวณเส้นทางได้ด้วยพิกัดดิบเสมอ
+async function handleMapClick(lat,lng){
+ const which=mapClickMode;
+ const label=(which==='pickup')?$('mapPickupInput'):$('mapDropoffInput');
+ const coordText=lat.toFixed(5)+', '+lng.toFixed(5);
+ if(label) label.value=coordText+' (กำลังค้นหาชื่อสถานที่...)';
+ const point={lat,lng,address:coordText,placeId:null};
+ if(which==='pickup') mapPickupPoint=point; else mapDropoffPoint=point;
+ updateOrderMapMarkers();
+ tryDrawRoute();
+ const addr=await reverseGeocode(lat,lng); // best-effort — ถ้า Geocoding API ไม่ได้เปิดใช้งาน จะคืนค่า null เฉย ๆ
+ if(addr){
+  point.address=addr;
+  if(label) label.value=addr;
+ } else if(label){ label.value=coordText; }
+ // ปักจุดรับด้วยการคลิกแล้ว ถ้ายังไม่มีจุดส่ง สลับโหมดไปรอปักจุดส่งต่อให้อัตโนมัติ (ปรับเองได้ทุกเมื่อผ่านปุ่ม)
+ if(which==='pickup'&&!mapDropoffPoint) setMapClickMode('dropoff');
+}
+// แปลงพิกัดเป็นที่อยู่ (reverse geocode) แบบ best-effort ผ่าน Geocoding API — ถ้า API นี้ไม่ได้เปิดใช้งานใน
+// โปรเจกต์ Google Cloud หรือเรียกไม่สำเร็จด้วยเหตุใดก็ตาม จะคืนค่า null เฉย ๆ (ไม่ throw) แล้วโค้ดที่เรียกใช้
+// จะ fallback ไปแสดงพิกัดดิบแทน — ไม่กระทบการปักหมุด/คำนวณเส้นทาง/ราคาเลย เพราะสิ่งเหล่านั้นใช้ lat/lng ตรงๆ
+async function reverseGeocode(lat,lng){
+ try{
+  const resp=await fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng='+lat+','+lng+'&language=th&key='+encodeURIComponent(GOOGLE_MAPS_API_KEY));
+  const data=await resp.json().catch(()=>null);
+  if(data&&data.status==='OK'&&data.results&&data.results[0]) return data.results[0].formatted_address||null;
+  return null;
+ }catch(e){ return null; }
 }
 // ค้นหาสถานที่ด้วย Places API (New) โดยตรงผ่าน REST (places:autocomplete) — ไม่ใช้ widget
 // google.maps.places.Autocomplete เดิม เพราะ widget นั้นต้องเปิดใช้ "Places API" รุ่นเก่า ซึ่งโปรเจกต์นี้ไม่ได้
@@ -1993,7 +2041,10 @@ async function fetchPlaceSuggestions(q,which,listEl){
   const resp=await fetch('https://places.googleapis.com/v1/places:autocomplete',{
    method:'POST',
    headers:{'Content-Type':'application/json','X-Goog-Api-Key':GOOGLE_MAPS_API_KEY},
-   body:JSON.stringify({input:q,languageCode:'th',regionCode:'TH'})
+   // regionCode:'TH' + locationBias รอบมหาวิทยาลัยอุบลราชธานี — "bias" เอนเอียงผลลัพธ์มาทางพื้นที่นี้ก่อน
+   // ไม่ใช่ locationRestriction (ซึ่งจะ hard-block พื้นที่อื่นไปเลย) จึงยังค้นหาสถานที่อื่นนอกพื้นที่ได้ตามปกติ
+   body:JSON.stringify({input:q,languageCode:'th',regionCode:'TH',
+    locationBias:{circle:{center:{latitude:UBU_CENTER.lat,longitude:UBU_CENTER.lng},radius:UBU_BIAS_RADIUS_M}}})
   });
   data=await resp.json().catch(()=>null); ok=resp.ok;
  }catch(e){ ok=false; }
@@ -2023,7 +2074,7 @@ async function pickPlaceSuggestion(sugg,which,listEl){
   data=await resp.json().catch(()=>null); ok=resp.ok;
  }catch(e){ ok=false; }
  if(!ok||!data||!data.location) return;
- const point={lat:data.location.latitude,lng:data.location.longitude,address:data.formattedAddress||(p.text&&p.text.text)||''};
+ const point={lat:data.location.latitude,lng:data.location.longitude,address:data.formattedAddress||(p.text&&p.text.text)||'',placeId:placeId};
  if(which==='pickup') mapPickupPoint=point; else mapDropoffPoint=point;
  updateOrderMapMarkers();
  tryDrawRoute();
@@ -2125,6 +2176,11 @@ function customerFormHTML(){
    <div class="field" style="position:relative"><label>จุดรับ</label><input id="mapPickupInput" placeholder="พิมพ์ค้นหาสถานที่จุดรับ..." autocomplete="off"><div id="mapPickupSuggest" hidden style="position:absolute;left:0;right:0;top:100%;z-index:50;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-top:4px;max-height:220px;overflow:auto;box-shadow:0 4px 14px rgba(0,0,0,.12)"></div></div>
    <div class="field" style="position:relative"><label>จุดส่ง</label><input id="mapDropoffInput" placeholder="พิมพ์ค้นหาสถานที่จุดส่ง..." autocomplete="off"><div id="mapDropoffSuggest" hidden style="position:absolute;left:0;right:0;top:100%;z-index:50;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-top:4px;max-height:220px;overflow:auto;box-shadow:0 4px 14px rgba(0,0,0,.12)"></div></div>
    <div id="orderMapStatus" class="sub" style="margin:6px 0"></div>
+   <div class="sub" style="margin-bottom:6px">แตะบนแผนที่เพื่อปักหมุด — เลือกโหมดก่อนแตะ:</div>
+   <div class="actions" style="margin-bottom:8px">
+    <button class="btn primary" type="button" id="mapModePickupBtn" onclick="setMapClickMode('pickup')">📍 ปักหมุดจุดรับ</button>
+    <button class="btn ghost" type="button" id="mapModeDropoffBtn" onclick="setMapClickMode('dropoff')">🏁 ปักหมุดจุดส่ง</button>
+   </div>
    <div id="orderMapCanvas" style="height:320px;border-radius:12px;border:1px solid var(--line);background:#eef2f6"></div>
    <div id="orderMapDistance" class="jobmini" style="margin-top:8px"></div>
   </div>
