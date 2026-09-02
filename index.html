@@ -490,12 +490,23 @@ function copyText(v){navigator.clipboard?.writeText(v);toast('คัดลอก
    แบบ localStorage vs RIDER/ADMIN_SESSION_KEY แบบ sessionStorage) — ถ้าใช้ client เดียวกันทั้ง 3 role
    จะเก็บ session ได้แค่อันเดียว ล็อกอินไรเดอร์แล้วจะเด้งลูกค้าออกทันที ซึ่งพังพฤติกรรมเดิม
    สำคัญ: ใช้ Publishable Key (เดิมเรียก anon key) เท่านั้น ห้ามใช้ Secret/service_role key ในหน้าเว็บเด็ดขาด
-   สิทธิ์ทุกอย่างถูกบังคับด้วย Row Level Security ฝั่ง Supabase (ดู supabase/migrations/0001_init.sql) */
+   สิทธิ์ทุกอย่างถูกบังคับด้วย Row Level Security ฝั่ง Supabase (ดู supabase/migrations/0001_init.sql)
+   เฟส "แก้บั๊ก Chat Cross-Match": บั๊กจริงที่ตรวจพบระหว่างตรวจสอบ session lifecycle รอบนี้ — sbRider/sbAdmin เดิม
+   ใช้ window.sessionStorage เก็บ session (คัดลอกมาจากพฤติกรรมเดิมก่อนเชื่อม Supabase ตามคอมเมนต์ด้านบน) ทั้งที่
+   จริง ๆ แล้วสิ่งที่ทำให้ล็อกอิน 3 role พร้อมกันในแท็บเดียวได้คือ "storageKey แยกกันคนละคีย์" (dekdoen-sb-customer/
+   -rider/-admin) เท่านั้น ไม่เกี่ยวกับชนิด storage เลย — การใช้ sessionStorage สำหรับผู้ให้บริการ/แอดมินโดยไม่จำเป็น
+   ทำให้ session เปราะกว่า localStorage มาก โดยเฉพาะบนมือถือที่เบราว์เซอร์/ระบบปฏิบัติการมักเคลียร์ sessionStorage
+   เวลาแท็บถูกพักพื้นหลัง/รีโหลดเอง (พฤติกรรมที่พบบ่อยมากบนมือถือ ซึ่งเป็นอุปกรณ์หลักของผู้ให้บริการ) เมื่อ session
+   Supabase ของ sbRider หายไปกลางคัน แต่สถานะ "ล็อกอินอยู่" ของแอปเอง (currentRider()) ยังไม่ถูกล้าง จะทำให้ปุ่มส่ง
+   ข้อความ/เรียก RPC ที่ต้องใช้ requireRiderAuthId() ล้มเหลวเงียบ ๆ (คืน null) โดยหน้าจอยังค้างแสดงข้อมูลเดิมอยู่ ไม่รีเฟรช
+   ให้เห็นสถานะจริง — เป็นความเสี่ยงด้านความเสถียรของแชทที่แท้จริงที่พบระหว่างตรวจสอบรอบนี้ แก้โดยเปลี่ยนมาใช้
+   window.localStorage ทั้ง 3 client เหมือนกัน (คงคนละ storageKey ไว้เหมือนเดิมทุกประการ) ได้พฤติกรรม "ล็อกอิน
+   พร้อมกัน 3 role ในแท็บเดียว" เหมือนเดิมทุกอย่าง แต่ session ทนทานขึ้นมาก ไม่หลุดง่ายเวลาแท็บถูกพักพื้นหลังบนมือถือ */
 const SUPABASE_URL='https://ptktomwmnnvlsjaiclvv.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_4MpZOC76iZsraUonFXyqAw_Dvxv1bWM';
 const sbCustomer=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:'dekdoen-sb-customer',storage:window.localStorage,persistSession:true,autoRefreshToken:true}});
-const sbRider=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:'dekdoen-sb-rider',storage:window.sessionStorage,persistSession:true,autoRefreshToken:true}});
-const sbAdmin=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:'dekdoen-sb-admin',storage:window.sessionStorage,persistSession:true,autoRefreshToken:true}});
+const sbRider=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:'dekdoen-sb-rider',storage:window.localStorage,persistSession:true,autoRefreshToken:true}});
+const sbAdmin=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:'dekdoen-sb-admin',storage:window.localStorage,persistSession:true,autoRefreshToken:true}});
 
 /* ======================= Match Marketplace: ระบบเดิม "Google Maps ตอนสร้างออเดอร์ลูกค้า" ถูกถอดออกจาก
    ระบบนี้ทั้งหมดแล้ว (เฟส Match Marketplace) ตามที่ระบุ — ระบบสร้างงาน/จุดรับ-จุดส่ง/ปักหมุด/คำนวณระยะทาง/
@@ -4101,9 +4112,18 @@ function boot(){
   if(panel&&!panel.classList.contains('hidden')) renderNotifPanel();
  });
 
+ // PHASE 1 (เอา Admin ออกจาก Public UI): เดิม default เมื่อไม่มี ?view= ใน URL เลย (เช่น production URL หลักที่
+ // ผู้ใช้ทั่วไปเปิดตรง ๆ, หรือ PWA ที่ start_url ใน manifest.json ไม่มี ?view= เช่นกัน) จะ fallback เข้าโหมด
+ // 'admin' ทันที — แปลว่า public visitor ที่เปิดลิงก์หลักของเว็บจะเจอหน้า login แอดมิน + role-picker
+ // (แอดมิน/ลูกค้า/ไรเดอร์) เป็นสิ่งแรกที่เห็น ซึ่งไม่ควรเป็น public flow เลย เปลี่ยน default เป็น 'customer'
+ // แทน (ฝั่งที่ผู้ใช้ทั่วไปควรเจอเป็นค่าเริ่มต้นของแอป Match Marketplace) — ไม่ได้ลบ route/backend ของแอดมินเลย
+ // แม้แต่จุดเดียว ยังเข้าถึงได้ตามเดิมทุกประการผ่าน URL ตรง ๆ (?view=admin) กลายเป็น internal/admin route ที่ไม่
+ // ถูก expose จาก public flow อีกต่อไป (role-picker ที่มีปุ่ม "แอดมิน" ถูกซ่อนอยู่แล้วในโหมด customer/rider ด้วย
+ // CSS .top.dk-mode .roles{display:none} เดิม — จุดเดียวที่ยังเห็น role-picker ได้คือต้องเข้า ?view=admin ตรง ๆ
+ // เท่านั้น ซึ่งไม่ใช่ทางที่ public flow จะพาไปถึงอีกต่อไป)
  const params=new URLSearchParams(location.search);
- const initial=params.get('view')||'admin';
- setRole(['admin','customer','rider'].includes(initial)?initial:'admin');
+ const initial=params.get('view')||'customer';
+ setRole(['admin','customer','rider'].includes(initial)?initial:'customer');
 
  // เฟส 3: ถ้ามี session ค้างอยู่แล้ว (เปิดหน้าเว็บซ้ำโดยไม่ต้อง login ใหม่) ให้เชื่อม sync+realtime ทันที
  // ต่อ role นั้น ๆ โดยไม่ต้องรอกด login/สมัครอีกครั้ง
