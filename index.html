@@ -304,6 +304,19 @@ background-size:auto,auto,38px 38px,38px 38px;background-color:#dfe9ee;margin:10
 .dk-reqcard-meta{font-size:11.5px;color:var(--ink-soft);margin-top:2px}
 .dk-reqcard-actions{display:flex;gap:10px;padding:0 16px 16px}
 .dk-reqcard-actions .dk-btn{flex:1}
+/* ---------- เฟส 19: หน้า "อันดับ" — โพเดียม 3 อันดับแรก + รายการอันดับที่เหลือ ข้อมูลจริงทั้งหมด ---------- */
+.dk-rank-podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin-bottom:18px;padding:6px 0 2px}
+.dk-rank-podium-item{display:flex;flex-direction:column;align-items:center;gap:4px;flex:0 0 auto;width:92px}
+.dk-rank-podium-item b{font-size:12.5px;font-weight:900;color:var(--ink);max-width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-rank-podium-item span{font-size:11px;color:var(--ink-soft);display:flex;align-items:center;gap:2px}
+.dk-rank-podium-item.p1{order:2}
+.dk-rank-podium-item.p2{order:1}
+.dk-rank-podium-item.p3{order:3}
+.dk-rank-medal{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:900;color:#fff;flex:0 0 auto}
+.dk-rank-medal.m1{background:#e8ab00}
+.dk-rank-medal.m2{background:#9aa4b0}
+.dk-rank-medal.m3{background:#c07a3f}
+.dk-rank-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:900;color:var(--ink-soft);background:var(--brand-light);flex:0 0 auto}
 .dk-chatbox{border:1px solid var(--brand-line);border-radius:var(--radius-md);padding:12px;height:480px;max-height:60vh;overflow-y:auto;background:#fffdfa;margin-bottom:10px;scroll-behavior:smooth}
 /* ---------- เฟส 17: การ์ดข้อความแชท MATCH ดีไซน์ใหม่ตาม Reference (bubble มน + เวลาใต้บับเบิล + อวตารฝั่งคู่สนทนา)
    แทนของเดิม (.chatmsg สีน้ำเงินของระบบออเดอร์เดิม) ที่ไม่ตรงกับโทนส้มของ dk- design system เลย ---------- */
@@ -378,7 +391,9 @@ background-size:auto,auto,38px 38px,38px 38px;background-color:#dfe9ee;margin:10
 .top.dk-mode .brand{gap:9px}
 .top.dk-mode .brand small{display:none}
 .top.dk-mode .brand b{font-size:20px;color:var(--brand);letter-spacing:-.2px;line-height:1}
-.top.dk-mode .brand img,.top.dk-mode .brand-logo{width:32px !important;height:32px !important;border-radius:9px !important}
+/* เฟส 19: ตามคำสั่งผู้ใช้ "ไม่เอาโลโก้" — โซนลูกค้า/ผู้ให้บริการใช้เวิร์ดมาร์กตัวอักษรล้วนเหมือนภาพอ้างอิง
+   (ไม่มีไอคอน/รูปโลโก้เลย) ซ่อนเฉพาะใน .dk-mode เท่านั้น ไม่แตะโลโก้ของหน้าแอดมิน */
+.top.dk-mode .brand img,.top.dk-mode .brand-logo{display:none !important}
 .top.dk-mode .headerRight{gap:8px}
 .top.dk-mode .roles,.top.dk-mode #testVoiceBtn{display:none}
 .top.dk-mode .icon-btn{background:var(--brand-light);border-color:var(--brand-line);color:var(--brand-dark)}
@@ -1157,11 +1172,9 @@ function markAllNotifRead(){
  if(changed) saveForRole(role);
  renderNotifPanel();
 }
-/* ---------- เฟส 17: แท็บ "กิจกรรม" ใน Bottom Navigation ตาม Reference (ลำดับแท็บ: หน้าหลัก/งาน/แชท/กิจกรรม/
-   โปรไฟล์) — ใช้ store การแจ้งเตือนจริงตัวเดียวกับกระดิ่งบนหัวเว็บทุกจุด (NOTIF_CUSTOMER/NOTIF_RIDER ที่รับข้อมูล
-   จริงจากตาราง notifications ผ่าน Realtime — ดู handleIncomingMatchNotification ด้านบน) ไม่ใช่ระบบใหม่/ข้อมูลปลอม
-   ตั้งใจไม่ทำเป็น "อันดับ/leaderboard" ที่มีคะแนนสะสม เพราะระบบยังไม่มีกลไกสะสมแต้มจริงในฐานข้อมูล การใส่ตัวเลข
-   อันดับ/แต้มตอนนี้จะเป็นข้อมูลหลอกทั้งหมด */
+/* ---------- เฟส 20: คืนแท็บ "กิจกรรม" กลับมาตามที่ผู้ใช้ยืนยันว่าห้ามลบ (Bottom Navigation 5 แท็บกลับเป็นของเดิม:
+   หน้าแรก/งาน/แชท/กิจกรรม/โปรไฟล์) ใช้ store การแจ้งเตือนจริงตัวเดียวกับกระดิ่งบนหัวเว็บทุกจุด (NOTIF_CUSTOMER/
+   NOTIF_RIDER ที่รับข้อมูลจริงจากตาราง notifications ผ่าน Realtime) ---------- */
 function activityRowsHTML(role){
  const list=storeForRole(role).list;
  if(!list.length) return '<div class="dk-empty">ยังไม่มีการแจ้งเตือน</div>';
@@ -1197,6 +1210,62 @@ function riderActivityHTML(){
  </div>`;
 }
 function renderRiderActivity(){ const box=$('dkRiderActivityList'); if(box) box.innerHTML=activityRowsHTML('rider'); }
+/* ---------- เฟส 19: หน้า "อันดับ" ตามภาพอ้างอิงที่ผู้ใช้แนบมา — เฟส 20 ปรับเป็น "หน้ารอง" เข้าถึงจากหน้าโปรไฟล์
+   เท่านั้น (ไม่ใช่แท็บหลักใน Bottom Navigation อีกต่อไป ตามที่ผู้ใช้ยืนยัน) การแจ้งเตือนยังเข้าถึงได้ตามเดิมผ่าน
+   กระดิ่งบนหัวเว็บ + แท็บกิจกรรมด้านบน ไม่เกี่ยวข้องกัน
+   จัดอันดับผู้ให้บริการจากคะแนนเฉลี่ย/จำนวนงานสำเร็จจริงเท่านั้น (rider_directory VIEW เดียวกับหน้าแรก) — ไม่มี
+   ระบบแต้ม/XP/รายสัปดาห์ปลอม เพราะฐานข้อมูลไม่มีกลไกสะสมแต้มหรือแบ่งช่วงเวลาแบบนั้นจริง ใช้ร่วมกันทั้งฝั่งลูกค้า/
+   ผู้ให้บริการ (เห็นอันดับเดียวกันจากข้อมูลจริงชุดเดียวกัน) จัดอันดับเฉพาะคนที่มีผลงาน/รีวิวจริงอย่างน้อย 1 อย่าง */
+let rankingCategory='all';
+function rankedProviders(){
+ let rows=RIDER_DIRECTORY.filter(r=>(Number(r.review_count)||0)>0||(Number(r.completed_count)||0)>0);
+ if(rankingCategory!=='all') rows=rows.filter(r=>(r.services||'').split(',').map(s=>s.trim()).includes(rankingCategory));
+ return rows.slice().sort((a,b)=>(Number(b.avg_rating)||0)-(Number(a.avg_rating)||0)||(Number(b.completed_count)||0)-(Number(a.completed_count)||0));
+}
+function rankBadgeHTML(n){
+ if(n<=3) return `<span class="dk-rank-medal m${n}">${n}</span>`;
+ return `<span class="dk-rank-num">${n}</span>`;
+}
+function rankRowHTML(r,rank){
+ const services=(r.services||'').split(',').map(s=>s.trim()).filter(Boolean);
+ return `<div class="dk-match-row" style="cursor:default">
+  ${rankBadgeHTML(rank)}
+  ${avatarHTML(r.name,r.photo,40,'brand')}
+  <div class="mtext"><div class="mtitle">${esc(r.name)}</div><div class="mmeta">${services.length?esc(services[0]):'ผู้ให้บริการ'} • ${r.completed_count} งาน</div></div>
+  <span class="dk-rating-num"><span class="dk-star">★</span> <b>${Number(r.avg_rating).toFixed(2)}</b></span>
+ </div>`;
+}
+function rankingListHTML(){
+ const rows=rankedProviders();
+ if(!rows.length) return '<div class="dk-empty">ยังไม่มีผู้ให้บริการที่มีผลงาน/รีวิวมากพอจะจัดอันดับตอนนี้</div>';
+ const top3=rows.slice(0,3), rest=rows.slice(3);
+ const podium=top3.length?`<div class="dk-rank-podium">${top3.map((r,i)=>`<div class="dk-rank-podium-item p${i+1}">${rankBadgeHTML(i+1)}${avatarHTML(r.name,r.photo,i===0?58:46,'brand')}<b>${esc(r.name)}</b><span><span class="dk-star">★</span> ${Number(r.avg_rating).toFixed(2)}</span></div>`).join('')}</div>`:'';
+ return podium+`<div class="dk-match-list">${rest.map((r,i)=>rankRowHTML(r,i+4)).join('')}</div>`;
+}
+function renderRankingList(){ const box=$('dkRankingList'); if(box) box.innerHTML=rankingListHTML(); }
+function rankingSetCategory(cat){
+ rankingCategory=cat;
+ const chips=$('dkRankingChips');
+ if(chips) chips.querySelectorAll('.dk-chip').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));
+ renderRankingList();
+}
+function rankingPageHTML(navTabsHTML,backFn){
+ return `${navTabsHTML}<div class="dk-card">
+  <div class="dk-head"><div><h2>อันดับ</h2><div class="dk-sub">จัดอันดับผู้ให้บริการจากคะแนนรีวิวและจำนวนงานสำเร็จจริงทั้งระบบ</div></div>
+   <button type="button" class="dk-btn outline" style="max-width:100px" onclick="${backFn}">${ICON_ARROWLEFT}&nbsp;กลับ</button></div>
+  <div class="dk-chip-row" id="dkRankingChips">
+   <button type="button" class="dk-chip${rankingCategory==='all'?' active':''}" data-cat="all" onclick="rankingSetCategory('all')">ทั้งหมด</button>
+   ${SERVICE_CATEGORIES.map(c=>`<button type="button" class="dk-chip${rankingCategory===c?' active':''}" data-cat="${esc(c)}" onclick="rankingSetCategory('${esc(c)}')">${esc(c)}</button>`).join('')}
+  </div>
+  <div id="dkRankingList"><div class="dk-empty">กำลังโหลด...</div></div>
+ </div>`;
+}
+function customerRankingHTML(){ return rankingPageHTML(customerNavTabsHTML(),"customerNavGo('profile')"); }
+async function renderCustomerRanking(){ if(!RIDER_DIRECTORY.length) await loadRiderDirectory(sbCustomer); renderRankingList(); }
+function customerOpenRanking(){ customerViewMode='ranking'; custBuiltMode=null; renderCustomerRoot(); }
+function riderRankingHTML(){ return rankingPageHTML(riderNavTabsHTML(),"riderNavGo('profile')"); }
+async function renderRiderRanking(){ if(!RIDER_DIRECTORY.length) await loadRiderDirectory(sbRider); renderRankingList(); }
+function riderOpenRanking(){ riderViewMode='ranking'; riderBuiltMode=null; renderRiderRoot(); }
 document.addEventListener('click',(e)=>{
  const wrap=document.querySelector('.notif-wrap'); const panel=$('notifPanel');
  if(!wrap||!panel||panel.classList.contains('hidden')) return;
@@ -1333,8 +1402,11 @@ function riderAvailabilityStatus(){
    (จำกัดคอลัมน์ไว้แล้วในฐานข้อมูล ไม่มีเบอร์โทร/ข้อมูลอ่อนไหวหลุดออกมา) สถานะที่แสดงคำนวณจากข้อมูลจริงเท่านั้น
    (availability_status ที่ไรเดอร์ตั้งเอง + has_active_job ที่คำนวณจากออเดอร์จริงที่กำลังทำอยู่) ไม่มีการสุ่ม/หลอก ---------- */
 let RIDER_DIRECTORY=[];
-async function loadRiderDirectory(){
- const {data,error}=await sbCustomer.from('rider_directory').select('*').order('name',{ascending:true});
+// เฟส 19: รับ client เป็นพารามิเตอร์ได้ (ค่าเริ่มต้น sbCustomer เหมือนเดิม ไม่กระทบของเดิม) เพื่อให้ฝั่งผู้ให้บริการ
+// เรียกโหลด rider_directory ตัวเดียวกันได้ด้วย (ใช้สำหรับหน้า "อันดับ" ที่ต้องให้ผู้ให้บริการเห็นอันดับเพื่อนร่วมวงการ
+// จริงเหมือนกัน) — VIEW นี้ grant select ให้ authenticated ทุกคนอยู่แล้วใน 0009 ไม่ใช่ policy เฉพาะลูกค้า
+async function loadRiderDirectory(client){
+ const {data,error}=await (client||sbCustomer).from('rider_directory').select('*').order('name',{ascending:true});
  if(error){ console.error('load rider_directory failed',error); return RIDER_DIRECTORY; }
  RIDER_DIRECTORY=data||[];
  return RIDER_DIRECTORY;
@@ -1741,8 +1813,10 @@ const ICON_USER=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" str
 const ICON_SEARCH=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`;
 const ICON_CHECK=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
 const ICON_CLOCK=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;
-// เฟส 17: ไอคอนแท็บ "กิจกรรม" ใน Bottom Navigation (ดูหมายเหตุที่ ACTIVITY_TABS/customerActivityHTML)
+// เฟส 17/20: ไอคอนแท็บ "กิจกรรม" ใน Bottom Navigation (คืนกลับมาตามที่ผู้ใช้ยืนยันว่าห้ามลบ)
 const ICON_ACTIVITY=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`;
+// เฟส 19: ไอคอนหน้ารอง "อันดับ" (เข้าถึงจากหน้าโปรไฟล์ ไม่ใช่แท็บหลัก — ดูหมายเหตุที่ rankingPageHTML)
+const ICON_RANK=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4a1 1 0 0 0-1 1c0 2.5 1.8 4.5 4 4.9M17 6h3a1 1 0 0 1 1 1c0 2.5-1.8 4.5-4 4.9"/></svg>`;
 const ICON_PAW=`<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="9" r="2.2"/><circle cx="10.5" cy="5.2" r="2.2"/><circle cx="15.5" cy="5.2" r="2.2"/><circle cx="19.5" cy="9.5" r="2.2"/><path d="M12 12c-3.5 0-6.5 2.3-6.5 5.3 0 1.7 1.4 3 3.1 2.7.9-.2 1.6-.6 2.6-.6.9 0 1.7.4 2.6.6.5.1 1 0 1.4-.2.4.2.9.3 1.4.2 1-.2 1.7-.6 2.6-.6 1 0 1.7.4 2.6.6 1.7.3 3.1-1 3.1-2.7 0-3-3-5.3-6.5-5.3-2 0-4-.3-6.3 0z"/></svg>`;
 /* ---------- render งานหนึ่งแถว ---------- */
 // เหลือใช้เฉพาะแอดมิน (adminStops) เท่านั้นแล้ว — ช่องข้อความล้วน ไม่มีแผนที่ (แอดมินไม่เคยใช้ระบบแผนที่เลยแม้แต่ตอนนั้น)
@@ -2666,7 +2740,7 @@ function customerActiveTabKey(){
  if(customerViewMode==='matches'||customerViewMode==='riderProfile') return 'matches';
  if(customerViewMode==='chats'||customerViewMode==='matchRoom') return 'chats';
  if(customerViewMode==='activity') return 'activity';
- if(customerViewMode==='profile') return 'profile';
+ if(customerViewMode==='profile'||customerViewMode==='ranking') return 'profile';
  return 'home';
 }
 /* ---------- แถบนำทางลูกค้า (หน้าแรก/งาน/แชท/กิจกรรม/โปรไฟล์) — เวอร์ชันเดสก์ท็อป (มือถือใช้ renderBottomNav() แทน) ---------- */
@@ -2990,6 +3064,7 @@ function customerProfileHTML(cust){
    </div>
   </div>
   ${customerStatsHTML(cust)}
+  <button type="button" class="dk-btn outline" style="width:100%;margin-bottom:14px" onclick="customerOpenRanking()">${ICON_RANK}&nbsp;ดูอันดับผู้ให้บริการ</button>
   <div class="field"><label>ชื่อ</label><input id="custProfileName" value="${esc(cust.name)}"></div>
   <div class="field"><label>เบอร์โทรศัพท์</label><input value="${esc(cust.phone)}" disabled></div>
   <button type="button" class="dk-btn primary" style="width:100%;margin-top:10px" onclick="onCustomerProfileSave()">บันทึกการเปลี่ยนแปลง</button>
@@ -3246,6 +3321,12 @@ function renderCustomerRoot(){
   renderBottomNav();
   return;
  }
+ if(customerViewMode==='ranking'){
+  if(custBuiltMode!=='ranking'){ root.innerHTML=customerRankingHTML(); custBuiltMode='ranking'; }
+  renderCustomerRanking();
+  renderBottomNav();
+  return;
+ }
  if(customerViewMode==='profile'){
   root.innerHTML=customerProfileHTML(cust);
   custBuiltMode='profile';
@@ -3267,7 +3348,7 @@ let riderAuthMode='login'; // 'login' | 'signup'
 let riderAuthPendingPhoto=null; // รูปที่เลือกไว้ระหว่างสมัครสมาชิก ก่อนกดยืนยัน
 let riderProfilePendingPhoto=undefined; // undefined=ยังไม่แก้ไข, null=ลบรูปตั้งใจ, string=รูปใหม่ที่เลือกไว้ระหว่างแก้โปรไฟล์
 let riderPendingServices=undefined; // undefined=ยังไม่แก้ไข, string=รายการบริการ (คั่นจุลภาค) ที่กำลังแก้ไข
-let riderViewMode='matches'; // 'matches' | 'active' | 'history' | 'activity' | 'profile' | 'matchRoom'
+let riderViewMode='matches'; // 'matches' | 'active' | 'history' | 'activity' | 'ranking' | 'profile' | 'matchRoom'
 let riderViewingMatchId=null;
 const RIDER_TABS=[
  {key:'matches',label:'Match ใหม่',icon:ICON_MATCH},
@@ -3278,6 +3359,7 @@ const RIDER_TABS=[
 ];
 function riderActiveTabKey(){
  if(riderViewMode==='matchRoom') return 'matches';
+ if(riderViewMode==='ranking') return 'profile';
  return riderViewMode;
 }
 function riderNavTabsHTML(){
@@ -3398,6 +3480,7 @@ function riderProfileCardHTML(){
    <label class="switch"><input type="checkbox" ${isOpen?'checked':''} ${riderAvailabilityBusy?'disabled':''} onchange="riderSetAvailability(this.checked?'available':'unavailable')"><span class="slider"></span></label>
   </div>
   ${riderStatsHTML(r)}
+  <button type="button" class="dk-btn outline" style="width:100%;margin-bottom:14px" onclick="riderOpenRanking()">${ICON_RANK}&nbsp;ดูอันดับผู้ให้บริการ</button>
   <details class="collapse" open><summary>แก้ไขโปรไฟล์ของฉัน</summary>
    <div class="inner">
     <div class="field"><label>รูปโปรไฟล์</label>
@@ -3873,6 +3956,11 @@ function renderRiderMain(){
  if(riderViewMode==='activity'){
   if(riderBuiltMode!=='activity'){ main.innerHTML=riderActivityHTML(); riderBuiltMode='activity'; }
   renderRiderActivity();
+  return;
+ }
+ if(riderViewMode==='ranking'){
+  if(riderBuiltMode!=='ranking'){ main.innerHTML=riderRankingHTML(); riderBuiltMode='ranking'; }
+  renderRiderRanking();
   return;
  }
  // 'profile' — รวมโปรไฟล์/สถานะพร้อมรับ MATCH/ผลงาน/เครดิต/ระบบรับงานเดิม (พับเก็บ)
