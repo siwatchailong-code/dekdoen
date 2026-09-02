@@ -172,6 +172,9 @@ background-size:auto,auto,38px 38px,38px 38px;background-color:#dfe9ee;margin:10
    หน้าโปรไฟล์ลูกค้า, ส่วนของผู้ให้บริการ (Match ใหม่/กำลังดำเนินการ/ประวัติงาน/โปรไฟล์) และ Bottom Navigation
    ================================================================================== */
 .dk-shell{max-width:1180px;margin:0 auto}
+/* เฟส 17: พื้นขาวสะอาดตาม Reference เฉพาะโซนลูกค้า/ผู้ให้บริการ (customerView/riderView) เท่านั้น — ไม่แตะ
+   var(--bg) เดิมของหน้าแอดมิน/ระบบออเดอร์เก่า เพื่อไม่ให้ดีไซน์ของสองระบบนั้นเปลี่ยนไปโดยไม่ได้ตั้งใจ */
+#customerView,#riderView{background:#fff}
 .dk-card{background:var(--surface);border:1px solid var(--brand-line);border-radius:var(--radius-lg);padding:20px;box-shadow:0 4px 18px rgba(226,101,10,.06);margin-bottom:16px}
 .dk-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 .dk-head h2{margin:0;font-size:18px;color:var(--ink)}
@@ -292,7 +295,33 @@ background-size:auto,auto,38px 38px,38px 38px;background-color:#dfe9ee;margin:10
 .dk-mstatus.st-active{background:#e9f9ef;color:#178a4c}
 .dk-mstatus.st-completed{background:#eef0f4;color:#4b5768}
 .dk-mstatus.st-declined,.dk-mstatus.st-cancelled{background:#fdeceb;color:#c23b2f}
+/* ---------- เฟส 17: การ์ดคำขอ MATCH ใหม่ของฝั่งผู้ให้บริการ ดีไซน์ใหญ่แนว Grab (รับ/ปฏิเสธได้จากรายการทันที) ---------- */
+.dk-reqcard-list{display:flex;flex-direction:column;gap:12px}
+.dk-reqcard{border:1px solid var(--brand-line);border-radius:var(--radius-lg);background:#fff;box-shadow:0 4px 18px rgba(28,22,16,.05);overflow:hidden}
+.dk-reqcard-top{display:flex;align-items:center;gap:12px;padding:15px 16px;cursor:pointer}
+.dk-reqcard-info{flex:1;min-width:0}
+.dk-reqcard-name{font-weight:900;font-size:14.5px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-reqcard-meta{font-size:11.5px;color:var(--ink-soft);margin-top:2px}
+.dk-reqcard-actions{display:flex;gap:10px;padding:0 16px 16px}
+.dk-reqcard-actions .dk-btn{flex:1}
 .dk-chatbox{border:1px solid var(--brand-line);border-radius:var(--radius-md);padding:12px;height:480px;max-height:60vh;overflow-y:auto;background:#fffdfa;margin-bottom:10px;scroll-behavior:smooth}
+/* ---------- เฟส 17: การ์ดข้อความแชท MATCH ดีไซน์ใหม่ตาม Reference (bubble มน + เวลาใต้บับเบิล + อวตารฝั่งคู่สนทนา)
+   แทนของเดิม (.chatmsg สีน้ำเงินของระบบออเดอร์เดิม) ที่ไม่ตรงกับโทนส้มของ dk- design system เลย ---------- */
+.dk-chatmsg{display:flex;gap:8px;align-items:flex-end;margin:10px 0;max-width:84%}
+.dk-chatmsg.me{margin-left:auto;flex-direction:row-reverse}
+.dk-chatmsg-body{min-width:0}
+.dk-chatmsg-name{font-size:10.5px;font-weight:800;color:var(--ink-soft);margin-bottom:3px;padding:0 3px}
+.dk-chatmsg-bubble{padding:9px 13px;border-radius:16px;font-size:13.5px;line-height:1.45;word-break:break-word;overflow-wrap:anywhere}
+.dk-chatmsg.other .dk-chatmsg-bubble{background:#fff;border:1px solid var(--brand-line);border-bottom-left-radius:4px;color:var(--ink)}
+.dk-chatmsg.me .dk-chatmsg-bubble{background:var(--brand);color:#fff;border-bottom-right-radius:4px}
+.dk-chatmsg-time{font-size:10px;color:var(--ink-soft);margin-top:3px;padding:0 3px}
+.dk-chatmsg.me .dk-chatmsg-time{text-align:right}
+.dk-chatmsg .chatimg{border-radius:12px;margin-bottom:4px}
+/* ---------- แถบพิมพ์ข้อความด้านล่างห้องแชท ---------- */
+.dk-chat-input-row{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid var(--brand-line);border-radius:999px;padding:5px 5px 5px 16px}
+.dk-chat-input-row input{flex:1;border:0;background:transparent;padding:8px 0;font-size:13.5px;outline:none}
+.dk-chat-input-row .dk-btn{flex:0 0 auto;width:auto;border-radius:999px;padding:11px 20px}
+.dk-chat-input-row .chat-attach-btn{border-radius:50%;background:var(--brand-light);color:var(--brand-dark);width:38px;height:38px;padding:0}
 .dk-proposal-card{max-width:78%;background:#fff;border:1.5px solid var(--brand);border-radius:14px;padding:13px 14px;margin:8px 0}
 .dk-proposal-card.me{margin-left:auto}
 .dk-proposal-card .pptitle{font-size:11px;font-weight:900;color:var(--brand-dark);text-transform:uppercase;letter-spacing:.03em}
@@ -1128,6 +1157,46 @@ function markAllNotifRead(){
  if(changed) saveForRole(role);
  renderNotifPanel();
 }
+/* ---------- เฟส 17: แท็บ "กิจกรรม" ใน Bottom Navigation ตาม Reference (ลำดับแท็บ: หน้าหลัก/งาน/แชท/กิจกรรม/
+   โปรไฟล์) — ใช้ store การแจ้งเตือนจริงตัวเดียวกับกระดิ่งบนหัวเว็บทุกจุด (NOTIF_CUSTOMER/NOTIF_RIDER ที่รับข้อมูล
+   จริงจากตาราง notifications ผ่าน Realtime — ดู handleIncomingMatchNotification ด้านบน) ไม่ใช่ระบบใหม่/ข้อมูลปลอม
+   ตั้งใจไม่ทำเป็น "อันดับ/leaderboard" ที่มีคะแนนสะสม เพราะระบบยังไม่มีกลไกสะสมแต้มจริงในฐานข้อมูล การใส่ตัวเลข
+   อันดับ/แต้มตอนนี้จะเป็นข้อมูลหลอกทั้งหมด */
+function activityRowsHTML(role){
+ const list=storeForRole(role).list;
+ if(!list.length) return '<div class="dk-empty">ยังไม่มีการแจ้งเตือน</div>';
+ return `<div class="dk-match-list">${list.map(n=>`<div class="dk-match-row" style="cursor:default;align-items:flex-start" onclick="markNotifReadFor('${role}','${n.id}')">
+  <span style="width:9px;height:9px;border-radius:50%;flex:0 0 auto;margin-top:6px;background:${n.read?'transparent':'var(--brand)'}"></span>
+  <div class="mtext"><div class="mtitle">${esc(n.title)}</div>${n.body?`<div class="mmeta">${esc(n.body)}</div>`:''}<div class="mmeta">${fmtTime(n.at)}</div></div>
+ </div>`).join('')}</div>`;
+}
+function markNotifReadFor(role,id){
+ const n=storeForRole(role).list.find(x=>x.id===id);
+ if(n&&!n.read){ n.read=true; saveForRole(role); }
+ if(role==='customer') renderCustomerActivity(); else renderRiderActivity();
+}
+function markAllActivityRead(role){
+ let changed=false;
+ storeForRole(role).list.forEach(n=>{ if(!n.read){ n.read=true; changed=true; } });
+ if(changed) saveForRole(role);
+ if(role==='customer') renderCustomerActivity(); else renderRiderActivity();
+}
+function customerActivityHTML(){
+ return `${customerNavTabsHTML()}<div class="dk-card">
+  <div class="dk-head"><div><h2>กิจกรรม</h2><div class="dk-sub">ความเคลื่อนไหวล่าสุดของบัญชีคุณ</div></div>
+   <button type="button" class="dk-btn outline" style="max-width:110px" onclick="markAllActivityRead('customer')">อ่านทั้งหมด</button></div>
+  <div id="dkCustomerActivityList"></div>
+ </div>`;
+}
+function renderCustomerActivity(){ const box=$('dkCustomerActivityList'); if(box) box.innerHTML=activityRowsHTML('customer'); }
+function riderActivityHTML(){
+ return `${riderNavTabsHTML()}<div class="dk-card">
+  <div class="dk-head"><div><h2>กิจกรรม</h2><div class="dk-sub">ความเคลื่อนไหวล่าสุดของบัญชีคุณ</div></div>
+   <button type="button" class="dk-btn outline" style="max-width:110px" onclick="markAllActivityRead('rider')">อ่านทั้งหมด</button></div>
+  <div id="dkRiderActivityList"></div>
+ </div>`;
+}
+function renderRiderActivity(){ const box=$('dkRiderActivityList'); if(box) box.innerHTML=activityRowsHTML('rider'); }
 document.addEventListener('click',(e)=>{
  const wrap=document.querySelector('.notif-wrap'); const panel=$('notifPanel');
  if(!wrap||!panel||panel.classList.contains('hidden')) return;
@@ -1672,6 +1741,9 @@ const ICON_USER=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" str
 const ICON_SEARCH=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`;
 const ICON_CHECK=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
 const ICON_CLOCK=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;
+// เฟส 17: ไอคอนแท็บ "กิจกรรม" ใน Bottom Navigation (ดูหมายเหตุที่ ACTIVITY_TABS/customerActivityHTML)
+const ICON_ACTIVITY=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`;
+const ICON_PAW=`<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="9" r="2.2"/><circle cx="10.5" cy="5.2" r="2.2"/><circle cx="15.5" cy="5.2" r="2.2"/><circle cx="19.5" cy="9.5" r="2.2"/><path d="M12 12c-3.5 0-6.5 2.3-6.5 5.3 0 1.7 1.4 3 3.1 2.7.9-.2 1.6-.6 2.6-.6.9 0 1.7.4 2.6.6.5.1 1 0 1.4-.2.4.2.9.3 1.4.2 1-.2 1.7-.6 2.6-.6 1 0 1.7.4 2.6.6 1.7.3 3.1-1 3.1-2.7 0-3-3-5.3-6.5-5.3-2 0-4-.3-6.3 0z"/></svg>`;
 /* ---------- render งานหนึ่งแถว ---------- */
 // เหลือใช้เฉพาะแอดมิน (adminStops) เท่านั้นแล้ว — ช่องข้อความล้วน ไม่มีแผนที่ (แอดมินไม่เคยใช้ระบบแผนที่เลยแม้แต่ตอนนั้น)
 // ระบบค้นหาสถานที่/ปักหมุด/จุดแวะ/แผนที่/คำนวณระยะทาง-เส้นทางจริงที่เคยอยู่ตรงนี้ (ผูกกับฟอร์มสร้างงานของลูกค้าเดิม
@@ -1933,21 +2005,32 @@ function matchChatMsgHTML(viewer,counterparty,match){
   const photo=mine?(self.photo||null):counterparty.photo;
   const roleLabel=m.from==='customer'?'ลูกค้า':'ผู้ให้บริการ';
   if(m.kind==='price_proposal'){
+   // เฟส 17 (รื้อ UI ตามภาพอ้างอิงที่แนบมา): ตามคำสั่ง "เอาระบบ/ปุ่มเสนอราคาออกจากหน้าแชท ไม่ต้องมี flow
+   // เสนอราคา-ยอมรับ-ปฏิเสธราคาใน UI" — ยังคงเรียก RPC เดิม (propose_match_price/respond_price_proposal)
+   // อยู่เบื้องหลังเป๊ะ ๆ เพราะเป็นทางเดียวที่ทำให้ MATCH เปลี่ยนสถานะเป็น active ได้จริงในฐานข้อมูล (ห้ามแก้ RPC/
+   // schema โดยไม่ได้รับคำสั่ง) แต่ลดขั้นตอนฝั่ง UI เหลือ "ผู้ให้บริการกำหนดราคา -> ลูกค้ากดยืนยันเริ่มงานปุ่มเดียว"
+   // ไม่มีปุ่มปฏิเสธ/ต่อรองราคาอีกต่อไป การ์ดนี้จึงสื่อสารเป็น "ยืนยันเริ่มงาน" ไม่ใช่ "เจรจาราคา"
    const meta=m.meta||{}; const price=meta.price; const status=meta.status||'pending';
    const canRespond=viewer==='customer'&&status==='pending';
    return `<div class="dk-proposal-card${mine?' me':''}">
-    <div class="pptitle">ข้อเสนอราคาจากผู้ให้บริการ</div>
+    <div class="pptitle">ราคาสำหรับงานนี้</div>
     <div class="ppprice">${baht(price)}</div>
     ${status==='pending'
-     ? (canRespond?`<div class="ppactions"><button class="dk-btn primary" type="button" onclick="customerRespondProposal('${m.id}',true)">ยอมรับราคานี้</button><button class="dk-btn outline" type="button" onclick="customerRespondProposal('${m.id}',false)">ปฏิเสธ</button></div>`:`<div class="ppresult">รอลูกค้าตอบรับข้อเสนอ</div>`)
-     : status==='accepted' ? `<div class="ppresult accepted">${ICON_CHECK} ลูกค้ายอมรับข้อเสนอนี้แล้ว</div>`
-     : `<div class="ppresult rejected">ลูกค้าปฏิเสธข้อเสนอนี้</div>`}
+     ? (canRespond?`<div class="ppactions"><button class="dk-btn primary" type="button" style="width:100%" onclick="customerRespondProposal('${m.id}',true)">ยืนยันเริ่มงาน</button></div>`:`<div class="ppresult">รอลูกค้ายืนยันเริ่มงาน</div>`)
+     : status==='accepted' ? `<div class="ppresult accepted">${ICON_CHECK} เริ่มงานแล้ว</div>`
+     : `<div class="ppresult rejected">รายการนี้ถูกยกเลิกแล้ว</div>`}
    </div>`;
   }
-  return `<div class="chatmsg ${mine?'me':'other'}">
-   <div class="who">${avatarHTML(name,photo,18,'brand')}<span class="whoname">${esc(name)}</span><span class="whorole">${roleLabel}</span><span class="whotime">${fmtTime(m.at)}</span></div>
-   ${m.image?`<img class="chatimg" src="${m.image}" onclick="openLightbox(this.src)" alt="รูปแนบในแชท">`:''}
-   ${m.text?`<div>${esc(m.text)}</div>`:''}
+  return `<div class="dk-chatmsg ${mine?'me':'other'}">
+   ${!mine?avatarHTML(name,photo,26,'brand'):''}
+   <div class="dk-chatmsg-body">
+    ${!mine?`<div class="dk-chatmsg-name">${esc(name)}</div>`:''}
+    <div class="dk-chatmsg-bubble">
+     ${m.image?`<img class="chatimg" src="${m.image}" onclick="openLightbox(this.src)" alt="รูปแนบในแชท">`:''}
+     ${m.text?`<div>${esc(m.text)}</div>`:''}
+    </div>
+    <div class="dk-chatmsg-time">${fmtTime(m.at)}</div>
+   </div>
   </div>`;
  };
 }
@@ -1984,7 +2067,10 @@ function matchRoomHTML(m,viewerRole,counterparty){
     <h2 style="margin:0;font-size:15px">${esc(counterparty.name)}</h2>
     <div class="dk-chathead-meta">${m.agreedPrice?`<b>ตกลงราคา ${baht(m.agreedPrice)}</b>`:(m.proposedPrice?`<b>เสนอ ${baht(m.proposedPrice)}</b>`:'<span>ยังไม่ตกลงราคา</span>')}<span class="dk-mstatus st-${m.status}">${customerMatchStatusLabel(m.status)}</span></div>
    </div></div>
-   <button type="button" class="dk-btn outline" style="flex:0 0 auto;max-width:110px" onclick="${backFn}">${ICON_ARROWLEFT}&nbsp;กลับ</button>
+   <div style="display:flex;gap:6px;flex:0 0 auto">
+    ${viewerRole==='rider'&&m.status==='active'?`<button type="button" class="dk-btn outline" style="max-width:100px;color:var(--red);border-color:#f3c9c5" onclick="riderOpenCompleteConfirm('${m.id}')">จบงาน</button>`:''}
+    <button type="button" class="dk-btn outline" style="max-width:110px" onclick="${backFn}">${ICON_ARROWLEFT}&nbsp;กลับ</button>
+   </div>
   </div>
   ${m.status==='pending'&&viewerRole==='customer'?`<div class="dk-empty">รอผู้ให้บริการตอบรับคำขอ MATCH นี้ — แชทจะเปิดใช้งานทันทีที่ตอบรับ</div>
    ${matchStepsHTML(m.status)}`:''}
@@ -1992,16 +2078,24 @@ function matchRoomHTML(m,viewerRole,counterparty){
    <div class="actions" style="display:flex;gap:10px;margin-bottom:6px"><button class="dk-btn primary" type="button" onclick="riderAcceptMatch('${m.id}')">ตอบรับ</button><button class="dk-btn outline" type="button" onclick="riderDeclineMatch('${m.id}')">ปฏิเสธ</button></div>`:''}
   ${m.status==='declined'?`<div class="dk-empty">ผู้ให้บริการไม่สะดวกรับงานนี้</div>`:''}
   ${m.status==='cancelled'?`<div class="dk-empty">MATCH นี้ถูกยกเลิกแล้ว</div>`:''}
+  ${viewerRole==='rider'&&m.status==='active'&&riderCompleteConfirmFor===m.id?`
+   <div class="dk-empty" style="border-color:#f3c9c5;background:#fff6f5;text-align:left;padding:14px 16px">
+    <b style="display:block;color:var(--red);margin-bottom:4px;font-size:13px">ยืนยันจบงานนี้?</b>
+    <span style="font-size:12.5px;color:var(--ink-soft)">เมื่อกดยืนยันแล้ว งานจะปิดทันทีและแก้ไขกลับไม่ได้ ลูกค้าจะให้คะแนนและรีวิวได้หลังจากนี้</span>
+    <div class="actions" style="margin-top:10px;display:flex;gap:8px">
+     <button class="dk-btn danger" type="button" style="flex:1" onclick="riderCompleteMatch('${m.id}')">ยืนยันจบงาน</button>
+     <button class="dk-btn outline" type="button" style="flex:1" onclick="riderCompleteConfirmFor=null;renderRiderRoot()">ยกเลิก</button>
+    </div>
+   </div>`:''}
   ${canChat?`
    <div class="dk-chatbox" id="dkChatBox">${m.chat.map(matchChatMsgHTML(viewerRole,counterparty,m)).join('')||'<div class="dk-empty">เริ่มต้นการสนทนาได้เลย</div>'}</div>
    <div class="chat-attach-preview hidden" id="${viewerRole==='customer'?'custAttachPreview':'riderAttachPreview'}"></div>
    ${viewerRole==='rider'&&m.status==='accepted'?(riderPriceProposeOpenFor===m.id?`
     <div style="border:1px solid var(--brand-line);border-radius:var(--radius-md);padding:12px;margin-bottom:10px;background:#fffdfa">
-     <div class="field" style="margin-bottom:8px"><label>เสนอราคา (บาท)</label><input id="riderPriceInput" type="number" min="1" placeholder="เช่น 60" onkeydown="if(event.key==='Enter'){event.preventDefault();riderConfirmPriceProposal('${m.id}');}"></div>
-     <div class="actions" style="display:flex;gap:8px"><button class="dk-btn primary" type="button" onclick="riderConfirmPriceProposal('${m.id}')">ส่งข้อเสนอ</button><button class="dk-btn outline" type="button" onclick="riderPriceProposeOpenFor=null;riderBuiltMode=null;renderRiderRoot()">ยกเลิก</button></div>
-    </div>`:`<div class="actions" style="margin-bottom:10px"><button class="dk-btn primary" type="button" style="width:100%" onclick="riderOpenPricePrompt('${m.id}')">เสนอราคา</button></div>`):''}
-   ${viewerRole==='rider'&&m.status==='active'?`<div class="actions" style="margin-bottom:10px"><button class="dk-btn primary" type="button" style="width:100%" onclick="riderCompleteMatch('${m.id}')">เสร็จสิ้นงาน</button></div>`:''}
-   <div class="chatrow">${chatAttachButtonHTML(chatImgInputId,viewerRole)}<input id="${chatInputId}" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter'){event.preventDefault();${sendFn};}"><button class="dk-btn primary" type="button" id="${chatInputId}SendBtn" style="flex:0 0 auto;padding:11px 18px" onclick="${sendFn}">ส่ง</button></div>
+     <div class="field" style="margin-bottom:8px"><label>ราคาสำหรับงานนี้ (บาท)</label><input id="riderPriceInput" type="number" min="1" placeholder="เช่น 60" onkeydown="if(event.key==='Enter'){event.preventDefault();riderConfirmPriceProposal('${m.id}');}"></div>
+     <div class="actions" style="display:flex;gap:8px"><button class="dk-btn primary" type="button" onclick="riderConfirmPriceProposal('${m.id}')">ยืนยันและเริ่มงาน</button><button class="dk-btn outline" type="button" onclick="riderPriceProposeOpenFor=null;riderBuiltMode=null;renderRiderRoot()">ยกเลิก</button></div>
+    </div>`:`<div class="actions" style="margin-bottom:10px"><button class="dk-btn primary" type="button" style="width:100%" onclick="riderOpenPricePrompt('${m.id}')">กำหนดราคาเพื่อเริ่มงาน</button></div>`):''}
+   <div class="dk-chat-input-row">${chatAttachButtonHTML(chatImgInputId,viewerRole)}<input id="${chatInputId}" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter'){event.preventDefault();${sendFn};}"><button class="dk-btn primary" type="button" id="${chatInputId}SendBtn" onclick="${sendFn}">ส่ง</button></div>
   `:''}
   ${viewerRole==='customer'&&m.status==='completed'?'<div id="dkReviewBox" style="margin-top:14px"></div>':''}
  </div>`;
@@ -2563,17 +2657,19 @@ let riderDirectorySearch='';
 const SERVICE_CATEGORIES=['รับหิ้ว','ส่งของ','ขนของ','ซื้อสินค้า','งานทั่วไป'];
 const CUSTOMER_TABS=[
  {key:'home',label:'หน้าแรก',icon:ICON_HOME},
- {key:'matches',label:'MATCH',icon:ICON_MATCH},
+ {key:'matches',label:'งาน',icon:ICON_MATCH},
  {key:'chats',label:'แชท',icon:ICON_CHAT},
+ {key:'activity',label:'กิจกรรม',icon:ICON_ACTIVITY},
  {key:'profile',label:'โปรไฟล์',icon:ICON_USER}
 ];
 function customerActiveTabKey(){
  if(customerViewMode==='matches'||customerViewMode==='riderProfile') return 'matches';
  if(customerViewMode==='chats'||customerViewMode==='matchRoom') return 'chats';
+ if(customerViewMode==='activity') return 'activity';
  if(customerViewMode==='profile') return 'profile';
  return 'home';
 }
-/* ---------- แถบนำทางลูกค้า (หน้าแรก/MATCH/แชท/โปรไฟล์) — เวอร์ชันเดสก์ท็อป (มือถือใช้ renderBottomNav() แทน) ---------- */
+/* ---------- แถบนำทางลูกค้า (หน้าแรก/งาน/แชท/กิจกรรม/โปรไฟล์) — เวอร์ชันเดสก์ท็อป (มือถือใช้ renderBottomNav() แทน) ---------- */
 function customerNavTabsHTML(){
  const active=customerActiveTabKey();
  return `<div class="dk-navtabs-desktop">${CUSTOMER_TABS.map(t=>`<button type="button" class="navtab${active===t.key?' active':''}" onclick="customerNavGo('${t.key}')">${t.icon}${t.label}</button>`).join('')}</div>`;
@@ -2581,7 +2677,7 @@ function customerNavTabsHTML(){
 function customerNavGo(key){
  const u=new URL(location.href); u.searchParams.delete('order'); history.pushState({},'',u.toString());
  customerViewingMatchId=null;
- customerViewMode=(key==='matches'||key==='chats'||key==='profile')?key:'home';
+ customerViewMode=(key==='matches'||key==='chats'||key==='activity'||key==='profile')?key:'home';
  custBuiltMode=null; renderCustomerRoot();
 }
 /* ---------- หน้าแรก: มาร์เก็ตเพลสค้นหา/เลือกผู้ให้บริการโดยตรง ไม่ต้องอธิบายงานล่วงหน้า ---------- */
@@ -2593,10 +2689,22 @@ function customerHomeHTML(cust){
    <button type="button" class="dk-chip${riderDirectoryCategory==='all'?' active':''}" data-cat="all" onclick="customerSetProviderCategory('all')">ทั้งหมด</button>
    ${SERVICE_CATEGORIES.map(c=>`<button type="button" class="dk-chip${riderDirectoryCategory===c?' active':''}" data-cat="${esc(c)}" onclick="customerSetProviderCategory('${esc(c)}')">${esc(c)}</button>`).join('')}
   </div>
+  <div id="dkNearbyJobsSection"></div>
   <div id="dkProviderGrid"><div class="dk-empty">กำลังโหลดรายชื่อผู้ให้บริการ...</div></div>
  </div>`;
 }
+/* "งานใกล้คุณ" ตาม Reference — ไม่มีพิกัด/ระยะทางจริงในฐานข้อมูล (ถูกถอดออกไปแล้วในเฟสก่อนหน้าเพราะเป็นข้อมูลปลอม)
+   จึงตีความส่วนนี้จากข้อมูลจริงที่มี: MATCH ของลูกค้าเองที่ "ยังไม่จบ" (pending/accepted/active) เรียงตามอัปเดตล่าสุด
+   แสดงเป็นแถบสั้น ๆ ด้านบนสุดของหน้าแรก ให้กลับไปดูงานที่ทำอยู่ได้ไว — ไม่ใช่งานหลอกจากระยะทางสุ่ม */
+function renderCustomerNearbyJobs(cust){
+ const box=$('dkNearbyJobsSection'); if(!box) return;
+ const active=matchesFor('customer',cust.id).filter(m=>['pending','accepted','active'].includes(m.status)).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt));
+ if(!active.length){ box.innerHTML=''; return; }
+ box.innerHTML=`<div class="dk-sechead" style="margin-top:2px"><h3>งานของคุณตอนนี้</h3><span>${active.length} รายการ</span></div>
+  <div class="dk-match-list">${active.slice(0,3).map(m=>matchListRowHTML(m,'customer')).join('')}</div>`;
+}
 async function renderCustomerHomeView(){
+ renderCustomerNearbyJobs(currentCustomer());
  await loadRiderDirectory();
  renderProviderGrid();
 }
@@ -2856,6 +2964,21 @@ async function customerSendMatchChat(){
  }
 }
 /* ---------- โปรไฟล์ลูกค้า (แท็บโปรไฟล์) ---------- */
+/* เฟส 18: สถิติจริงในหน้าโปรไฟล์ลูกค้า — นับจาก MATCHES ที่โหลดจริงในเครื่อง (cache กลางเดียวกับที่ทุกหน้าใช้
+   ไม่ query ใหม่/ไม่มีตัวเลขหลอก) เฉพาะสถานะที่นับได้จริงตามความหมายของคำ: "เสร็จสิ้นแล้ว" (completed) และ
+   "กำลังดำเนินการอยู่ตอนนี้" (accepted+active) เท่านั้น — ไม่แสดงถ้าไม่มีประวัติเลยเพื่อไม่ให้ตัวเลข 0 ว่างเปล่ารก UI */
+function customerStatsHTML(cust){
+ const list=matchesFor('customer',cust.id);
+ const completed=list.filter(m=>m.status==='completed').length;
+ const ongoing=list.filter(m=>['accepted','active'].includes(m.status)).length;
+ const pending=list.filter(m=>m.status==='pending').length;
+ if(!completed && !ongoing && !pending) return '';
+ return `<div class="dk-stat-row" style="margin-bottom:14px">
+  <div class="dk-stat"><b>${pending}</b><span>รอตอบรับ</span></div>
+  <div class="dk-stat"><b>${ongoing}</b><span>กำลังดำเนินการ</span></div>
+  <div class="dk-stat"><b>${completed}</b><span>เสร็จสิ้นแล้ว</span></div>
+ </div>`;
+}
 function customerProfileHTML(cust){
  return `${customerNavTabsHTML()}<div class="dk-card">
   <div class="dk-head"><div><h2>โปรไฟล์ของฉัน</h2><div class="dk-sub">แก้ไขชื่อและรูปโปรไฟล์ของคุณ</div></div>
@@ -2866,6 +2989,7 @@ function customerProfileHTML(cust){
     <input type="file" id="custProfilePhotoInput" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none" onchange="onCustomerProfilePhotoPicked(this)">
    </div>
   </div>
+  ${customerStatsHTML(cust)}
   <div class="field"><label>ชื่อ</label><input id="custProfileName" value="${esc(cust.name)}"></div>
   <div class="field"><label>เบอร์โทรศัพท์</label><input value="${esc(cust.phone)}" disabled></div>
   <button type="button" class="dk-btn primary" style="width:100%;margin-top:10px" onclick="onCustomerProfileSave()">บันทึกการเปลี่ยนแปลง</button>
@@ -3116,6 +3240,12 @@ function renderCustomerRoot(){
   renderBottomNav();
   return;
  }
+ if(customerViewMode==='activity'){
+  if(custBuiltMode!=='activity'){ root.innerHTML=customerActivityHTML(); custBuiltMode='activity'; }
+  renderCustomerActivity();
+  renderBottomNav();
+  return;
+ }
  if(customerViewMode==='profile'){
   root.innerHTML=customerProfileHTML(cust);
   custBuiltMode='profile';
@@ -3137,12 +3267,13 @@ let riderAuthMode='login'; // 'login' | 'signup'
 let riderAuthPendingPhoto=null; // รูปที่เลือกไว้ระหว่างสมัครสมาชิก ก่อนกดยืนยัน
 let riderProfilePendingPhoto=undefined; // undefined=ยังไม่แก้ไข, null=ลบรูปตั้งใจ, string=รูปใหม่ที่เลือกไว้ระหว่างแก้โปรไฟล์
 let riderPendingServices=undefined; // undefined=ยังไม่แก้ไข, string=รายการบริการ (คั่นจุลภาค) ที่กำลังแก้ไข
-let riderViewMode='matches'; // 'matches' | 'active' | 'history' | 'profile' | 'matchRoom'
+let riderViewMode='matches'; // 'matches' | 'active' | 'history' | 'activity' | 'profile' | 'matchRoom'
 let riderViewingMatchId=null;
 const RIDER_TABS=[
  {key:'matches',label:'Match ใหม่',icon:ICON_MATCH},
  {key:'active',label:'กำลังดำเนินการ',icon:ICON_CLOCK},
  {key:'history',label:'ประวัติงาน',icon:ICON_LIST},
+ {key:'activity',label:'กิจกรรม',icon:ICON_ACTIVITY},
  {key:'profile',label:'โปรไฟล์',icon:ICON_USER}
 ];
 function riderActiveTabKey(){
@@ -3155,7 +3286,7 @@ function riderNavTabsHTML(){
 }
 function riderNavGo(key){
  riderViewingMatchId=null;
- riderViewMode=['matches','active','history','profile'].includes(key)?key:'matches';
+ riderViewMode=['matches','active','history','activity','profile'].includes(key)?key:'matches';
  riderBuiltMode=null;
  renderRiderRoot();
 }
@@ -3545,6 +3676,30 @@ function renderRiderMyJob(){
  if(nextBox&&wasNearBottom) nextBox.scrollTop=nextBox.scrollHeight;
 }
 /* ---------- เฟส Match Marketplace: เนื้อหา 4 แท็บใหม่ของผู้ให้บริการ ---------- */
+/* การ์ดคำขอ MATCH ใหม่ ดีไซน์อ้างอิง UX แนว Grab (การ์ดใหญ่ ตอบรับ/ปฏิเสธได้ทันทีจากรายการ ไม่ต้องกดเข้าไปในแชทก่อน)
+   แต่ใช้ดีไซน์ dk- ของเด็กเดินเอง (การ์ดขาว มุมโค้ง เงาอ่อน ปุ่มส้ม) — ยังคงเรียก RPC accept_match/decline_match เดิม
+   ทุกประการ ไม่มีการเปลี่ยนพฤติกรรมฐานข้อมูลใด ๆ */
+function riderRequestCardHTML(m){
+ const c=getMatchCustomerDisplay(m.customerId);
+ return `<div class="dk-reqcard">
+  <div class="dk-reqcard-top" onclick="riderOpenMatch('${m.id}')">
+   ${avatarHTML(c.name,c.photo,48,'brand')}
+   <div class="dk-reqcard-info">
+    <div class="dk-reqcard-name">${esc(c.name)}</div>
+    <div class="dk-reqcard-meta">ขอ MATCH เมื่อ ${fmtTime(m.createdAt)}</div>
+   </div>
+   <span class="dk-mstatus st-${m.status}">${customerMatchStatusLabel(m.status)}</span>
+  </div>
+  <div class="dk-reqcard-actions">
+   <button type="button" class="dk-btn outline" onclick="event.stopPropagation();riderDeclineMatch('${m.id}')">ปฏิเสธ</button>
+   <button type="button" class="dk-btn primary" onclick="event.stopPropagation();riderAcceptMatch('${m.id}')">ตอบรับ</button>
+  </div>
+ </div>`;
+}
+function renderRiderRequestListInto(boxId,list){
+ const box=$(boxId); if(!box) return;
+ box.innerHTML=list.length? `<div class="dk-reqcard-list">${list.map(riderRequestCardHTML).join('')}</div>` : '<div class="dk-empty">ยังไม่มีคำขอใหม่</div>';
+}
 function riderMatchesTabHTML(){
  return `${riderNavTabsHTML()}<div class="dk-card">
   <div class="dk-head"><div><h2>คำขอ MATCH ใหม่</h2><div class="dk-sub">ลูกค้าที่ต้องการจับคู่กับคุณ — ตอบรับเพื่อเริ่มแชทและเสนอราคา</div></div></div>
@@ -3614,6 +3769,10 @@ async function riderDeclineMatch(id){
 // เสนอราคา: เปิดฟอร์มกรอกราคาแบบฝังในหน้า (ไม่ใช้ window.prompt() ให้สอดคล้องกับดีไซน์ระบบส่วนอื่นทั้งหมด)
 let riderPriceProposeOpenFor=null;
 function riderOpenPricePrompt(id){ riderPriceProposeOpenFor=id; riderBuiltMode=null; renderRiderRoot(); }
+// เฟส 17: ปุ่ม "จบงาน" ย้ายจากตำแหน่งเดิม (ติดอยู่เหนือช่องพิมพ์แชทพอดี กดพลาดง่ายเวลาพิมพ์/เลื่อนจอ) ไปไว้เป็นปุ่ม
+// เล็กที่หัวห้องแชท และต้องกดยืนยันอีกครั้งก่อนเรียก complete_match จริง (ป้องกันกดโดนโดยไม่ตั้งใจ งานนี้แก้กลับไม่ได้)
+let riderCompleteConfirmFor=null;
+function riderOpenCompleteConfirm(id){ riderCompleteConfirmFor=id; renderRiderRoot(); }
 let riderProposeBusy=false;
 async function riderConfirmPriceProposal(id){
  if(riderProposeBusy) return;
@@ -3628,11 +3787,17 @@ async function riderConfirmPriceProposal(id){
   toast('ส่งข้อเสนอราคาแล้ว');
  } finally { riderProposeBusy=false; }
 }
+let riderCompleteBusy=false;
 async function riderCompleteMatch(id){
- const {data,error}=await sbRider.rpc('complete_match',{p_match_id:id});
- if(error){ toast(error.message||'ปิดงานไม่สำเร็จ'); return; }
- upsertMatch(data);
- toast('งานเสร็จสิ้นแล้ว — ลูกค้าจะให้คะแนนและรีวิวได้ในแชท');
+ if(riderCompleteBusy) return;
+ riderCompleteBusy=true;
+ try{
+  const {data,error}=await sbRider.rpc('complete_match',{p_match_id:id});
+  if(error){ toast(error.message||'ปิดงานไม่สำเร็จ'); return; }
+  riderCompleteConfirmFor=null;
+  upsertMatch(data);
+  toast('งานเสร็จสิ้นแล้ว — ลูกค้าจะให้คะแนนและรีวิวได้ในแชท');
+ } finally { riderCompleteBusy=false; }
 }
 /* ---------- ส่งข้อความในห้องแชท MATCH (ฝั่งผู้ให้บริการ) ---------- */
 let riderMatchChatSendBusy=false;
@@ -3692,7 +3857,7 @@ function renderRiderMain(){
  }
  if(riderViewMode==='matches'){
   if(riderBuiltMode!=='matches'){ main.innerHTML=riderMatchesTabHTML(); riderBuiltMode='matches'; }
-  renderMatchListInto('dkRiderMatchesList', matchesFor('rider',rider.id).filter(m=>m.status==='pending').slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)), 'rider');
+  renderRiderRequestListInto('dkRiderMatchesList', matchesFor('rider',rider.id).filter(m=>m.status==='pending').slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)));
   return;
  }
  if(riderViewMode==='active'){
@@ -3703,6 +3868,11 @@ function renderRiderMain(){
  if(riderViewMode==='history'){
   if(riderBuiltMode!=='history'){ main.innerHTML=riderHistoryTabHTML(); riderBuiltMode='history'; }
   renderMatchListInto('dkRiderHistoryList', matchesFor('rider',rider.id).filter(m=>['completed','declined','cancelled'].includes(m.status)).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt)), 'rider');
+  return;
+ }
+ if(riderViewMode==='activity'){
+  if(riderBuiltMode!=='activity'){ main.innerHTML=riderActivityHTML(); riderBuiltMode='activity'; }
+  renderRiderActivity();
   return;
  }
  // 'profile' — รวมโปรไฟล์/สถานะพร้อมรับ MATCH/ผลงาน/เครดิต/ระบบรับงานเดิม (พับเก็บ)
