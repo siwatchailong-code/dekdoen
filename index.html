@@ -230,6 +230,11 @@ background-size:auto,auto,38px 38px,38px 38px;background-color:#dfe9ee;margin:10
 .dk-sechead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:2px 0 9px}
 .dk-sechead h3{margin:0;font-size:14.5px;font-weight:900;color:var(--ink)}
 .dk-sechead span{font-size:11.5px;color:var(--ink-soft);font-weight:700;white-space:nowrap}
+/* ป้ายตัวนับจำนวนรายการจริงข้าง h2 ของหน้ารายการ (คำขอ MATCH/กำลังดำเนินการ/ประวัติ/แชท) — กันหัวข้อโล่ง ๆ
+   ไม่มีบริบทว่ามีกี่รายการ ตัวเลขมาจาก list.length จริงที่ render ไว้แล้วเท่านั้น ไม่มีการนับซ้ำ/ประมาณการ
+   ซ่อนอัตโนมัติเมื่อยังไม่มีรายการ (0) เพื่อไม่ให้ป้าย "0" ว่างเปล่ารกหัวข้อ */
+.dk-headcount{display:inline-block;font-size:11px;font-weight:800;color:var(--brand-dark);background:var(--brand-light);border-radius:999px;padding:2px 9px;margin-left:7px;vertical-align:middle}
+.dk-headcount:empty{display:none}
 /* บรรทัดข้อมูลใต้ชื่อคู่สนทนาในหัวห้องแชท ตาม Reference (ราคา + สถานะอยู่บรรทัดเดียวกันใต้ชื่อ) */
 .dk-chathead-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:3px;font-size:11.5px;color:var(--ink-soft)}
 .dk-chathead-meta b{color:var(--brand-dark);font-weight:900;font-size:12px}
@@ -343,6 +348,12 @@ background-size:auto,auto,38px 38px,38px 38px;background-color:#dfe9ee;margin:10
 .dk-proposal-card .ppresult{font-size:12px;font-weight:800;padding:6px 0}
 .dk-proposal-card .ppresult.accepted{color:#178a4c}
 .dk-proposal-card .ppresult.rejected{color:#c23b2f}
+.dk-proposal-card .pptitle{display:flex;align-items:center;gap:5px}
+.dk-proposal-card .pptitle svg{flex:0 0 auto}
+/* คั่นวันในกล่องแชท MATCH ตาม Reference (เช่น "วันนี้" / "15 ก.ย. 2569") — คำนวณจากเวลาข้อความจริง (m.at)
+   ที่ sync มาจาก Supabase เท่านั้น ไม่ใช่ข้อมูลปลอม ใช้แค่จัดกลุ่มสายตา ไม่กระทบข้อมูล/การเรียงลำดับข้อความเดิม */
+.dk-chat-daysep{display:flex;align-items:center;justify-content:center;margin:12px 0;gap:8px}
+.dk-chat-daysep span{font-size:10.5px;font-weight:800;color:var(--ink-soft);background:#fff;border:1px solid var(--brand-line);border-radius:999px;padding:3px 12px}
 .dk-avail-switch{display:flex;align-items:center;gap:10px;background:var(--brand-light);border:1px solid var(--brand-line);border-radius:var(--radius-md);padding:13px 14px;margin:12px 0}
 .dk-avail-switch .swlabel{flex:1}
 .dk-avail-switch .swlabel b{display:block;font-size:13px;color:var(--ink)}
@@ -1817,6 +1828,8 @@ const ICON_CLOCK=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" st
 const ICON_ACTIVITY=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`;
 // เฟส 19: ไอคอนหน้ารอง "อันดับ" (เข้าถึงจากหน้าโปรไฟล์ ไม่ใช่แท็บหลัก — ดูหมายเหตุที่ rankingPageHTML)
 const ICON_RANK=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4a1 1 0 0 0-1 1c0 2.5 1.8 4.5 4 4.9M17 6h3a1 1 0 0 1 1 1c0 2.5-1.8 4.5-4 4.9"/></svg>`;
+// การ์ดเสนอราคาในแชท MATCH (transaction card) ตาม PRIORITY 2 ของคำสั่งรื้อ Chat UX — ไอคอนป้ายราคาเฉย ๆ ไม่มีความหมายข้อมูลอะไรเพิ่ม แค่ช่วยให้การ์ดอ่านง่ายขึ้นตามลำดับชั้นที่ขอ (ไอคอน/หัวข้อ/ราคา/สถานะ/ปุ่ม)
+const ICON_PRICETAG=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`;
 const ICON_PAW=`<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="9" r="2.2"/><circle cx="10.5" cy="5.2" r="2.2"/><circle cx="15.5" cy="5.2" r="2.2"/><circle cx="19.5" cy="9.5" r="2.2"/><path d="M12 12c-3.5 0-6.5 2.3-6.5 5.3 0 1.7 1.4 3 3.1 2.7.9-.2 1.6-.6 2.6-.6.9 0 1.7.4 2.6.6.5.1 1 0 1.4-.2.4.2.9.3 1.4.2 1-.2 1.7-.6 2.6-.6 1 0 1.7.4 2.6.6 1.7.3 3.1-1 3.1-2.7 0-3-3-5.3-6.5-5.3-2 0-4-.3-6.3 0z"/></svg>`;
 /* ---------- render งานหนึ่งแถว ---------- */
 // เหลือใช้เฉพาะแอดมิน (adminStops) เท่านั้นแล้ว — ช่องข้อความล้วน ไม่มีแผนที่ (แอดมินไม่เคยใช้ระบบแผนที่เลยแม้แต่ตอนนั้น)
@@ -2065,9 +2078,10 @@ function matchListRowHTML(m,viewerRole){
   <span class="dk-mstatus st-${m.status}">${customerMatchStatusLabel(m.status)}</span>
  </div>`;
 }
-function renderMatchListInto(boxId,list,viewerRole){
+function renderMatchListInto(boxId,list,viewerRole,countId){
  const box=$(boxId); if(!box) return;
  box.innerHTML=list.length? `<div class="dk-match-list">${list.map(m=>matchListRowHTML(m,viewerRole)).join('')}</div>` : '<div class="dk-empty">ยังไม่มีรายการ</div>';
+ if(countId&&$(countId)) $(countId).textContent=list.length?String(list.length):'';
 }
 // การ์ดข้อความในห้องแชท MATCH — ต่างจาก chatMsgHTML (ระบบออเดอร์เดิม) ตรงที่ต้องรองรับการ์ดข้อเสนอราคาพิเศษ
 // (kind='price_proposal') เพิ่มเติมจากข้อความปกติ ใช้ counterparty ที่ resolve ไว้แล้ว (sync) แทนการ query ซ้ำทุกข้อความ
@@ -2087,7 +2101,7 @@ function matchChatMsgHTML(viewer,counterparty,match){
    const meta=m.meta||{}; const price=meta.price; const status=meta.status||'pending';
    const canRespond=viewer==='customer'&&status==='pending';
    return `<div class="dk-proposal-card${mine?' me':''}">
-    <div class="pptitle">ราคาสำหรับงานนี้</div>
+    <div class="pptitle">${ICON_PRICETAG}ราคาสำหรับงานนี้</div>
     <div class="ppprice">${baht(price)}</div>
     ${status==='pending'
      ? (canRespond?`<div class="ppactions"><button class="dk-btn primary" type="button" style="width:100%" onclick="customerRespondProposal('${m.id}',true)">ยืนยันเริ่มงาน</button></div>`:`<div class="ppresult">รอลูกค้ายืนยันเริ่มงาน</div>`)
@@ -2107,6 +2121,31 @@ function matchChatMsgHTML(viewer,counterparty,match){
    </div>
   </div>`;
  };
+}
+// ป้ายคั่นวันเหนือกลุ่มข้อความ (เช่น "วันนี้" / "เมื่อวาน" / "2 ก.ย. 2569") — คำนวณจากเวลาข้อความจริง (m.at ที่ sync
+// มาจาก created_at ใน Supabase) เทียบกับเวลาเครื่องผู้ใช้ตอนนี้เท่านั้น ไม่ใช่ข้อมูลปลอม/สมมติ
+function chatDaySepLabel(iso){
+ try{
+  const d=new Date(iso), now=new Date();
+  const sameDay=(a,b)=>a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+  if(sameDay(d,now)) return 'วันนี้';
+  const yest=new Date(now); yest.setDate(yest.getDate()-1);
+  if(sameDay(d,yest)) return 'เมื่อวาน';
+  return d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'});
+ }catch(e){ return ''; }
+}
+// ประกอบ HTML ของกล่องแชท MATCH ทั้งกล่อง พร้อมแทรกตัวคั่นวันระหว่างกลุ่มข้อความคนละวัน (PRIORITY 2: date
+// separator) — ใช้แทน m.chat.map(...).join('') เดิมตรง ๆ ไม่เปลี่ยนลำดับ/เนื้อหา/การกรองข้อความเดิมแม้แต่จุดเดียว
+function matchChatListHTML(chat,viewerRole,counterparty,match){
+ if(!chat||!chat.length) return '<div class="dk-empty">เริ่มต้นการสนทนาได้เลย</div>';
+ const msgFn=matchChatMsgHTML(viewerRole,counterparty,match);
+ let out='', lastDay='';
+ chat.forEach(m=>{
+  const dayKey=(m.at||'').slice(0,10);
+  if(dayKey!==lastDay){ out+=`<div class="dk-chat-daysep"><span>${esc(chatDaySepLabel(m.at))}</span></div>`; lastDay=dayKey; }
+  out+=msgFn(m);
+ });
+ return out;
 }
 // ห้องแชท MATCH เต็มรูปแบบ — ใช้ร่วมกันทั้งสองฝั่ง ต่างกันแค่ปุ่ม action (ตอบรับ/ปฏิเสธ/เสนอราคา/เสร็จสิ้นงาน เป็นของ
 // ผู้ให้บริการเท่านั้น) กับปลายทางปุ่ม "กลับ" ผู้เรียกต้อง render ต่อหลังจากนี้: ถ้า status==='completed' และ
@@ -2162,7 +2201,7 @@ function matchRoomHTML(m,viewerRole,counterparty){
     </div>
    </div>`:''}
   ${canChat?`
-   <div class="dk-chatbox" id="dkChatBox">${m.chat.map(matchChatMsgHTML(viewerRole,counterparty,m)).join('')||'<div class="dk-empty">เริ่มต้นการสนทนาได้เลย</div>'}</div>
+   <div class="dk-chatbox" id="dkChatBox">${matchChatListHTML(m.chat,viewerRole,counterparty,m)}</div>
    <div class="chat-attach-preview hidden" id="${viewerRole==='customer'?'custAttachPreview':'riderAttachPreview'}"></div>
    ${viewerRole==='rider'&&m.status==='accepted'?(riderPriceProposeOpenFor===m.id?`
     <div style="border:1px solid var(--brand-line);border-radius:var(--radius-md);padding:12px;margin-bottom:10px;background:#fffdfa">
@@ -2950,14 +2989,14 @@ function customerOpenMatch(id){
 /* ---------- แท็บ MATCH: รายการคำขอทั้งหมดของลูกค้า (ทุกสถานะ) ---------- */
 function customerMatchesHTML(){
  return `${customerNavTabsHTML()}<div class="dk-card">
-  <div class="dk-head"><div><h2>คำขอ MATCH ของฉัน</h2><div class="dk-sub">ติดตามสถานะคำขอที่ส่งไปถึงผู้ให้บริการ</div></div></div>
+  <div class="dk-head"><div><h2>คำขอ MATCH ของฉัน<span class="dk-headcount" id="dkMatchesCount"></span></h2><div class="dk-sub">ติดตามสถานะคำขอที่ส่งไปถึงผู้ให้บริการ</div></div></div>
   <div id="dkMatchesList"><div class="dk-empty">ยังไม่มีรายการ</div></div>
  </div>`;
 }
 /* ---------- แท็บแชท: เฉพาะ MATCH ที่เปิดคุยกันได้แล้ว (ยอมรับ/กำลังดำเนินงาน/เสร็จสิ้นแล้ว) ---------- */
 function customerChatsHTML(){
  return `${customerNavTabsHTML()}<div class="dk-card">
-  <div class="dk-head"><div><h2>แชท</h2><div class="dk-sub">บทสนทนากับผู้ให้บริการที่ตอบรับคำขอแล้ว</div></div></div>
+  <div class="dk-head"><div><h2>แชท<span class="dk-headcount" id="dkChatsCount"></span></h2><div class="dk-sub">บทสนทนากับผู้ให้บริการที่ตอบรับคำขอแล้ว</div></div></div>
   <div id="dkChatsList"><div class="dk-empty">ยังไม่มีบทสนทนา</div></div>
  </div>`;
 }
@@ -3305,13 +3344,13 @@ function renderCustomerRoot(){
  }
  if(customerViewMode==='matches'){
   if(custBuiltMode!=='matches'){ root.innerHTML=customerMatchesHTML(); custBuiltMode='matches'; }
-  renderMatchListInto('dkMatchesList', matchesFor('customer',cust.id).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt)), 'customer');
+  renderMatchListInto('dkMatchesList', matchesFor('customer',cust.id).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt)), 'customer', 'dkMatchesCount');
   renderBottomNav();
   return;
  }
  if(customerViewMode==='chats'){
   if(custBuiltMode!=='chats'){ root.innerHTML=customerChatsHTML(); custBuiltMode='chats'; }
-  renderMatchListInto('dkChatsList', matchesFor('customer',cust.id).filter(m=>['accepted','active','completed'].includes(m.status)).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt)), 'customer');
+  renderMatchListInto('dkChatsList', matchesFor('customer',cust.id).filter(m=>['accepted','active','completed'].includes(m.status)).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt)), 'customer', 'dkChatsCount');
   renderBottomNav();
   return;
  }
@@ -3779,25 +3818,26 @@ function riderRequestCardHTML(m){
   </div>
  </div>`;
 }
-function renderRiderRequestListInto(boxId,list){
+function renderRiderRequestListInto(boxId,list,countId){
  const box=$(boxId); if(!box) return;
  box.innerHTML=list.length? `<div class="dk-reqcard-list">${list.map(riderRequestCardHTML).join('')}</div>` : '<div class="dk-empty">ยังไม่มีคำขอใหม่</div>';
+ if(countId&&$(countId)) $(countId).textContent=list.length?String(list.length):'';
 }
 function riderMatchesTabHTML(){
  return `${riderNavTabsHTML()}<div class="dk-card">
-  <div class="dk-head"><div><h2>คำขอ MATCH ใหม่</h2><div class="dk-sub">ลูกค้าที่ต้องการจับคู่กับคุณ — ตอบรับเพื่อเริ่มแชทและเสนอราคา</div></div></div>
+  <div class="dk-head"><div><h2>คำขอ MATCH ใหม่<span class="dk-headcount" id="dkRiderMatchesCount"></span></h2><div class="dk-sub">ลูกค้าที่ต้องการจับคู่กับคุณ — ตอบรับเพื่อเริ่มแชทและเสนอราคา</div></div></div>
   <div id="dkRiderMatchesList"><div class="dk-empty">ยังไม่มีคำขอใหม่</div></div>
  </div>`;
 }
 function riderActiveTabHTML(){
  return `${riderNavTabsHTML()}<div class="dk-card">
-  <div class="dk-head"><div><h2>กำลังดำเนินการ</h2><div class="dk-sub">คุยรายละเอียด เสนอราคา และอัปเดตความคืบหน้างาน</div></div></div>
+  <div class="dk-head"><div><h2>กำลังดำเนินการ<span class="dk-headcount" id="dkRiderActiveCount"></span></h2><div class="dk-sub">คุยรายละเอียด เสนอราคา และอัปเดตความคืบหน้างาน</div></div></div>
   <div id="dkRiderActiveList"><div class="dk-empty">ยังไม่มีงานที่กำลังดำเนินการ</div></div>
  </div>`;
 }
 function riderHistoryTabHTML(){
  return `${riderNavTabsHTML()}<div class="dk-card">
-  <div class="dk-head"><div><h2>ประวัติงาน</h2><div class="dk-sub">งานที่เสร็จสิ้น ถูกปฏิเสธ หรือยกเลิกแล้ว</div></div></div>
+  <div class="dk-head"><div><h2>ประวัติงาน<span class="dk-headcount" id="dkRiderHistoryCount"></span></h2><div class="dk-sub">งานที่เสร็จสิ้น ถูกปฏิเสธ หรือยกเลิกแล้ว</div></div></div>
   <div id="dkRiderHistoryList"><div class="dk-empty">ยังไม่มีประวัติ</div></div>
  </div>`;
 }
@@ -3940,17 +3980,17 @@ function renderRiderMain(){
  }
  if(riderViewMode==='matches'){
   if(riderBuiltMode!=='matches'){ main.innerHTML=riderMatchesTabHTML(); riderBuiltMode='matches'; }
-  renderRiderRequestListInto('dkRiderMatchesList', matchesFor('rider',rider.id).filter(m=>m.status==='pending').slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)));
+  renderRiderRequestListInto('dkRiderMatchesList', matchesFor('rider',rider.id).filter(m=>m.status==='pending').slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)), 'dkRiderMatchesCount');
   return;
  }
  if(riderViewMode==='active'){
   if(riderBuiltMode!=='active'){ main.innerHTML=riderActiveTabHTML(); riderBuiltMode='active'; }
-  renderMatchListInto('dkRiderActiveList', matchesFor('rider',rider.id).filter(m=>['accepted','active'].includes(m.status)).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt)), 'rider');
+  renderMatchListInto('dkRiderActiveList', matchesFor('rider',rider.id).filter(m=>['accepted','active'].includes(m.status)).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt)), 'rider', 'dkRiderActiveCount');
   return;
  }
  if(riderViewMode==='history'){
   if(riderBuiltMode!=='history'){ main.innerHTML=riderHistoryTabHTML(); riderBuiltMode='history'; }
-  renderMatchListInto('dkRiderHistoryList', matchesFor('rider',rider.id).filter(m=>['completed','declined','cancelled'].includes(m.status)).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt)), 'rider');
+  renderMatchListInto('dkRiderHistoryList', matchesFor('rider',rider.id).filter(m=>['completed','declined','cancelled'].includes(m.status)).slice().sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt)), 'rider', 'dkRiderHistoryCount');
   return;
  }
  if(riderViewMode==='activity'){
